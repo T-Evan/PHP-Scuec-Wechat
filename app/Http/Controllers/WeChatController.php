@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Config;
-use EasyWeChat\Work\Application;
+use EasyWeChat\Factory;
 use Log;
 
 class WeChatController extends Controller
@@ -18,7 +18,7 @@ class WeChatController extends Controller
     {
         $options = Config::get('wechat')['official_account']['default'];
 
-        $app = new Application($options);
+        $app = Factory::officialAccount($options);
 
         $user = $app->user;
 
