@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Config;
+use EasyWeChat\Work\Application;
 use Log;
-use EasyWeChat\Factory;
 
 class WeChatController extends Controller
 {
@@ -15,22 +16,16 @@ class WeChatController extends Controller
      */
     public function serve()
     {
-        $config = [
-            'app_id' => 'wx3cf0f39249eb0xxx',
-            'secret' => 'f1c242f4f28f735d4687abb469072xxx',
+        $options = Config::get('wechat')['official_account']['default'];
 
-            'response_type' => 'array',
+        $app = new Application($options);
 
-            'log' => [
-                'level' => 'debug',
-                'file' => __DIR__.'/wechat.log',
-            ],
-        ];
+        $user = $app->user;
 
-        $app = Factory::officialAccount($config);
-        $app->server->push(function ($message) {
-            return "您好！欢迎使用 EasyWeChat!";
+        $app->server->push(function ($message) use ($user) {
+            return "Hello!";
         });
+
         return $app->server->serve();
     }
 }
