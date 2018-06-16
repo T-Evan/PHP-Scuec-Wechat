@@ -16,6 +16,7 @@ class UserInfoHandler implements EventHandlerInterface
     public function handle($message = null)
     {
         $app = app('wechat');
+        
         $user = $app->user->get($message['FromUserName']);
     }
 }
