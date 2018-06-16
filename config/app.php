@@ -125,6 +125,8 @@ return [
 
     'log_level' => env('APP_LOG_LEVEL', 'debug'),
 
+    'api_weather' => env('Api_Aliyun', null),
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

@@ -8,6 +8,7 @@
 
 namespace App\Http\MessageHandler;
 
+use App\Http\Service\OuterApiService;
 use EasyWeChat\Kernel\Contracts\EventHandlerInterface;
 use EasyWeChat\Kernel\Messages\News;
 use EasyWeChat\Kernel\Messages\NewsItem;
@@ -25,32 +26,7 @@ class TextMessageHandler implements EventHandlerInterface
                 return $content;  //标准格式回复
                 break;
             case 'weather':
-                $host = "http://apifreelat.market.alicloudapi.com";
-                $path = "/whapi/json/aliweather/briefforecast3days";
-                $apiUrl=$host.$path;
-                $weatherText = file_get_contents($apiUrl);
-                if (strlen($weatherText) < 10) {
-                    $contentstr = "出现错误，你可以稍后再试或把问题反馈给我们。";
-                } else {
-                    preg_match("/.*?(\{.+\}).*/", $weatherText, $matches);  // jsonp to json
-                    $weatherJson = $matches[1]; // json数据
-                    $weatherArray = json_decode($weatherJson, true);    // 转为数组
-
-                    $RTtemperature = $weatherArray['realtime']['weather']['temperature']."℃";  // 实时温度
-                    $RThumidity = $weatherArray['realtime']['weather']['humidity']."%"; // 实时湿度
-                    $RTinfo = $weatherArray['realtime']['weather']['info']; // 实时天气
-                    $RTwind = $weatherArray['realtime']['wind']['direct'].$weatherArray['realtime']['wind']['power'];   // 实时风向
-                    $pm25 = $weatherArray['pm25']['quality']." ".$weatherArray['pm25']['aqi'];  // 空气质量
-                    $ganmao = $weatherArray['life']['info']['ganmao']['0']."，".$weatherArray['life']['info']['ganmao']['1'];   // 感冒指数
-                    $ziwaixian = $weatherArray['life']['info']['ziwaixian']['0']."，".$weatherArray['life']['info']['ziwaixian']['1'];  // 紫外线指数
-
-                    $weather7d = '☞<a href="http://mobile.weather.com.cn/city/101200101.html?data=7d">未来七天天气预报</a>';
-
-                    $contentstr = sprintf("实时天气: %s，%s，%s，湿度: %s，空气质量: %s\n感冒指数: %s\n紫外线指数: %s\n%s", $RTinfo, $RTtemperature, $RTwind, $RThumidity, $pm25, $ganmao, $ziwaixian, $weather7d);
-                    $contentstr = $this->tody_info()."\n".$contentstr;
-                }
-
-                $resultStr = $this->ReplyText($object, $contentstr);
+                return OuterApiService::weather();
                 break;
             case '课表':
                 $items = [
@@ -82,6 +58,8 @@ class TextMessageHandler implements EventHandlerInterface
     {
         if (($keyword == '0') or ($keyword == '帮助')) { //此处有陷阱，如果字符串以合法的数字开头，就用该数字作为其值，否则其值为数字0。
             return 'help';
+        } elseif ($keyword == '天气') {
+            return 'weather';
         }
     }
 
