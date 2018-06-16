@@ -15,7 +15,7 @@ class CreateStudentsTable extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->increments('id');
-            $table->char('tousername', 50)->index();
+            $table->char('openid', 50)->index();
             $table->string('account', 100)->nullable()->index();
             $table->string('ssfw_password', 100)->nullable();
             $table->string('lib_password', 100)->nullable();
