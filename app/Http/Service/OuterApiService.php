@@ -93,6 +93,30 @@ class OuterApiService
         }
         return $content;
     }
+    public static function translate($word)
+    {
+        if (strlen($word)) {
+            $host = "http://jisuzxfy.market.alicloudapi.com";
+            $path = "/translate/translate";
+            //根据字段是否为中文判断翻译类型
+            if (preg_match("/[\x7f-\xff]/", $word)) {
+                $querys = "from=zh-CN&text=$word&to=en&type=baidu";
+            } else {
+                $querys = "from=en&text=$word&to=zh-CN&type=baidu";
+            }
+            $url = $host . $path . "?" . $querys;
+            $result=json_decode(OuterApiService::apiCurlGet($url), true);
+            if ($result['status'] =='0') {
+                $trans_word=$result['result']['result'];//取出翻译结果
+                $content = "baidu翻译结果: ".strip_tags($trans_word);
+            } else {
+                $content = "出现错误，你可以稍后再试或把问题反馈给我们。";
+            }
+        } else {
+            $content = "输入括号里的关键字【翻译+内容】即可智能翻译。如【翻译apple】、【翻译今天天气真好】。\n当需要翻译的语言为非中文时，会被翻译成中文。为中文时，会被翻译为英文。";
+        }
+        return $content;
+    }
     private static function apiCurlGet($url)
     {
         $headers = array();
@@ -103,6 +127,22 @@ class OuterApiService
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_FAILONERROR, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        return curl_exec($curl);
+    }
+
+    private static function apiCurlPost($url, $bodys)
+    {
+        $headers = array();
+        array_push($headers, "Authorization:APPCODE " . config('outapi.ali_APPCODE'));
+        //根据API的要求，定义相对应的Content-Type
+        array_push($headers, "Content-Type".":"."application/x-www-form-urlencoded; charset=UTF-8");
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_FAILONERROR, false);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $bodys);
         return curl_exec($curl);
     }
 }

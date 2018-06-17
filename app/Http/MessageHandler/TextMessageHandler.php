@@ -44,6 +44,23 @@ class TextMessageHandler implements EventHandlerInterface
                 $content = $kuaidi_service->kuaiDi();
                 return $content;
                 break;
+            case 'map':
+                $items = [
+                    new NewsItem(
+                        [
+                            'title'       => '中南民族大学地图',
+                            'description' => "点击进入民大地图\n周边搜索功能，囊括餐饮、娱乐、购物等周边生活信息，轻松掌控城市生活。\n线路搜索功能，轻松规划出行线路",
+                            'url' => "https://m.expoon.com/qjjx/xuexiao/7onuyhthawb.html",
+                            'image' => config('app.base_url')."/img/baidumap.jpg",
+                        ]
+                    )
+                ];
+                return new News($items);
+                break;
+            case 'translate':
+                $word = HelperService::getContent($keyword, "翻译");   // 获得需要翻译的文本
+                return OuterApiService::translate($word);
+                break;
             case '课表':
                 $items = [
                     new NewsItem(
@@ -82,6 +99,10 @@ class TextMessageHandler implements EventHandlerInterface
             return 'train';
         } elseif (preg_match("/^快递/u", $keyword)) {
             return 'kuaidi';
+        } elseif ($keyword == '地图') {
+            return 'map';
+        } elseif (preg_match("/^翻译/u", $keyword)) {
+            return 'translate';
         }
     }
 

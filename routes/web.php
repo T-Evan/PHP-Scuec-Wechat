@@ -14,6 +14,6 @@
 Route::get('/', function () {
     return view('welcome');
 });
-Route::any('/test', '\App\Http\Service\OuterApiService@train');
+Route::any('/test', '\App\Http\Service\OuterApiService@translate');
 
 Route::any('/wechat', 'WeChatController@serve');
