@@ -9,6 +9,7 @@
 namespace App\Http\MessageHandler;
 
 use App\Http\Service\HelperService;
+use App\Http\Service\KuaiDiApiService;
 use App\Http\Service\OuterApiService;
 use EasyWeChat\Kernel\Contracts\EventHandlerInterface;
 use EasyWeChat\Kernel\Messages\News;
@@ -36,6 +37,12 @@ class TextMessageHandler implements EventHandlerInterface
             case 'train':
                 $trainNum = HelperService::getContent($keyword, "火车");   // 得到车次
                 return OuterApiService::train($trainNum);
+                break;
+            case 'kuaidi':
+                $kuaidi_num = HelperService::getContent($keyword, "快递");  // 得到快递单号
+                $kuaidi_service =new KuaiDiApiService($kuaidi_num);
+                $content = $kuaidi_service->kuaiDi();
+                return $content;
                 break;
             case '课表':
                 $items = [
@@ -73,6 +80,8 @@ class TextMessageHandler implements EventHandlerInterface
             return 'bus';
         } elseif (preg_match("/^火车/u", $keyword)) {
             return 'train';
+        } elseif (preg_match("/^快递/u", $keyword)) {
+            return 'kuaidi';
         }
     }
 
@@ -110,5 +119,4 @@ class TextMessageHandler implements EventHandlerInterface
 更多功能努力研发ing";
         return $helpStr;
     }
-
 }
