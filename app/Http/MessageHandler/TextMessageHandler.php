@@ -8,6 +8,7 @@
 
 namespace App\Http\MessageHandler;
 
+use App\Http\Service\HelperService;
 use App\Http\Service\OuterApiService;
 use EasyWeChat\Kernel\Contracts\EventHandlerInterface;
 use EasyWeChat\Kernel\Messages\News;
@@ -27,6 +28,14 @@ class TextMessageHandler implements EventHandlerInterface
                 break;
             case 'weather':
                 return OuterApiService::weather();
+                break;
+            case 'bus':
+                $content = "<a href=\"http://m.amap.com/search/view/keywords=".$keyword."\">〖高德地图-".$keyword."〗</a>";//暂未找到免费公交查询接口,暂时跳转到高德地图查看
+                return $content;
+                break;
+            case 'train':
+                $trainNum = HelperService::getContent($keyword, "火车");   // 得到车次
+                return OuterApiService::train($trainNum);
                 break;
             case '课表':
                 $items = [
@@ -60,52 +69,46 @@ class TextMessageHandler implements EventHandlerInterface
             return 'help';
         } elseif ($keyword == '天气') {
             return 'weather';
+        } elseif (preg_match("/^公交|^地铁/u", $keyword)) {
+            return 'bus';
+        } elseif (preg_match("/^火车/u", $keyword)) {
+            return 'train';
         }
     }
 
 
-    /**
-     * Notes:http://code.iamcal.com/php/emoji/
-     * 关于unicode编码的转化，显示emoji表情
-     * @param $str
-     * @return mixed
-     */
-    private function getEmoji($str)
-    {
-        $str = '{"result_str":"'.$str.'"}';     //组合成json格式
-        $strarray = json_decode($str, true);        //json转换为数组，同时将unicode编码转化成显示实体
-        return $strarray['result_str'];
-    }
+
 
     //帮助信息文本。注意：下面的文字顶格换行微信里面显示也是这样
     private function helpStr()
     {
         $helpStr = "资讯民大功能菜单，回复括号里的关键词，get√
 生活查询 :
-".$this->getEmoji("\ue04A")."【天气】 ".$this->getEmoji("\ue112")."【快递】
-".$this->getEmoji("\ue009")."【电话】 ".$this->getEmoji("\ue201")."【地图】
-".$this->getEmoji("\ue159")."【公交/地铁】
-".$this->getEmoji("\ue00C")."【电视直播】
-".$this->getEmoji("\ue01F")."【火车】
+".HelperService::getEmoji("\ue04A")."【天气】 ".HelperService::getEmoji("\ue112")."【快递】
+".HelperService::getEmoji("\ue009")."【电话】 ".HelperService::getEmoji("\ue201")."【地图】
+".HelperService::getEmoji("\ue159")."【公交/地铁】
+".HelperService::getEmoji("\ue00C")."【电视直播】
+".HelperService::getEmoji("\ue01F")."【火车】
 学习查询 :
-".$this->getEmoji("\ue157")."【课表】 ".$this->getEmoji("\ue44C")."【校历】
-".$this->getEmoji("\ue02B")."【考试】 ".$this->getEmoji("\ue14E")."【成绩】
-".$this->getEmoji("\ue345")."【翻译】 ".$this->getEmoji("\ue114")."【图书】
-".$this->getEmoji("\ue148")."【当前借阅】".$this->getEmoji("\ue157")."【大物实验】
-".$this->getEmoji("\ue301")."【时刻表】
+".HelperService::getEmoji("\ue157")."【课表】 ".HelperService::getEmoji("\ue44C")."【校历】
+".HelperService::getEmoji("\ue02B")."【考试】 ".HelperService::getEmoji("\ue14E")."【成绩】
+".HelperService::getEmoji("\ue345")."【翻译】 ".HelperService::getEmoji("\ue114")."【图书】
+".HelperService::getEmoji("\ue148")."【当前借阅】".HelperService::getEmoji("\ue157")."【大物实验】
+".HelperService::getEmoji("\ue301")."【时刻表】
 
 信息资讯 :
-".$this->getEmoji("\ue534")."【辅修】".$this->getEmoji("\ue114"). "【助学金】
-".$this->getEmoji("\ue302")."【教师证】".$this->getEmoji("\ue157")."【医保】
-".$this->getEmoji("\ue114")."【号内搜】".$this->getEmoji("\ue532")."【考证】
+".HelperService::getEmoji("\ue534")."【辅修】".HelperService::getEmoji("\ue114"). "【助学金】
+".HelperService::getEmoji("\ue302")."【教师证】".HelperService::getEmoji("\ue157")."【医保】
+".HelperService::getEmoji("\ue114")."【号内搜】".HelperService::getEmoji("\ue532")."【考证】
 
 其它 :
-".$this->getEmoji("\ue428")."【微社区】
-".$this->getEmoji("\ue24e")."【关于】 ".$this->getEmoji("\ue327")."【帮推】
-".$this->getEmoji("\ue020")."【帮助】 ".$this->getEmoji("\ue103")."【反馈】
-".$this->getEmoji("\ue443")."【重新绑定】
-".$this->getEmoji("\ue019")."【历史消息】
+".HelperService::getEmoji("\ue428")."【微社区】
+".HelperService::getEmoji("\ue24e")."【关于】 ".HelperService::getEmoji("\ue327")."【帮推】
+".HelperService::getEmoji("\ue022")."【帮助】 ".HelperService::getEmoji("\ue103")."【反馈】
+".HelperService::getEmoji("\ue443")."【重新绑定】
+".HelperService::getEmoji("\ue019")."【历史消息】
 更多功能努力研发ing";
         return $helpStr;
     }
+
 }

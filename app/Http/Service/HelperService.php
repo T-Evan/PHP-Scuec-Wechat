@@ -116,4 +116,34 @@ class HelperService
                 return $res;
         }
     }
+
+    /**
+     * Notes:http://code.iamcal.com/php/emoji/
+     * emoji代码参考自:
+     * https://blog.csdn.net/lyq8479/article/details/9393097
+     * 代码实现参考自:
+     * https://blog.csdn.net/u012767761/article/details/71272780
+     * 关于unicode编码的转化，显示emoji表情
+     * @param $str
+     * @return mixed
+     */
+    public static function getEmoji($str)
+    {
+        $str = '{"result_str":"'.$str.'"}';     //组合成json格式
+        $strarray = json_decode($str, true);        //json转换为数组，同时将unicode编码转化成显示实体
+        return $strarray['result_str'];
+    }
+
+    public static function getContent($str, $keyword)    // 匹配字符串中关键词后面的内容
+    {
+        $pregStr = "/(?<=".$keyword.").*/u";    // 正则表达式语法，向后查找
+        preg_match($pregStr, $str, $matches);   // 使用向后查找可以匹配例如“图书图书”的情况
+        $content = trim($matches[0]);   // 去除前后空格
+        // http://www.php.net/manual/zh/function.strpos.php
+        if (strpos($content, '+') !== false) {  // 如果获得的字符串前面有+号则去除
+            $content = preg_replace("/\+/", '', $content, 1);   // 去除加号，且只去除一次，解决用户多输入+号的情况
+            $content = trim($content);
+        }
+        return $content;
+    }
 }
