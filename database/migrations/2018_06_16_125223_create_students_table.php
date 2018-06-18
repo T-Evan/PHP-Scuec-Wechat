@@ -19,6 +19,7 @@ class CreateStudentsTable extends Migration
             $table->string('account', 100)->nullable()->index();
             $table->string('ssfw_password', 100)->nullable();
             $table->string('lib_password', 100)->nullable();
+            $table->string('lab_password', 100)->nullable();
             $table->timestamps();
         });
     }

@@ -212,6 +212,8 @@ class TextMessageHandler implements EventHandlerInterface
                 $content =  "如需绑定教务系统/研究生管理系统账号请点击:".$ssfwLink;
                 $libLink = $this->get_binding_link($tousername, "lib");
                 $content = $content."\n"."如需绑定图书馆账号请点击:".$libLink;
+                $libLink = $this->get_binding_link($tousername, "lab");
+                $content = $content."\n"."如需绑定大学物理实验账号请点击:".$libLink;
                 return $content;
                 break;
             case '课表':
@@ -324,6 +326,10 @@ class TextMessageHandler implements EventHandlerInterface
         }
         if ($type == 'lib') {
             $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/lib/'.
+                $openid.'">〖绑定账号〗</a>';
+        }
+        if ($type == 'lab') {
+            $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/lab/'.
                 $openid.'">〖绑定账号〗</a>';
         }
         if ($type == 'libName') {

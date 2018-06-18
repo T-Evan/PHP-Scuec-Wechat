@@ -19,11 +19,12 @@ class AccountInfoController extends Controller
      */
 
     const ACCOUNT_WRONG_PASSWORD = 422;
-    const NEED_CAPTURE = 202;
+    const NEED_CAPTURE = 401;
     const ACCOUNT_EXPIRED = 410;
     const TIMEOUT = 504;
     const FREEZE = 503;
     const SUCCESS = 200;
+
 
     /**
      * Notes:
@@ -65,7 +66,7 @@ class AccountInfoController extends Controller
         $user_name = HelperService::domCrawler($data, 'filterXPath', '//*[@class="auth_username"]/span/span'); //尝试从登录后页面获取姓名，判断是否登录成功
         if ($user_name) {
             $key = array(
-                'message' => "user valid and get cookie successfully",
+                'message' => "用户账号密码正确",
                 'data' => array(
                     'cookie' => serialize($res['cookie'])
                 )
@@ -76,23 +77,27 @@ class AccountInfoController extends Controller
             switch ($wrong_msg) {
                 case '您提供的用户名或者密码有误':
                     $key = array(
+                        'status' => self::ACCOUNT_WRONG_PASSWORD,
                         'message' => "你的用户名或密码貌似有误，请重新输入！",
                         'data' => null
                     );
-                    return $this->response->array($key)->setStatusCode(self::ACCOUNT_WRONG_PASSWORD);
+                    return $this->response->array($key);
                     break;
                 case '请输入验证码':
                     $key = array(
-                        'message' => "你输入错误次数过多，请尝试登陆官网认证身份后，重新进行绑定！",
+                        'status' => self::NEED_CAPTURE,
+                        'message' => "你输入错误的次数过多，请尝试登陆官网认证身份后，重新进行绑定！",
                         'data' => null
                     );
-                    return $this->response->array($key)->setStatusCode(self::NEED_CAPTURE);
+                    return $this->response->array($key);
                     break;
                 case 'expired':
-                    return $this->response->array([
+                    $key = array(
+                        'status' => self::ACCOUNT_EXPIRED,
                         'message' => "account expired",
-                        'data' => null])
-                        ->setStatusCode(self::ACCOUNT_EXPIRED);
+                        'data' => null
+                    );
+                    return $this->response->array($key);
                     break;
             }
         }
