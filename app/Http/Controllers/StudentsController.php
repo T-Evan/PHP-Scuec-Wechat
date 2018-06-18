@@ -2,14 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Api\AccountInfoController;
-use App\Http\Controllers\Api\LibInfoController;
 use App\Http\Requests\StudentRequest;
-use App\Http\Service\AccountInfoService;
 use App\Models\Student;
-use Dingo\Api\Exception\InternalHttpException;
 use Illuminate\Http\Request;
-use Validator;
+use Illuminate\Support\Facades\Redis;
 
 class StudentsController extends Controller
 {
@@ -24,12 +20,16 @@ class StudentsController extends Controller
 
     public function store(StudentRequest $studentRequest)
     {
+        $account = $studentRequest->account;
+        $password = $studentRequest->password;
+        $type = $studentRequest->type;
+        $openid = $studentRequest->openid;
         //学校认证平台post字段为username，因此需要将account重新构造数组
         $user_info_array = [
-            'username' => $studentRequest->account,
-            'password' => $studentRequest->password
+            'username' => $account,
+            'password' => $password
         ];
-        switch ($studentRequest->type) {
+        switch ($type) {
             case 'ssfw':
                 $result = $this->api->post('students/ssfw', $user_info_array); //dingo内部调用
                 break;
@@ -38,19 +38,20 @@ class StudentsController extends Controller
                 break;
         }
         if (!empty($result['data'])) { //验证通过
-            $student = Student::where('openid', $studentRequest->openid);
+            Redis::set($type.'_'.$openid, $result['data']['cookie']);
+            $student = Student::where('openid', $openid);
             if (empty($student->get()->first())) {
                 $student = Student::create([
-                            'openid' => $studentRequest->openid,
-                            'account' => $studentRequest->account,
-                            $studentRequest->type . '_password' => bcrypt($studentRequest->password) //拼接要保存的密码类型
+                            'openid' => $openid,
+                            'account' => $account,
+                            $type . '_password' => bcrypt($password) //拼接要保存的密码类型
                         ]);
                 $student->save();
                 session()->flush();
                 session()->flash('success', '完成：初步绑定成功！点击左上角返回聊天窗口，再次回复关键字即可。');
             } else {
-                $student->update(['account' => $studentRequest->account,
-                            $studentRequest->type . '_password' => bcrypt($studentRequest->password)]);
+                $student->update(['account' => $account,
+                            $type . '_password' => bcrypt($password)]);
                 session()->flush();
                 session()->flash('info', '提醒：账号绑定信息更新成功！缓存数据已刷新。点击左上角返回聊天窗口，再次回复关键字即可。');
             }
@@ -59,8 +60,8 @@ class StudentsController extends Controller
         }
 
         $array = [
-            'type' => $studentRequest->type,
-            'openid' => $studentRequest->openid
+            'type' => $type,
+            'openid' => $openid
         ];
         return view('static_pages.login', $array);
     }
