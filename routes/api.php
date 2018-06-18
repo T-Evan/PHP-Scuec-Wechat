@@ -20,7 +20,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 $api->version('v1', function ($api) {
     $api->post('students/judge', 'App\Http\Controllers\Api\AccountInfoController@judgeAccount');
-    $api->get('test', function (Request $request) {
-        return 'test';
-    });
 });

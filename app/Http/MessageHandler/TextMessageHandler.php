@@ -207,8 +207,11 @@ class TextMessageHandler implements EventHandlerInterface
                 ];
                 return new News($items);
             case 'rebinding':
-                $content = '<a href="https://wechat.uliuli.fun/students/create'."?type=ssfw&openid=".
-                    $message['FromUserName'].'">重新绑定</a>';
+                $tousername = $message['FromUserName'];
+                $ssfwLink = $this->get_binding_link($tousername, "ssfw");
+                $content =  "如需绑定教务系统/研究生管理系统账号请点击:".$ssfwLink;
+                $libLink = $this->get_binding_link($tousername, "lib");
+                $content = $content."\n"."如需绑定图书馆账号请点击:".$libLink;
                 return $content;
                 break;
             case '课表':
@@ -311,5 +314,23 @@ class TextMessageHandler implements EventHandlerInterface
 ".HelperService::getEmoji("\ue019")."【历史消息】
 更多功能努力研发ing";
         return $helpStr;
+    }
+
+    private function get_binding_link($openid, $type) // 获得绑定链接
+    {
+        if ($type == 'ssfw') {
+            $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/ssfw/'.
+                $openid.'">〖绑定账号〗</a>';
+        }
+        if ($type == 'lib') {
+            $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/lib/'.
+                $openid.'">〖绑定账号〗</a>';
+        }
+        if ($type == 'libName') {
+            $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/lib/'.
+                $openid.'">〖绑定账号〗</a>';
+        }
+
+        return $bindingLink;
     }
 }
