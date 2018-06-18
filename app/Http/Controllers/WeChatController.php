@@ -6,6 +6,8 @@ use App\Http\MessageHandler\ImageMessageHandler;
 use App\Http\MessageHandler\OtherMessageHandler;
 use App\Http\MessageHandler\TextMessageHandler;
 use App\Http\MessageHandler\EventInfoHandler;
+use Config;
+use EasyWeChat\Factory;
 use EasyWeChat\Kernel\Messages\Message;
 use Illuminate\Support\Facades\Log;
 
@@ -19,6 +21,8 @@ class WeChatController extends Controller
      */
     public function serve()
     {
+//        $options = Config::get('wechat')['official_account']['default'];
+//        $app = Factory::officialAccount($options);
         $app =  app('wechat');
         $app->server->push(OtherMessageHandler::class); //优先过滤不能处理的消息类型，放在第一行防止错误覆盖其他正常信息处理结果
         $app->server->push(EventInfoHandler::class); //处理微信事件

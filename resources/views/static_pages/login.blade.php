@@ -15,10 +15,17 @@
     <form method="POST" action="{{ route('students.store') }}" class="form-signin">
         {{ csrf_field() }}
         <h2 class="form-signin-heading">账号绑定</h2>
+        @if ($type === 'ssfw')
+            <p>输入您教务系统/研究生管理系统的账号同你的微信账号绑定</p>
+        @elseif ($type === 'lib')
+            <p>输入您图书馆的账号（用户名为学号）同你的微信账号绑定</p>
+        @else
+
+        @endif
         <div class="form-group">
             <input type="text" name="account" class="form-control" placeholder="学号" autofocus value="{{ old('account') }}">
-        </div>
-        <div class="text">
+            <input type="hidden" name="type" value={{$type}}>
+            <input type="hidden" name="openid" value={{$openid}}>
             <input type="password" name="password" class="form-control" placeholder="密码" value="{{ old('password') }}">
         </div>
         <button class="btn btn-lg btn-primary btn-block" type="submit">绑&nbsp;定</button>

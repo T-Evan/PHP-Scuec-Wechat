@@ -15,7 +15,7 @@ class WeChatServiceProvider extends ServiceProvider
      *
      * @var bool
      */
-    protected $defer = true;
+//    protected $defer = true;
 
     /**
      * Bootstrap the application services.

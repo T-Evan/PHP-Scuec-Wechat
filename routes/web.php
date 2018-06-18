@@ -11,12 +11,11 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Route::get('/test', '\App\Http\Service\OuterApiService@translate');
 
-Route::resource('students', 'StudentsController');
+
+Route::get('/students/create/{type}/{openid}', 'StudentsController@create')->name('students.create');
+Route::post('/students', 'StudentsController@store')->name('students.store');
+
 
 Route::any('/wechat', 'WeChatController@serve');

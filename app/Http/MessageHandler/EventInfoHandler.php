@@ -16,13 +16,12 @@ class EventInfoHandler implements EventHandlerInterface
 {
     public function handle($message = null)
     {
-        $app = app('wechat');
         if ($message['MsgType'] == 'event') {
             switch ($message['Event']) {
                 case 'subscribe':   //订阅
                     $content = "欢迎订阅资讯民大微信公众平台。\n您可以戳一下底部的菜单，常用功能都在里面哦，或者随便说点什么。/::P \n回复【帮助】查看我的全部技能。";
                     $user = Student::create(['openid' => $message['FromUserName'],]);
-                    $user->save();
+//                    $user->save();
                     return $content;
                     break;
                 case 'unsubscribe': //取消订阅

@@ -207,7 +207,9 @@ class TextMessageHandler implements EventHandlerInterface
                 ];
                 return new News($items);
             case 'rebinding':
-
+                $content = '<a href="https://wechat.uliuli.fun/students/create'."?type=ssfw&openid=".
+                    $message['FromUserName'].'">重新绑定</a>';
+                return $content;
                 break;
             case '课表':
                 $items = [
@@ -271,7 +273,7 @@ class TextMessageHandler implements EventHandlerInterface
             return 'studyroom';
         } elseif (strpos($keyword, '校园网') !== false) {
             return 'campus_network';
-        } elseif (($keyword == '重新绑定') OR ($keyword == '绑定账号') OR ($keyword == '账号绑定')){
+        } elseif (($keyword == '重新绑定') or ($keyword == '绑定账号') or ($keyword == '账号绑定')) {
             return 'rebinding';
         }
     }
