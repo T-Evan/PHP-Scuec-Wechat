@@ -1,13 +1,3 @@
-
-// Fonts
-@import url("https://fonts.googleapis.com/css?family=Raleway:300,400,600");
-
-// Variables
-@import "variables";
-
-// Bootstrap
-@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
-
 body {
   padding-top: 40px;
   padding-bottom: 40px;
@@ -32,8 +22,8 @@ body {
   height: auto;
   padding: 10px;
   -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
 }
 .form-signin .form-control:focus {
   z-index: 2;

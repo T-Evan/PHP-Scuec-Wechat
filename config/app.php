@@ -29,6 +29,9 @@ return [
 
     'base_url' => env('BASE_URL', null),
 
+    'blog_url' => env('BLOG_URL', null),
+
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
@@ -67,6 +70,7 @@ return [
         Overtrue\LaravelLang\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        Dingo\Api\Provider\LaravelServiceProvider::class,
 
         /*
          * Package Service Providers...
