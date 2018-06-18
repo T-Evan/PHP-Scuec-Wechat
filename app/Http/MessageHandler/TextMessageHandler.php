@@ -8,6 +8,7 @@
 
 namespace App\Http\MessageHandler;
 
+use App\Http\Controllers\Api\AccountInfoController;
 use App\Http\Service\HelperService;
 use App\Http\Service\KuaiDiApiService;
 use App\Http\Service\OuterApiService;
@@ -217,6 +218,11 @@ class TextMessageHandler implements EventHandlerInterface
                 return $content;
                 break;
             case '课表':
+                $account = new AccountInfoController();
+                $content = $account->getMessage($message['FromUserName']);
+                return new News($content);
+
+            case 'test2':
                 $items = [
                     new NewsItem(
                         [
@@ -226,9 +232,6 @@ class TextMessageHandler implements EventHandlerInterface
                         ]
                     )
                 ];
-                return new News($items);
-
-            case 'test2':
                 return 'test2√';
             default:
                 return $message['Content'].$message['FromUserName'];

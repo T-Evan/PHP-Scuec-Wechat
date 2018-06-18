@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/test1', '\App\Http\Controllers\Api\AccountInfoController@test');
+Route::get('/test', 'StudentsController@test');
 
 
 Route::get('/students/create/{type}/{openid}', 'StudentsController@create')->name('students.create');

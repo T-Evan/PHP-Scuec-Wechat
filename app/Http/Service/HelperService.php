@@ -147,4 +147,148 @@ class HelperService
         }
         return $content;
     }
+
+    /*
+     * 老版资讯民大函数库
+     */
+
+
+    /**
+     * Lets you determine whether an array index is set and whether it has a value.
+     * If the element is empty it returns empty string (or whatever you specify as the default value.)
+     *
+     * Code from CodeIgniter
+     *
+     * @param   string
+     * @param   array
+     * @param   mixed
+     * @return  mixed   depends on what the array contains
+     */
+    public static function element($key, $array, $default = '')
+    {
+        return array_key_exists($key, $array) ? $array[$key] : $default;
+    }
+
+    /**
+     * 生成随机字符串
+     * Code from CodeIgniter
+     *
+     * @param int $length 随机字符串的长度
+     * @return string $word
+     */
+    public static function randStr($length = 16)
+    {
+        $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $word = '';
+        for ($i = 0, $mt_rand_max = strlen($chars) - 1; $i < $length; $i++) {
+            $word .= $chars[mt_rand(0, $mt_rand_max)];
+        }
+
+        return $word;
+    }
+
+    /**
+     * 发送 http(s) 请求（GET/POST/上传文件/JSON）
+     *
+     * @param string $url 请求的url
+     * @param mixed $data string/array
+     * @param int $timeout a value of timeout
+     * @param string $cookie a cookie string for request
+     * @return string 返回的结果
+     */
+    public static function httpRequest($url, $data = null, $timeout = null, $cookie = null)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    // 返回原生输出
+        curl_setopt($ch, CURLOPT_HEADER, 0);    // 不显示header头
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:')); // Disable Expect: header (some server does not support it)
+
+        // https 请求
+        if (strpos($url, "https://") !== false) {
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);    // 不检查SSL证书
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_SSLVERSION, 1);    // CURL_SSLVERSION_TLSv1
+        }
+        // POST 请求
+        // To post a file, prepend a filename with @ and use the full path.
+        // post JSON: string
+        // 正常 POST 请求: urlencoded string
+        if (!empty($data)) {
+            // POST JSON
+            if (self::is_JSON($data)) {
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+            }
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        }
+        if (!empty($timeout)) {
+            curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+        }
+        if (!empty($cookie)) {
+            curl_setopt($ch, CURLOPT_COOKIE, $cookie);
+        }
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        return $result;
+    }
+
+    /**
+     * 判断字符串是否是 JSON（PHP >= 5.3.0）
+     *
+     * @param string $string 待判断的 JSON 串
+     * @return bool
+     */
+    public static function is_JSON($string)
+    {
+        return is_string($string) && is_object(json_decode($string))
+        && (json_last_error() == JSON_ERROR_NONE) ? true : false;
+    }
+
+    /**
+     * 从字符串（http头）中抽出Cookie
+     * @param string $string 带http头的字符串
+     * @return mixed
+     */
+    public static function getCookieFromStr($string){
+        $isMatched = preg_match_all("/(Set-Cookie|Cookie):\s(.*?)\r\n/ism", $string, $arrCookies);  //一定要\r\n啊，否则抓到的Cookie会带有\r
+        if ($isMatched) {
+            $cookie = implode("; ", $arrCookies[2]);
+        }
+        else {
+            $cookie = "";
+        }
+        return $cookie;
+    }
+
+    /**
+     * remove all html entities from a htmlencoded string
+     * @param string
+     * @return string
+     */
+    public static function removeHtmlEntities($rawStr){
+        $final = preg_replace("/&#?[a-z0-9]{2,8};/is", "", $rawStr);
+        return $final;
+    }
+
+    /**
+     * this function is from User Contributed Notes on http://php.net/base64_encode
+     * return a special string(modify from base64) that can be part of the url
+     * @param string
+     * @return string
+     */
+    public static function urlBase64Encode($data){
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+
+    /**
+     * this function is from User Contributed Notes on http://php.net/base64_encode
+     * corresponding to urlBase64Encode()
+     * @param string
+     * @return string
+     */
+    public static function urlBase64Decode($data){
+        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
+    }
 }

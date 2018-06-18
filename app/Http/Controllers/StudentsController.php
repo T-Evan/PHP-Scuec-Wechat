@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\AccountInfoController;
 use App\Http\Requests\StudentRequest;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -17,7 +18,13 @@ class StudentsController extends Controller
         ];
         return view('static_pages.login', $array);
     }
-
+    public function test()
+    {
+        $test = new AccountInfoController();
+        $userInfoArray=['openid'=>'onzftwySIXNVZolvsw_hUvvT8UN0'];
+        $res = $test->getTimeTable($userInfoArray);
+        dd($res);
+    }
     public function store(StudentRequest $studentRequest)
     {
         $account = $studentRequest->account;
