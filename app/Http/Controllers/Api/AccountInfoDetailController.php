@@ -27,8 +27,8 @@ class AccountInfoDetailController extends Controller
             );
             return $timetable;
         }
-        $test = new StudentsController();
-        $cookie_array = $test->Cookie('ssfw');
+        $student_controller = new StudentsController();
+        $cookie_array = $student_controller->Cookie('ssfw');
         if ($cookie_array['data'] == null) {
             return $cookie_array['message'];
         }
@@ -40,11 +40,11 @@ class AccountInfoDetailController extends Controller
         );
         $jar1 = $res['cookie'];
         $res = HelperService::get(
-            'http://ssfw.scuec.edu.cn/ssfw/pkgl/kcbxx/4/2017-2018-2.do?flag=4&xnxqdm=2017-2018-2',
+            config('app.timetable_url'),
             $jar1,
             'http://ssfw.scuec.edu.cn/ssfw/index.do'
         );
-        $table_html = $res['res']->getbody();
+        $table_html = $res['res']->getbody()->getcontents();
 
         /*
          * 处理课表，抽出不带“未安排课程”子表格的html代码段（这样写比正则匹配快多了[当然可能是我正则写的烂）
@@ -172,7 +172,7 @@ class AccountInfoDetailController extends Controller
                 }
             }
             $parsedTimetable = $this->parseTimetable($timetable);
-            $redis->set('timetable_'.$openid, json_encode($parsedTimetable)); //缓存课表
+            $redis->setex('timetable_'.$openid, 7200,json_encode($parsedTimetable)); //缓存课表两小时
             $rtnArray = array(
                 'status' => 200,
                 'message' => __CLASS__ . ': get timetable successfully',
@@ -189,6 +189,100 @@ class AccountInfoDetailController extends Controller
                 $rtnArray['raw_timetable'] = $trimedTable;
             }
             return $rtnArray;
+        }
+    }
+
+    public function getExamArrangement()
+    {
+        $message = app('wechat')->server->getMessage();
+//        $openid = $message['FromUserName'];
+        $openid='onzftwySIXNVZolvsw_hUvvT8UN0';
+        $redis= Redis::connection('exam');
+        $exam_cache = $redis->get('exam_'.$openid);
+        if (!empty($exam_cache)) {
+            $exam = array(
+                'status' => 200,
+                'message' => __CLASS__ . ': get exam successfully',
+                'data' => json_decode($exam_cache, true)
+            );
+            return $exam;
+        }
+        $student_controller = new StudentsController();
+        $cookie_array = $student_controller->Cookie('ssfw');
+        if ($cookie_array['data'] == null) {
+            return $cookie_array['message'];
+        }
+        $cookie = unserialize($cookie_array['data']);
+        $res = HelperService::get(
+            'http://id.scuec.edu.cn/authserver/login?goto=http%3A%2F%2Fssfw.scuec.edu.cn%2Fssfw%2Fj_spring_ids_security_check',
+            $cookie,
+            'http://ssfw.scuec.edu.cn/ssfw/index.do'
+        );
+        $jar1 = $res['cookie'];
+        $res = HelperService::get(
+            'http://ssfw.scuec.edu.cn/ssfw/xsks/kcxx',
+            $jar1,
+            'http://ssfw.scuec.edu.cn/ssfw/index.do'
+        );
+        $exam_html = $res['res']->getbody()->getcontents();
+
+        if (!empty($exam_html)) {
+            if (strpos($exam_html, "已安排考试课程") !== false) {
+                preg_match("/<table class=\"table_con\"[\s\S]+?座位号[\s\S]+?<\/table>/", $exam_html, $matches);
+                preg_match_all("/<tr class=\"t_con\">[\s\S]+?<\/tr>/", $matches[0], $arrTr);
+                $testAmount = count($arrTr[0]);
+                $arrTestInfo = array();
+                foreach ($arrTr[0] as $key => $value) {
+                    preg_match_all("/<td.*>(.+?)<\/.*td>/", $value, $matches);
+                    /* trim all strings in the array*/
+                    $countofMatches = count($matches[1]);
+                    for ($i=0; $i<$countofMatches; $i++) {
+                        trim($matches[1][$i]);
+                    }
+                    $arrTestInfo[] = $matches[1];
+                }
+                return array(
+                    'status' => 200,
+                    'message' => __CLASS__ . ": get the test arrangement successfully",
+                    'data' => $arrTestInfo
+                );
+                /* WHY CAN'T IT WORK?
+                 * It seems that an encoding problem occured. ALL Chinese characters
+                 * cannot be decoded correctly while the html parsing is successful.
+                 * Besides, WHY CAN'T I USE CHINESE INPUT METHOD IN SUBLIME for LINUX?
+
+                $htmlDom = new \HtmlParser\ParserDom($matches[0]);
+                $arrTr = $htmlDom->find('tr');
+                $courseCount = count($arrTr)-1;    // 课程数量
+                for ($i=0; $i < $courseCount; $i++) {
+                    $td = $arrTr[$i+1]->find('td');
+                    $course[$i]['name'] = trim($td[2]->getPlainText());    // 课程名称
+                    $course[$i]['teacher'] = trim($td[4]->getPlainText());    // 教师
+                    $course[$i]['seat'] = trim($td[6]->getPlainText());    // 座次
+                    $course[$i]['time'] = trim($td[7]->getPlainText());    // 时间
+                    $course[$i]['class'] = trim($td[8]->getPlainText());    // 考场位置
+                    // 考试状态
+                    if (trim($td[11]->getPlainText()) == "已结束") {
+                        $course[$i]['status'] = 'end';
+                    }
+                    else{
+                        $course[$i]['status'] = 'ing';
+                    }
+                }
+                */
+            } else {
+                return array(
+                    'status' => 204,
+                    'message' => __CLASS__ . ": NO TEST ARRANGEMENT",
+                    'data' => null
+                );
+            }
+        } else{
+            return array(
+                'status' => 404,
+                'message' => __CLASS__ . ": connection timed out",
+                'data' => null
+            );
         }
     }
     private function parseTimetable($arrTimetable)

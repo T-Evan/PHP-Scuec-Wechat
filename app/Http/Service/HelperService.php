@@ -39,6 +39,7 @@ class HelperService
 //                'proxy' => ['http' => 'http://localhost:8888'],
             'cookies' => $cookie_jar,
             $postType => $body,
+            'timeout' => 5,
             'headers' => [
                 'User-Agent' => self::DEFAULT_USER_AGENT,
                 'Referer' => $referer
@@ -68,6 +69,7 @@ class HelperService
         $request_array = [
             'cookies' => $cookie_jar,
             //                'debug' => true,
+            'timeout' => 5,
             'headers' => [
                 'User-Agent' => self::DEFAULT_USER_AGENT,
                 'Referer' => $referer

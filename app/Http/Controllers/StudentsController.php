@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Api\AccountInfoController;
+use App\Http\Controllers\Api\AccountInfoDetailController;
 use App\Http\Requests\StudentRequest;
 use App\Http\Service\TimeTableReplyService;
 use App\Models\Student;
@@ -40,7 +41,7 @@ class StudentsController extends Controller
                 break;
         }
         if (!empty($result['data'])) { //验证通过
-            Redis::setex($type.'_'.$openid, 3600, $result['data']['cookie']); //cookie有效期为1小时
+            Redis::setex($type.'_'.$openid, 3600, $result['data']['cookie']); //cookie缓存有效期为1小时
             $student = Student::where('openid', $openid);
             if (empty($student->get()->first())) {
                 $student = Student::create([
@@ -71,14 +72,15 @@ class StudentsController extends Controller
 
     public function test()
     {
-        $this->Cookie('ssfw');
+        $test =new AccountInfoController();
+        dd($test->getExamMessage());
     }
     public function Cookie($type)
     {
         $app = app('wechat');
         $message = $app->server->getMessage();
-        $openid = $message['FromUserName'];
-//        $openid='onzftwySIXNVZolvsw_hUvvT8UN0';
+//        $openid = $message['FromUserName'];
+        $openid='onzftwySIXNVZolvsw_hUvvT8UN0';
         $key = $type.'_'.$openid;
         $cookie = Redis::get($key);
         if (!$cookie) {
@@ -90,7 +92,6 @@ class StudentsController extends Controller
                 return ['data'=>null,'message'=>'用户不存在'];
             }
             $studentRequest = new StudentRequest();
-
             $studentRequest->account =  $student->account;
             $studentRequest->password =  decrypt($student->toArray()[$password]);
             $studentRequest->openid = $student->openid;

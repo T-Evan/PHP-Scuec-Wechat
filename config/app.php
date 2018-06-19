@@ -31,6 +31,8 @@ return [
 
     'blog_url' => env('BLOG_URL', null),
 
+    'timetable_url' => env('TIMETABLE_URL', null),
+
     'semester_begin_date' => env('semester_begin_date', null),
 
     'semester_end_date'=> env('semester_end_date', null),

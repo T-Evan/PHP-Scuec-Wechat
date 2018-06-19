@@ -223,7 +223,20 @@ class TextMessageHandler implements EventHandlerInterface
             case 'timetable':
                 $account = new AccountInfoController();
                 try {
-                    $content = $account->getMessage();
+                    $content = $account->getTableMessage();
+                    if (is_array($content)) {
+                        return new News($content);
+                    } else {
+                        return $content;
+                    }
+                } catch (\Exception $exception) {
+                    Log::error('openid：'.$message['FromUserName'].'  error：'.$exception->getTraceAsString());
+                }
+                break;
+            case 'exam':
+                $account = new AccountInfoController();
+                try {
+                    $content = $account->getExamMessage();
                     if (is_array($content)) {
                         return new News($content);
                     } else {
@@ -296,6 +309,8 @@ class TextMessageHandler implements EventHandlerInterface
             return 'rebinding';
         } elseif (($keyword == '课表')) {
             return 'timetable';
+        } elseif (($keyword == '考试') || $keyword == '查考试' || $keyword == '考试安排'){
+            return 'exam';
         }
     }
 
