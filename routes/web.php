@@ -12,6 +12,7 @@
 */
 
 Route::get('/test', 'StudentsController@test');
+Route::get('/test1', 'WeChatController@serve');
 
 
 Route::get('/students/create/{type}/{openid}', 'StudentsController@create')->name('students.create');

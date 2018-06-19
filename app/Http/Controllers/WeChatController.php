@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\AccountInfoController;
 use App\Http\MessageHandler\ImageMessageHandler;
 use App\Http\MessageHandler\OtherMessageHandler;
 use App\Http\MessageHandler\TextMessageHandler;
 use App\Http\MessageHandler\EventInfoHandler;
+use App\Http\Service\TimeTableReplyService;
 use Config;
 use EasyWeChat\Factory;
 use EasyWeChat\Kernel\Messages\Message;
+use EasyWeChat\Kernel\Messages\News;
 use Illuminate\Support\Facades\Log;
 
 class WeChatController extends Controller
@@ -28,7 +31,11 @@ class WeChatController extends Controller
         $app->server->push(EventInfoHandler::class); //处理微信事件
         $app->server->push(TextMessageHandler::class, Message::TEXT); // 处理文字消息
         $app->server->push(ImageMessageHandler::class, Message::IMAGE); // 处理图片消息
-
+//        $app->server->push(function ($message='123') {
+//            $account = new TimeTableReplyService('onzftwySIXNVZolvsw_hUvvT8UN0');
+//            $content = $account->reply();
+//            return new News($content);
+//        });
         return $app->server->serve();
     }
 }

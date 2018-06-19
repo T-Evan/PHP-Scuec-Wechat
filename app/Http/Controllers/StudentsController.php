@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Api\AccountInfoController;
 use App\Http\Requests\StudentRequest;
+use App\Http\Service\TimeTableReplyService;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
@@ -20,9 +21,12 @@ class StudentsController extends Controller
     }
     public function test()
     {
-        $test = new AccountInfoController();
-        $userInfoArray=['openid'=>'onzftwySIXNVZolvsw_hUvvT8UN0'];
-        $res = $test->getTimeTable($userInfoArray);
+//        $test = new AccountInfoController();
+//        $userInfoArray=['openid'=>'onzftwySIXNVZolvsw_hUvvT8UN0'];
+//        $res = $test->getTimeTable('onzftwySIXNVZolvsw_hUvvT8UN0');
+        $test =new TimeTableReplyService('onzftwySIXNVZolvsw_hUvvT8UN0');
+         $res = $test->test();
+
         dd($res);
     }
     public function store(StudentRequest $studentRequest)

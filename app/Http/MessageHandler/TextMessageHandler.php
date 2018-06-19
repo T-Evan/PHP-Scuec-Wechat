@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\AccountInfoController;
 use App\Http\Service\HelperService;
 use App\Http\Service\KuaiDiApiService;
 use App\Http\Service\OuterApiService;
+use App\Http\Service\TimeTableReplyService;
 use EasyWeChat\Kernel\Contracts\EventHandlerInterface;
 use EasyWeChat\Kernel\Messages\News;
 use EasyWeChat\Kernel\Messages\NewsItem;
@@ -217,9 +218,9 @@ class TextMessageHandler implements EventHandlerInterface
                 $content = $content."\n"."如需绑定大学物理实验账号请点击:".$libLink;
                 return $content;
                 break;
-            case '课表':
-                $account = new AccountInfoController();
-                $content = $account->getMessage($message['FromUserName']);
+            case 'timetable':
+                $account = new TimeTableReplyService($message['FromUserName']);
+                $content = $account->test();
                 return new News($content);
 
             case 'test2':
@@ -283,6 +284,8 @@ class TextMessageHandler implements EventHandlerInterface
             return 'campus_network';
         } elseif (($keyword == '重新绑定') or ($keyword == '绑定账号') or ($keyword == '账号绑定')) {
             return 'rebinding';
+        } elseif (($keyword == '课表')) {
+            return 'timetable';
         }
     }
 
