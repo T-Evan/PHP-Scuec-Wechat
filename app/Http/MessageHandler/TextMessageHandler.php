@@ -9,6 +9,7 @@
 namespace App\Http\MessageHandler;
 
 use App\Http\Controllers\Api\AccountInfoController;
+use App\Http\Controllers\StudentsController;
 use App\Http\Service\HelperService;
 use App\Http\Service\KuaiDiApiService;
 use App\Http\Service\OuterApiService;
@@ -16,6 +17,7 @@ use App\Http\Service\TimeTableReplyService;
 use EasyWeChat\Kernel\Contracts\EventHandlerInterface;
 use EasyWeChat\Kernel\Messages\News;
 use EasyWeChat\Kernel\Messages\NewsItem;
+use Log;
 
 class TextMessageHandler implements EventHandlerInterface
 {
@@ -210,19 +212,27 @@ class TextMessageHandler implements EventHandlerInterface
                 return new News($items);
             case 'rebinding':
                 $tousername = $message['FromUserName'];
-                $ssfwLink = $this->get_binding_link($tousername, "ssfw");
+                $ssfwLink = HelperService::getBindingLink($tousername, "ssfw");
                 $content =  "如需绑定教务系统/研究生管理系统账号请点击:".$ssfwLink;
-                $libLink = $this->get_binding_link($tousername, "lib");
+                $libLink = HelperService::getBindingLink($tousername, "lib");
                 $content = $content."\n"."如需绑定图书馆账号请点击:".$libLink;
-                $libLink = $this->get_binding_link($tousername, "lab");
+                $libLink = HelperService::getBindingLink($tousername, "lab");
                 $content = $content."\n"."如需绑定大学物理实验账号请点击:".$libLink;
                 return $content;
                 break;
             case 'timetable':
-                $account = new TimeTableReplyService($message['FromUserName']);
-                $content = $account->test();
-                return new News($content);
-
+                $account = new AccountInfoController();
+                try {
+                    $content = $account->getMessage();
+                    if (is_array($content)) {
+                        return new News($content);
+                    } else {
+                        return $content;
+                    }
+                } catch (\Exception $exception) {
+                    Log::error('openid：'.$message['FromUserName'].'  error：'.$exception->getTraceAsString());
+                }
+                break;
             case 'test2':
                 $items = [
                     new NewsItem(
@@ -233,7 +243,7 @@ class TextMessageHandler implements EventHandlerInterface
                         ]
                     )
                 ];
-                return 'test2√';
+                return new News($items);
             default:
                 return $message['Content'].$message['FromUserName'];
 
@@ -322,27 +332,5 @@ class TextMessageHandler implements EventHandlerInterface
 ".HelperService::getEmoji("\ue019")."【历史消息】
 更多功能努力研发ing";
         return $helpStr;
-    }
-
-    private function get_binding_link($openid, $type) // 获得绑定链接
-    {
-        if ($type == 'ssfw') {
-            $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/ssfw/'.
-                $openid.'">〖绑定账号〗</a>';
-        }
-        if ($type == 'lib') {
-            $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/lib/'.
-                $openid.'">〖绑定账号〗</a>';
-        }
-        if ($type == 'lab') {
-            $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/lab/'.
-                $openid.'">〖绑定账号〗</a>';
-        }
-        if ($type == 'libName') {
-            $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/lib/'.
-                $openid.'">〖绑定账号〗</a>';
-        }
-
-        return $bindingLink;
     }
 }

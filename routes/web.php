@@ -11,8 +11,8 @@
 |
 */
 
-Route::get('/test', 'StudentsController@test');
-Route::get('/test1', 'WeChatController@serve');
+Route::get('/test', 'StudentsController@ssfwCookie');
+Route::get('/test1', 'StudentsController@test');
 
 
 Route::get('/students/create/{type}/{openid}', 'StudentsController@create')->name('students.create');
