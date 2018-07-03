@@ -56,6 +56,11 @@ class StudentsController extends Controller
                 $student->update(['account' => $account,
                             $type . '_password' => encrypt($password)]);
                 session()->flush();
+
+                //重新绑定，刷新cookie，通过绑定增加一定的操作复杂度，防止用户不停刷新
+                $redis= Redis::connection('exam');
+                $redis->del('exam_'.$openid);
+
                 session()->flash('info', '提醒：账号绑定信息更新成功！缓存数据已刷新。点击左上角返回聊天窗口，再次回复关键字即可。');
             }
         } else {

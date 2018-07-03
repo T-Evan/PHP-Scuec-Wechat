@@ -13,7 +13,6 @@
 
 Route::get('/test1', 'StudentsController@test');
 
-
 Route::get('/students/create/{type}/{openid}', 'StudentsController@create')->name('students.create');
 Route::post('/students', 'StudentsController@store')->name('students.store');
 
