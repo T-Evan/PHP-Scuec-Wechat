@@ -7,6 +7,7 @@ use App\Http\Service\HelperService;
 use App\Http\Service\SchoolDatetime;
 use EasyWeChat\Kernel\Messages\NewsItem;
 use Illuminate\Http\Request;
+use Log;
 use Symfony\Component\DomCrawler\Crawler;
 
 class AccountInfoController extends Controller
@@ -116,6 +117,13 @@ class AccountInfoController extends Controller
      */
     public function getTableMessage()
     {
+        $termWeek = SchoolDatetime::getSchoolWeek();    // 本周的学期周数
+        if ($termWeek > 20) {   // 如果大于20周课表查询关闭
+            $content = "\n本学期已经结束了哦，课表查询功能自动关闭。学霸们，下个学期继续努力吧。";
+            $content = HelperService::todyInfo().$content;
+            return $content;
+        }
+
         $message = app('wechat')->server->getMessage();
         $openid = $message['FromUserName'];
         /* 课表 */
@@ -124,12 +132,12 @@ class AccountInfoController extends Controller
         if (!is_array($timetable)) {
             switch ($timetable) {
                 case '用户不存在':
-                    $news = "你还没有绑定账号噢~ /:P-( " .
-                        HelperService::getBindingLink($openid, 'ssfw');
+                    $news = "绑定账号后即可查询课表。妈妈再也不用担心我忘记教室了。/::,@\n请先" .
+                        HelperService::getBindingLink('ssfw');
                     break;
                 case '用户信息有误':
                     $news = "你绑定的账号信息貌似有误 /:P-( 需要重新" .
-                        HelperService::getBindingLink($openid, 'ssfw');
+                        HelperService::getBindingLink('ssfw');
                     break;
             }
             return $news;
@@ -259,7 +267,6 @@ class AccountInfoController extends Controller
                 if ($nextDay == 0) {
                     ++$targetWeek;
                 }
-
                 $nextDayTimetable = $timetable['data']['timetable'][$nextDay];
                 $nextDayCourseCount = count($nextDayTimetable);
                 $nextDayCourseName = array();
@@ -323,14 +330,15 @@ class AccountInfoController extends Controller
             // $extraInfo = "\n- 遇到课表错误，记得@程序员反馈哦\n".$updateDateStr;
 
             // BEGIN OF APRIL FOOL CODE BLOCKS
+            $update_time = "\n\n课表更新于：".$timetable['update_time'];
             $extraInfo = "\n- 要查询所有课程，请查看一周课表\n" . $updateDateStr;
             // END OF APRIL FOOL CODE BLOCKS
             $news = [
                     new NewsItem(
                         [
                             'title' => $dateString,
-                            'description' => $replyText . $adjInfoString . $nextDayCoursePrompt . $extraInfo,
-                            'url' => config('app.base_url') . '/lab_query/web/schedule/index.html?openid=' . $openid,
+                            'description' => $replyText . $adjInfoString . $nextDayCoursePrompt .$update_time. $extraInfo,
+                            'url' => config('app.base_url') . '/schedule/index.html?openid=' . $openid,
                         ]
                     )
                 ];
@@ -344,31 +352,67 @@ class AccountInfoController extends Controller
         /* 考试 */
         $account_info_detail = new AccountInfoDetailController();
         $arrange = $account_info_detail->getExamArrangement();
-        if ($arrange['status'] != 200) {
-            return $arrange;
-        }
-        $replyText = "";
-        if (count($arrange['data']) > 0) {
-            foreach ($arrange['data'] as $key => $item) {
-                $displayNum = $key + 1;
-                $replyText .= "[{$displayNum}]\n"
-                        ."科目: ".$item[2]."\n"
-                        ."时间: ".$item[7]."\n"
-                        ."地点: ".$item[8]."\n"
-                        ."教师: ".$item[4]."\n\n";
+        if (!is_array($arrange)) {
+            switch ($arrange) {
+                case '用户不存在':
+                    $news = "绑定账号后即可查询考试安排，提前做好复习准备，沉着应对考试。/:,@f\n请先" .
+                        HelperService::getBindingLink('ssfw');
+                    break;
+                case '用户信息有误':
+                    $news = "你绑定的账号信息貌似有误 /:P-( 需要重新" .
+                        HelperService::getBindingLink('ssfw');
+                    break;
             }
-        } else {
-            $replyText = "你当前没有考试安排哦~";
+            return $news;
         }
-        $items = [
-                new NewsItem(
-                    [
-                        'title'       => '考试安排',
-                        'description' => $replyText,
-                    ]
-                )
-            ];
-        return $items;
+        $courseCount = count($arrange['data']);
+        $content =HelperService::todyInfo()."\n---已安排考试课程---";
+        $course = $arrange['data'];
+        /*example
+         array:4 [▼
+          0 => array:12 [▼
+            0 => "1"
+            1 => "209103013513"
+            2 => "网络协议分析与编程"
+            3 => "必修课"
+            4 => "朱剑林"
+            5 => "2.5"
+            6 => "67"
+            7 => "2018-06-21 16:00-17:40"
+            8 => "15号楼-15221"
+            9 => "闭卷"
+            10 => "笔试"
+            11 => "</span>" OR "已结束"
+            //未考试时页面表中该项由“ing”变为空，因此之前的正则抓取有bug，先改用结束作为判断标记
+          ]
+         */
+        if ($courseCount>0) {
+            for ($i=0; $i < $courseCount; $i++) {
+                $time = substr(strip_tags($course[$i][7]), 5); // 时间，截去年份
+                $name = $course[$i][2];    // 课程名称
+                $content .= "\n".($i+1)."-[".$course[$i][4]."]".$name;
+                if ($course[$i][11] === '已结束') {
+                    $time = substr($time, 0, 5);
+                    $content .= "，时间: " . $time . " (已结束)";
+                } else {
+                    $class = $course[$i][8];  // 考场
+                    if (preg_match("/11|15/", $class)) {
+                        $class = substr($class, 9); // 去掉楼栋中文
+                        $floor = substr($class, 0, 2)."#";
+                        $class = substr($class, 2);
+                        $class = $floor.$class;
+                    }
+                    $content .= "，时间: ".$time."，考场: ".$class."，座次: ".$course[$i][6];
+                }
+            }
+            $content .= "\n\n考试信息更新于：".$arrange['update_time'];
+            $bindingLink = HelperService::getBindingLink("ssfw");
+            $content .= "\n\n<a href=\"https://test.stuzone.com/zixunminda-blog/why-extend-cache-time.html\">关于延长缓存时间的更新说明</a>\n想要马上更新考试信息,可以重新".$bindingLink;
+        } else {
+            $bindingLink = HelperService::getBindingLink("ssfw");
+            $content = HelperService::todyInfo()."\n/:sun 目前没有考试安排，平常努力学习才能考出好成绩哦。\n想要马上更新考试信息,可以重新".$bindingLink;
+        }
+        return $content;
     }
     public function getScoreMessage()
     {
@@ -393,4 +437,40 @@ class AccountInfoController extends Controller
         return $items;
     }
 
+    /**
+     * Notes:为前端提供api接口
+     * @param Request $request
+     */
+    public function tableApi($openid)
+    {
+        if (isset($openid)) {
+            $matchCount = preg_match("/^oULq3u[a-zA-Z0-9_-]{22}/", $_GET['openid'], $match);
+            if ($matchCount == 1) {
+                $account_info_detail = new AccountInfoDetailController();
+                $timetable = $account_info_detail->getTimeTable();
+                if ($timetable !== false) {
+                    $arrTimetable = json_decode($timetable, true);
+                    $curWeek = SchoolDatetime::getSchoolWeek();
+                    // 如果没开学，则显示第一周课表
+                    $curWeek = $curWeek ? $curWeek : 1;
+                    $arrTimetable['current_week'] = $curWeek;
+                    $retArray = array(
+                        'status' => 200,
+                        'data' => $arrTimetable
+                    );
+                } else {
+                    $retArray = array(
+                        'status' => 404,
+                        'data' => null
+                    );
+                }
+            } else {
+                $retArray = array(
+                    'status' => 405,
+                    'data' => null
+                );
+            }
+            echo json_encode($retArray);
+        }
+    }
 }

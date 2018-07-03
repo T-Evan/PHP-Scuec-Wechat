@@ -11,6 +11,7 @@ namespace App\Http\MessageHandler;
 use App\Models\Student;
 use EasyWeChat\Kernel\Contracts\EventHandlerInterface;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 
 class EventInfoHandler implements EventHandlerInterface
 {
@@ -25,11 +26,15 @@ class EventInfoHandler implements EventHandlerInterface
                     return $content;
                     break;
                 case 'unsubscribe': //取消订阅
+                    $openid = $message['FromUserName'];
                     try {
-                        Student::where('openid', $message['FromUserName'])->first()
+                        Student::where('openid', $openid)->first()
                             ->delete();
+                        Redis::del('ssfw_'.$openid); //清除办事大厅cookie缓存
+                        Redis::connection('timetable')->del('timetable_'.$openid);
+                        Redis::connection('exam')->del('exam_'.$openid);
                     } catch (\Exception $e) {
-                        Log::debug($e->getMessage());
+                        Log::error('openid：'.$message['FromUserName'].'  error：'.$e->getTraceAsString());
                     }
                     return true;
                     break;

@@ -75,12 +75,13 @@ class StudentsController extends Controller
         $test =new AccountInfoController();
         dd($test->getExamMessage());
     }
-    public function Cookie($type)
+
+    public function cookie($type)
     {
         $app = app('wechat');
         $message = $app->server->getMessage();
-//        $openid = $message['FromUserName'];
-        $openid='onzftwySIXNVZolvsw_hUvvT8UN0';
+        $openid = $message['FromUserName'];
+//        $openid='onzftwySIXNVZolvsw_hUvvT8UN0';
         $key = $type.'_'.$openid;
         $cookie = Redis::get($key);
         if (!$cookie) {
@@ -88,7 +89,7 @@ class StudentsController extends Controller
             $student = Student::select('account', $password, 'openid')
                 ->where('openid', $openid)
                 ->get()->first();
-            if (empty($student)) {
+            if ($student->account==null || $student->password==null) {
                 return ['data'=>null,'message'=>'用户不存在'];
             }
             $studentRequest = new StudentRequest();

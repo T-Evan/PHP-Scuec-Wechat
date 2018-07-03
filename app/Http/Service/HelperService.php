@@ -150,8 +150,11 @@ class HelperService
         return $content;
     }
 
-    public static function getBindingLink($openid, $type) // 获得绑定链接
+    public static function getBindingLink($type) // 获得绑定链接
     {
+        $app = app('wechat');
+        $message = $app->server->getMessage();
+        $openid = $message['FromUserName'];
         if ($type == 'ssfw') {
             $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/ssfw/'.
                 $openid.'">〖绑定账号〗</a>';
@@ -172,6 +175,30 @@ class HelperService
         return $bindingLink;
     }
 
+    public static function todyInfo()
+    {   //今天的详细信息，如今天的日期以及周数
+        return SchoolDatetime::getDateInfo();
+        $timeymd = date("Y年n月j日");
+        $weektocn = array('Monday' => "星期一",
+            'Tuesday' => "星期二",
+            'Wednesday' => "星期三",
+            'Thursday' => "星期四",
+            'Friday' => "星期五",
+            'Saturday' => "星期六",
+            'Sunday' => "星期日"
+        );
+        $weekcn = $weektocn[date("l")];     //将获取到的英文星期信息转换为中文
+
+        $weeknumcount = SchoolDatetime::getSchoolWeek();
+        if ($weeknumcount > SchoolDatetime::getWeekCount()) { // 大于20周不显示周数
+            $weeknumcountStr = '少年郎，我咖喱港，这学期干得不错，下学期8月27日、28日注册，8月29日正式上课。暑假快乐~/::P';
+        } else {
+            $weeknumcountStr = "本学期第".$weeknumcount."周";
+        }
+
+        $tody_info_str = $timeymd." ".$weekcn."\n".$weeknumcountStr;
+        return $tody_info_str;
+    }
     /*
      * 老版资讯民大函数库
      */

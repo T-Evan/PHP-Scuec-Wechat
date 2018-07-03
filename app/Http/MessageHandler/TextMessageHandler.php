@@ -211,12 +211,11 @@ class TextMessageHandler implements EventHandlerInterface
                 ];
                 return new News($items);
             case 'rebinding':
-                $tousername = $message['FromUserName'];
-                $ssfwLink = HelperService::getBindingLink($tousername, "ssfw");
+                $ssfwLink = HelperService::getBindingLink("ssfw");
                 $content =  "如需绑定教务系统/研究生管理系统账号请点击:".$ssfwLink;
-                $libLink = HelperService::getBindingLink($tousername, "lib");
+                $libLink = HelperService::getBindingLink("lib");
                 $content = $content."\n"."如需绑定图书馆账号请点击:".$libLink;
-                $libLink = HelperService::getBindingLink($tousername, "lab");
+                $libLink = HelperService::getBindingLink("lab");
                 $content = $content."\n"."如需绑定大学物理实验账号请点击:".$libLink;
                 return $content;
                 break;
@@ -238,7 +237,7 @@ class TextMessageHandler implements EventHandlerInterface
                 try {
                     $content = $account->getExamMessage();
                     if (is_array($content)) {
-                        return new News($content);
+                        return ($content['message']);
                     } else {
                         return $content;
                     }

@@ -6,6 +6,7 @@ use App\Exceptions\SchoolInfoException;
 use App\Http\Controllers\StudentsController;
 use App\Http\Service\HelperService;
 use App\Http\Service\SchoolDatetime;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
@@ -20,15 +21,17 @@ class AccountInfoDetailController extends Controller
         $redis= Redis::connection('timetable');
         $timetable_cache = $redis->get('timetable_'.$openid);
         if (!empty($timetable_cache)) {
+            $pass_time =config('app.timetable_cache_time')-$redis->ttl('timetable_'.$openid);//已缓存了多久
             $timetable = array(
                 'status' => 200,
                 'message' => __CLASS__ . ': get timetable successfully',
-                'data' => json_decode($timetable_cache, true)
+                'data' => json_decode($timetable_cache, true),
+                'update_time' => Carbon::now()->subSeconds($pass_time)->diffForHumans()
             );
             return $timetable;
         }
         $student_controller = new StudentsController();
-        $cookie_array = $student_controller->Cookie('ssfw');
+        $cookie_array = $student_controller->cookie('ssfw');
         if ($cookie_array['data'] == null) {
             return $cookie_array['message'];
         }
@@ -172,14 +175,24 @@ class AccountInfoDetailController extends Controller
                 }
             }
             $parsedTimetable = $this->parseTimetable($timetable);
-            $redis->setex('timetable_'.$openid, 7200,json_encode($parsedTimetable)); //缓存课表两小时
+            $redis->setex(
+                'timetable_'.$openid,
+                config('app.timetable_cache_time'),
+                json_encode(array(
+                'adj_info' => $currAdjInfo,
+                'timetable' => $parsedTimetable,
+                 ))
+            ); //缓存课表两小时
+
             $rtnArray = array(
                 'status' => 200,
                 'message' => __CLASS__ . ': get timetable successfully',
                 'data' => array(
                     'adj_info' => $currAdjInfo,
                     'timetable' => $parsedTimetable,
-                )
+                ),
+                'update_time' => '刚刚'
+
             );
             //添加未安排课程信息
             if (isset($no_arrange)) {
@@ -195,20 +208,21 @@ class AccountInfoDetailController extends Controller
     public function getExamArrangement()
     {
         $message = app('wechat')->server->getMessage();
-//        $openid = $message['FromUserName'];
-        $openid='onzftwySIXNVZolvsw_hUvvT8UN0';
+        $openid = $message['FromUserName'];
         $redis= Redis::connection('exam');
         $exam_cache = $redis->get('exam_'.$openid);
         if (!empty($exam_cache)) {
+            $pass_time =config('app.exam_cache_time')-$redis->ttl('exam_'.$openid);//已缓存了多久
             $exam = array(
                 'status' => 200,
                 'message' => __CLASS__ . ': get exam successfully',
-                'data' => json_decode($exam_cache, true)
+                'data' => json_decode($exam_cache, true),
+                'update_time' => Carbon::now()->subSeconds($pass_time)->diffForHumans()
             );
             return $exam;
         }
         $student_controller = new StudentsController();
-        $cookie_array = $student_controller->Cookie('ssfw');
+        $cookie_array = $student_controller->cookie('ssfw');
         if ($cookie_array['data'] == null) {
             return $cookie_array['message'];
         }
@@ -241,46 +255,48 @@ class AccountInfoDetailController extends Controller
                     }
                     $arrTestInfo[] = $matches[1];
                 }
+                $redis->setex('exam_'.$openid, config('app.exam_cache_time'), json_encode($arrTestInfo)); //缓存考试两小时
                 return array(
                     'status' => 200,
                     'message' => __CLASS__ . ": get the test arrangement successfully",
-                    'data' => $arrTestInfo
+                    'data' => $arrTestInfo,
+                    'update_time' => '刚刚'
                 );
-                /* WHY CAN'T IT WORK?
-                 * It seems that an encoding problem occured. ALL Chinese characters
-                 * cannot be decoded correctly while the html parsing is successful.
-                 * Besides, WHY CAN'T I USE CHINESE INPUT METHOD IN SUBLIME for LINUX?
+            /* WHY CAN'T IT WORK?
+             * It seems that an encoding problem occured. ALL Chinese characters
+             * cannot be decoded correctly while the html parsing is successful.
+             * Besides, WHY CAN'T I USE CHINESE INPUT METHOD IN SUBLIME for LINUX?
 
-                $htmlDom = new \HtmlParser\ParserDom($matches[0]);
-                $arrTr = $htmlDom->find('tr');
-                $courseCount = count($arrTr)-1;    // 课程数量
-                for ($i=0; $i < $courseCount; $i++) {
-                    $td = $arrTr[$i+1]->find('td');
-                    $course[$i]['name'] = trim($td[2]->getPlainText());    // 课程名称
-                    $course[$i]['teacher'] = trim($td[4]->getPlainText());    // 教师
-                    $course[$i]['seat'] = trim($td[6]->getPlainText());    // 座次
-                    $course[$i]['time'] = trim($td[7]->getPlainText());    // 时间
-                    $course[$i]['class'] = trim($td[8]->getPlainText());    // 考场位置
-                    // 考试状态
-                    if (trim($td[11]->getPlainText()) == "已结束") {
-                        $course[$i]['status'] = 'end';
-                    }
-                    else{
-                        $course[$i]['status'] = 'ing';
-                    }
+            $htmlDom = new \HtmlParser\ParserDom($matches[0]);
+            $arrTr = $htmlDom->find('tr');
+            $courseCount = count($arrTr)-1;    // 课程数量
+            for ($i=0; $i < $courseCount; $i++) {
+                $td = $arrTr[$i+1]->find('td');
+                $course[$i]['name'] = trim($td[2]->getPlainText());    // 课程名称
+                $course[$i]['teacher'] = trim($td[4]->getPlainText());    // 教师
+                $course[$i]['seat'] = trim($td[6]->getPlainText());    // 座次
+                $course[$i]['time'] = trim($td[7]->getPlainText());    // 时间
+                $course[$i]['class'] = trim($td[8]->getPlainText());    // 考场位置
+                // 考试状态
+                if (trim($td[11]->getPlainText()) == "已结束") {
+                    $course[$i]['status'] = 'end';
                 }
-                */
+                else{
+                    $course[$i]['status'] = 'ing';
+                }
+            }
+            */
             } else {
                 return array(
                     'status' => 204,
-                    'message' => __CLASS__ . ": NO TEST ARRANGEMENT",
+                    'message' => "没有考试信息",
                     'data' => null
                 );
             }
-        } else{
+        } else {
             return array(
                 'status' => 404,
-                'message' => __CLASS__ . ": connection timed out",
+                'message' => "超时",
                 'data' => null
             );
         }

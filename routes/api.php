@@ -20,8 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 $api->version('v1', function ($api) {
     $api->post('students/ssfw', 'App\Http\Controllers\Api\AccountInfoController@judgeAccount');
-    $api->get('students/ssfw/timetable/{openid}', 'App\Http\Controllers\Api\AccountInfoController@getStudentName');
-
+    $api->get('students/ssfw/timetable/{openid}', 'App\Http\Controllers\Api\AccountInfoController@tableApi');
     $api->post('students/lib', 'App\Http\Controllers\Api\LibInfoController@judgeAccount');
 
 });

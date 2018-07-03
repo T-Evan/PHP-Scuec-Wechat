@@ -27,11 +27,17 @@ return [
 
     //应用内常用环境变量
 
+    'openid_regex' => env('OPENID_REGEX', null),
+
     'base_url' => env('BASE_URL', null),
 
     'blog_url' => env('BLOG_URL', null),
 
     'timetable_url' => env('TIMETABLE_URL', null),
+
+    'timetable_cache_time' => env('TIMETABLE_CACHE_TIME', null),
+
+    'exam_cache_time' => env('EXAM_CACHE_TIME', null),
 
     'semester_begin_date' => env('semester_begin_date', null),
 
