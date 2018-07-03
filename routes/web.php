@@ -11,7 +11,6 @@
 |
 */
 
-Route::get('/test', 'StudentsController@ssfwCookie');
 Route::get('/test1', 'StudentsController@test');
 
 

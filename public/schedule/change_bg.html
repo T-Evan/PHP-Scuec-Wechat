@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>课表背景图更换</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+	<style>
+		body{
+			position:relative;
+			background-color: #fff;
+		}
+
+		input[type="file"]{
+			position: relative;
+			display:block;
+			width: 4rem;
+			height:0.7rem;
+			margin: 0 auto;
+			margin-top: 1rem;
+			border: none;
+			font-size: 16px;
+			color: #ccc;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+
+
+		}
+		::-ms-browse, [type='file'] {
+		   line-height: 0.7rem;
+		    border:none;
+		    background: #eee;
+		    color: #888;
+		}
+		::-webkit-file-upload-button {
+		    line-height: 0.7rem;
+		    border:none;
+		    background: #eee;
+		    color: #888;
+		}
+		button[type="submit"]{
+			position: relative;
+			display:block;
+			width: 4rem;
+			height:0.7rem;
+			margin: 0.4rem auto;
+			border: none;
+			font-size: 16px;
+			background-color: #3b3;
+			color: #fff;
+			border-radius: 5px;
+		}
+
+	</style>
+</head>
+<body>
+	<form action="postpic.php"
+	      method="post"
+				enctype="multipart/form-data">
+
+	 	<input type="file" name="pic"/>
+	    <button type="submit">提交</button>
+	</form>
+</body>
+<script>
+(function() { var resizeEvent = 'orientationchange' in window ? 'orientationchange' : 'resize';
+    var rescale = function() {
+      document.documentElement.style.fontSize = document.documentElement.clientWidth/375*75 + 'px';
+    }
+   window.addEventListener(resizeEvent,rescale,false);
+   document.addEventListener('DOMContentLoaded',rescale,false); })();
+
+</script>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <title>一周课表</title>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+   <link rel="stylesheet" href="./css/weui.min.css"/>
+   <link href="./css/index.css" rel="stylesheet" type="text/css"/>
+ <script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "https://hm.baidu.com/hm.js?a464a4a745137768ad31a245b8e5897e";
+	  var s = document.getElementsByTagName("script")[0];
+	  s.parentNode.insertBefore(hm, s);
+	})();
+</script>
+</head>
+<body>
+	<div class="container">
+		<div class="main">
+
+			<table class="header">
+				<tr>
+					<th></th>
+					<td class="a1">周一</td>
+					<td class="a2">周二</td>
+					<td class="a3">周三</td>
+					<td class="a4">周四</td>
+					<td class="a5">周五</td>
+					<td class="a6">周六</td>
+					<td class="a7">周日</td>
+				</tr>
+			</table>
+			<div class="table_wrap">
+				<table>
+					<tr>
+						<th class="section">1</th>
+					    <td></td>
+					    <td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th class="section">2</th>
+					    <td></td>
+					    <td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th class="section">3</th>
+					    <td></td>
+					    <td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th class="section">4</th>
+					    <td></td>
+					    <td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th class="section">5</th>
+					    <td></td>
+					    <td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th class="section">6</th>
+					    <td></td>
+					    <td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th class="section">7</th>
+					    <td></td>
+					    <td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th class="section">8</th>
+					    <td></td>
+					    <td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th class="section">9</th>
+					    <td></td>
+					    <td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th class="section">10</th>
+					    <td></td>
+					    <td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th class="section">11</th>
+					    <td></td>
+					    <td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th class="section">12</th>
+					    <td></td>
+					    <td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</table>
+			</div>
+
+			<ul class="button_group">
+				<li><img src="./img/more.png"><span id="no_arrange">更多课程</span></li>
+				<li><a href="javascript:;" class="weui-btn weui-btn_default" id="showPicker"><img src="./img/change_week.png">第<span id="week"></span>周</a></li>
+			</ul>
+
+			<div class="conflict_panel">
+				<h3>冲突课程</h3>
+				<ol >
+				</ol>
+			</div>
+
+			<div class="no_arrange">
+				<div class="no_arrange_header"><span>未安排课程</span></div>
+				<ul>
+				</ul>
+			</div>
+			<div class="shade"></div>
+		</div>
+		<div class="detail">
+			<div class="detail_header">
+				<img src="./img/return.png" class="return_btn"></img>
+				<span>课程详情</span>
+			</div>
+			<div class="wrap">
+				<div class="detail_wrap">
+						<p class="class_name"></p>
+						<ul>
+							<li class="classroom"><img src="./img/place.png"><span class="info_title">教室</span><span class="class_info"></span></li>
+							<li class="week"><img src="./img/week.png"><span class="info_title">周数</span><span class="class_info"></span></li>
+							<li class="section"><img src="./img/section.png"><span class="info_title">节数</span><span class="class_info"></span></li>
+							<li class="detail_info time"><img src="./img/time.png"><span class="info_title">时间</span><span class="class_info"></span></li>
+							<li class="detail_info teacher"><img src="./img/teacher.png"><span class="info_title">老师</span><span class="class_info"></span></li>
+						</ul>
+				</div>
+				<div class="adj_info">
+					<div class="adj_header"><img src="./img/adj.png"><span class="info_title">课程调至</span></div>
+					<ul>
+						<li class="place"><span class="adj_title">教室</span><span class="adj_result"></span></li>
+						<li class="section"><span class="adj_title">节数</span><span class="adj_result"></span></li>
+						<li class="week"><span class="adj_title">周数</span><span class="adj_result"></span></li>
+						<li class="teacher"><span class="adj_title">老师</span><span class="adj_result"></span>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+<img  src="./img/bit.png" class="bit"></img>
+
+</body>
+<script src="./js/jquery-3.1.1.min.js"></script>
+<script src="./js/zepto.min.js"></script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script src="https://res.wx.qq.com/open/libs/weuijs/1.0.0/weui.min.js"></script>
+<script src="./js/index.js"></script>
+</html>

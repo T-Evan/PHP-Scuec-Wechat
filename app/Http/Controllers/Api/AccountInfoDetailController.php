@@ -100,7 +100,6 @@ class AccountInfoDetailController extends Controller
                 );//构造数组
             }
 
-
             /* 解析教务系统课程表。
              * 以下代码可以实现：将每天的课程放到对应的数组里（星期一=>[0], 星期二=>[1], etc.）。
              * 解析的难度在于，课表会使用rowspan属性来控制单个课程占据行单元格的数量。因此，每行的td个数
@@ -175,14 +174,6 @@ class AccountInfoDetailController extends Controller
                 }
             }
             $parsedTimetable = $this->parseTimetable($timetable);
-            $redis->setex(
-                'timetable_'.$openid,
-                config('app.timetable_cache_time'),
-                json_encode(array(
-                'adj_info' => $currAdjInfo,
-                'timetable' => $parsedTimetable,
-                 ))
-            ); //缓存课表两小时
 
             $rtnArray = array(
                 'status' => 200,
@@ -198,6 +189,12 @@ class AccountInfoDetailController extends Controller
             if (isset($no_arrange)) {
                 $rtnArray['data']['no_arrange']=$no_arrange;
             }
+
+            $redis->setex(
+                'timetable_'.$openid,
+                config('app.timetable_cache_time'),
+                json_encode($rtnArray['data'])
+            ); //缓存课表两小时
             if ($debug == true) {
                 $rtnArray['raw_timetable'] = $trimedTable;
             }

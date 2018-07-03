@@ -7,6 +7,7 @@ use App\Http\Service\HelperService;
 use App\Http\Service\SchoolDatetime;
 use EasyWeChat\Kernel\Messages\NewsItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 use Log;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -439,38 +440,38 @@ class AccountInfoController extends Controller
 
     /**
      * Notes:为前端提供api接口
-     * @param Request $request
+     * @param $openid
+     * @throws \App\Exceptions\SchoolInfoException
      */
     public function tableApi($openid)
     {
-        if (isset($openid)) {
-            $matchCount = preg_match("/^oULq3u[a-zA-Z0-9_-]{22}/", $_GET['openid'], $match);
-            if ($matchCount == 1) {
-                $account_info_detail = new AccountInfoDetailController();
-                $timetable = $account_info_detail->getTimeTable();
-                if ($timetable !== false) {
-                    $arrTimetable = json_decode($timetable, true);
-                    $curWeek = SchoolDatetime::getSchoolWeek();
-                    // 如果没开学，则显示第一周课表
-                    $curWeek = $curWeek ? $curWeek : 1;
-                    $arrTimetable['current_week'] = $curWeek;
-                    $retArray = array(
+        $matchCount = preg_match(config('app.openid_regex'), $openid, $match);
+        if ($matchCount == true) {
+            $openid = $match[0];
+            $redis= Redis::connection('timetable');
+            $timetable_cache = $redis->get('timetable_'.$openid);
+            if ($timetable_cache !== false) {
+                $arrTimetable = json_decode($timetable_cache, true);
+                $curWeek = SchoolDatetime::getSchoolWeek();
+                // 如果没开学，则显示第一周课表
+                $curWeek = $curWeek ? $curWeek : 1;
+                $arrTimetable['current_week'] = $curWeek;
+                $retArray = array(
                         'status' => 200,
                         'data' => $arrTimetable
                     );
-                } else {
-                    $retArray = array(
+            } else {
+                $retArray = array(
                         'status' => 404,
                         'data' => null
                     );
-                }
-            } else {
-                $retArray = array(
+            }
+        } else {
+            $retArray = array(
                     'status' => 405,
                     'data' => null
                 );
-            }
-            echo json_encode($retArray);
         }
+        echo json_encode($retArray);
     }
 }

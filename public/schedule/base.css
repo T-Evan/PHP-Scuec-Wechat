@@ -1,0 +1,164 @@
+
+* {
+  margin: 0;
+  padding: 0;
+}
+html,body{
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto;
+  
+}
+#wrap{
+  width: 200%;
+  height: 100%;
+  position: relative;
+}
+#left{
+  width: 50%;
+  height: 100%;
+  float: left;
+  background: url(image/background.jpg);
+  background-size:100% 100%;
+  background-repeat: no-repeat;
+  position: relative;
+}
+#fixed{
+  width:100%;
+  position: absolute;
+  margin-top: 0px;
+  height: 6%;
+  z-index: 2;
+  opacity: 0.8;
+}
+#timetable_wrap{
+  position: absolute;
+  bottom:0px;
+  width: 100%;
+  height: 94%;
+  overflow: auto;
+}
+#timetable{
+  background: url(image/sign.png);
+  background-repeat: no-repeat;
+  background-size:100% 100%;
+  width: 100%;
+  height:110%;
+  overflow: auto;
+  margin-top: 0px;
+  text-align: center;
+  z-index: 1;
+  position: absolute;
+   
+}
+#right{
+  width: 50%;
+  height: 100%;
+  background-image: url(image/background.jpg);
+  background-size:100% 100%;
+  background-repeat: no-repeat;
+  overflow:auto;
+  
+}
+.week{
+  width:12.962963%;
+  height:6%; 
+}
+.section{
+  width: 9%; 
+}
+td{
+  overflow:hidden;
+  border-radius: 0.6em;
+  table-layout: fixed;
+}
+
+td p{
+  width: 85%;
+  overflow: hidden;
+  font-size:24px;
+  display: inline-block;
+  color: #fff;
+}
+
+th{
+ 
+  font-size: 24px;
+  text-align: center;
+  border:1px solid #ccc;
+  opacity: 0.7;
+  font-weight: normal;
+}
+#return{
+  position: relative;
+  margin-top: 2%;
+  margin-left: 2%;
+}
+#caption{
+  margin-top: 0px;
+}
+#origin{
+  height: 70%;
+  width: 95%;
+  position: relative;
+  margin-top: 4%;
+  left: 5%;
+  list-style-type: none; 
+}
+#modified{
+  height: 40%;
+  width: 95%;
+  position: relative;
+  left: 5%;
+  top: 30%;
+  list-style-type: none;
+  display: none;
+}
+
+
+#detail_info li{
+  width: 100%;
+  margin-bottom: 8%;
+  overflow: hidden;
+  font-size: 28px;
+  position: relative;
+  display: block;
+}
+li img{
+  margin-right: 2%;
+  position: relative;
+  display: inline-block;
+
+}
+li div{
+  margin-top: 0px;
+  display: inline-block;
+  position: relative;
+  font-size: 28px;
+  
+}
+li p{
+  position: relative;
+  padding-left: 5%;
+  display: inline-block;
+  width:75%;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+  font-size: 28px;
+}
+
+.bit{
+  display:block;
+  width:100%;
+  text-align: center;
+  font-size: 18px;
+  color: #555;
+  opacity: 0.6;
+  position:fixed;
+  margin: auto;
+  bottom: 10px; 
+  z-index: 3;
+  }
+ 

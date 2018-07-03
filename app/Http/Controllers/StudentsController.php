@@ -73,7 +73,7 @@ class StudentsController extends Controller
     public function test()
     {
         $test =new AccountInfoController();
-        dd($test->getExamMessage());
+        dd($test->getTableMessage());
     }
 
     public function cookie($type)
