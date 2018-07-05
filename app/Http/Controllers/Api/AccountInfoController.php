@@ -392,7 +392,7 @@ class AccountInfoController extends Controller
                 $time = substr(strip_tags($course[$i][7]), 5); // 时间，截去年份
                 $name = $course[$i][2];    // 课程名称
                 $content .= "\n".($i+1)."-[".$course[$i][4]."]".$name;
-                if ($course[$i][11] === '已结束') {
+                if (isset($course[$i][11]) && $course[$i][11] == '已结束') {
                     $time = substr($time, 0, 5);
                     $content .= "，时间: " . $time . " (已结束)";
                 } else {

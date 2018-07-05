@@ -9,6 +9,7 @@ use App\Http\Service\TimeTableReplyService;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
+use Log;
 
 class StudentsController extends Controller
 {
@@ -94,7 +95,7 @@ class StudentsController extends Controller
             $student = Student::select('account', $password, 'openid')
                 ->where('openid', $openid)
                 ->get()->first();
-            if ($student->account==null || $student->password==null) {
+            if ($student->account==null || $student->$password==null) {
                 return ['data'=>null,'message'=>'用户不存在'];
             }
             $studentRequest = new StudentRequest();
@@ -102,7 +103,6 @@ class StudentsController extends Controller
             $studentRequest->password =  decrypt($student->toArray()[$password]);
             $studentRequest->openid = $student->openid;
             $studentRequest->type =  $type;
-
             $res = $this->store($studentRequest)->getData();
             if ($res['message']=='用户账号密码正确') {
                 $cookie = Redis::get($key);
