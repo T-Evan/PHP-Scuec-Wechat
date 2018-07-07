@@ -7,7 +7,6 @@ use App\Http\Controllers\StudentsController;
 use App\Http\Service\HelperService;
 use App\Http\Service\SchoolDatetime;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
@@ -202,6 +201,118 @@ class AccountInfoDetailController extends Controller
         }
     }
 
+    public function getScoreInfo($year = false, $term = false)
+    {
+        $message = app('wechat')->server->getMessage();
+        $openid = $message['FromUserName'];
+//        $openid = 'onzftwySIXNVZolvsw_hUvvT8UN0';
+        $redis= Redis::connection('score');
+        $score_cache = $redis->get('score_'.$openid);
+        if (!empty($score_cache)) {
+            $pass_time =config('app.score_cache_time')-$redis->ttl('score_'.$openid);//已缓存了多久
+            $score = array(
+            'status' => 200,
+            'message' => __CLASS__ . ': get score successfully',
+            'info' => json_decode($score_cache, true),
+            'update_time' => Carbon::now()->subSeconds($pass_time)->diffForHumans()
+             );
+            return $score;
+        }
+        $student_controller = new StudentsController();
+        $cookie_array = $student_controller->cookie('ssfw');
+        if ($cookie_array['data'] == null) {
+            return $cookie_array['message'];
+        }
+        /**
+         * goto后面的值Base64解码后为http://ssfw.scuec.edu.cn/ssfw/j_spring_ids_security_check
+         * 表示认证用户信息后跳转的地址
+         */
+        $cookie = unserialize($cookie_array['data']);
+        $res = HelperService::get(
+            'http://id.scuec.edu.cn/authserver/login?goto=http%3A%2F%2Fssfw.scuec.edu.cn%2Fssfw%2Fj_spring_ids_security_check',
+            $cookie,
+            'http://ssfw.scuec.edu.cn/ssfw/index.do'
+        );
+        $jar1 = $res['cookie'];
+
+        //尝试获取本科生成绩信息
+        if (($year !== false) && ($term !== false)) {
+            $url = "http://ssfw.scuec.edu.cn/ssfw/zhcx/cjxx?qXndm_ys={$year}&qXqdm_ys={$term}";
+        } else {
+            $url = "http://ssfw.scuec.edu.cn/ssfw/zhcx/cjxx";
+        }
+        $res = HelperService::get(
+            $url,
+            $jar1,
+            'http://ssfw.scuec.edu.cn/ssfw/index.do'
+        );
+        $score_html = $res['res']->getbody()->getcontents();
+
+        if (strpos($score_html, "评教") !== false) {  //判断是否评教
+            return array(
+                'status' => 205,
+                'message' => __CLASS__ . ": 未评教",
+                'info' => '',
+                'update_time' => '刚刚'
+            );
+        } elseif (strpos($score_html, "原始成绩")) {
+            preg_match("/<table class=\"table_con\" base=\"color3\"[\s\S]+复查操作[\s\S]+?<\/table>/", $score_html, $matches);
+            unset($score_html);   // 释放占用的内存
+            if (strpos($matches[0], "暂无记录") !== false) {
+                if ($openid !== 'null') {
+                    $redis->hSet("user:public:score:score_amount", $openid, 0);
+                }
+                return array(
+                    'status' => 204,
+                    'message' => __CLASS__ . ": 暂无成绩",
+                    'info' => '',
+                    'update_time' => '刚刚'
+                );
+            } else {
+                preg_match_all("/<tr class=\"t_con\">([\s\S]*?)<\/tr>/", $matches[0], $matches);
+                for ($i=0; $i < count($matches[1]); $i++) {
+                    preg_match_all("/<td align=\"center\" valign=\"middle\">([\s\S]*?)<\/td>/", $matches[1][$i], $td_matches);
+                    /*$td_matches
+                          0 => "1"
+                          1 => "2017-2018学年第二学期"
+                          2 => "115100000113"
+                          3 => "就业指导"
+                          4 => "公共必修课&nbsp;"
+                          5 => "必修课&nbsp;"
+                          6 => "1.0&nbsp;"
+                          7 => """
+                            \r\n
+                            \t                  \t  \t  \r\n
+                            \t                  \t  \t  \t\r\n
+                            \t                  \t  \t  \t\r\n
+                            \t                  \t  \t  \t\t<span><strong>73&nbsp;</strong></span>\r\n
+                            \t                  \t  \t  \t\r\n
+                            \t                  \t  \t  \r\n
+                            \t                  \t
+                            """
+                          8 => "初修&nbsp;"
+                          9 => "92/107&nbsp;"
+                          10 => "<strong></strong><br/>"
+                     */
+                    preg_match('/\d{1,3}/', $td_matches[1][7], $score);
+                    $course[$i]['name'] = trim($td_matches[1][3]); // 课程名称
+                    $course[$i]['type'] = str_replace('&nbsp;', '', $td_matches[1][4]); // 课程类别
+                    $course[$i]['credits'] = str_replace('&nbsp;', '', $td_matches[1][6]);   // 班级排名
+                    $course[$i]['score'] = $score[0];   // 课程成绩
+                    $course[$i]['rank'] = str_replace('&nbsp;', '', $td_matches[1][9]);   // 班级排名
+                }
+                $this->isNewScoreExists($openid, $redis, count($course));
+            }
+        }
+        $redis->setex('score_'.$openid, config('app.score_cache_time'), json_encode($course)); //缓存考试两小时
+        return array(
+            'status' => 200,
+            'message' => __CLASS__ . ": get the test arrangement successfully",
+            'info' => $course,
+            'update_time' => '刚刚'
+        );
+    }
+
     public function getExamArrangement()
     {
         $message = app('wechat')->server->getMessage();
@@ -224,6 +335,10 @@ class AccountInfoDetailController extends Controller
             return $cookie_array['message'];
         }
         $cookie = unserialize($cookie_array['data']);
+        /**
+         * goto后面的值Base64解码后为http://ssfw.scuec.edu.cn/ssfw/j_spring_ids_security_check
+         * 表示认证用户信息后跳转的地址
+         */
         $res = HelperService::get(
             'http://id.scuec.edu.cn/authserver/login?goto=http%3A%2F%2Fssfw.scuec.edu.cn%2Fssfw%2Fj_spring_ids_security_check',
             $cookie,
@@ -412,5 +527,20 @@ class AccountInfoDetailController extends Controller
             );
         }
         return $currAdjInfo;
+    }
+    private function isNewScoreExists($openid, $redis, $newAmount)
+    {
+        $oldAmount = $redis->hGet("user:public:score:score_amount", $openid);
+        if ($oldAmount === false) {
+            $redis->hSet("user:public:score:score_amount", $openid, $newAmount);
+            $newScoreCount = 0;
+        } else {
+            $newScoreCount = $newAmount - $oldAmount;
+            $newScoreCount = ($newScoreCount < 0) ? 0 : $newScoreCount;
+            if ($newScoreCount >= 0) {
+                $redis->hSet("user:public:score:score_amount", $openid, $newAmount);
+            }
+        }
+        return $newScoreCount;
     }
 }

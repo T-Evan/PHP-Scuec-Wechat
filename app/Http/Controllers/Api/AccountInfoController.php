@@ -418,24 +418,43 @@ class AccountInfoController extends Controller
     public function getScoreMessage()
     {
         /* 成绩 */
-        $arrScore = $this->getScore();
-        if ($arrScore['status'] != 200) {
-            return $arrScore;
+        $account_info_detail = new AccountInfoDetailController();
+        $arrScore = $account_info_detail->getScoreInfo();
+        if (!is_array($arrScore)) {
+            switch ($arrScore) {
+                case '用户不存在':
+                    $news = "绑定账号后即可查询最新的考试成绩。考得好的话不要到处打击人哦。/:,@x\n请先" .
+                        HelperService::getBindingLink('ssfw');
+                    break;
+                case '用户信息有误':
+                    $news = "你绑定的账号信息貌似有误 /:P-( 需要重新" .
+                        HelperService::getBindingLink('ssfw');
+                    break;
+            }
+            return $news;
         }
-        $replyText = '';
-        foreach ($arrScore['data'] as $key => $item) {
-            $replyText .= "课程：[{$item[4]}]".$item[3]."\n"
-                    ."分数: ".$item[7]."\n\n";
+        switch ($arrScore['status']){
+            case 204:
+                $courseStr = SchoolDatetime::getDateInfo()."\n/:sun 过儿，目前还没有成绩出来哦。你可以看看还有什么考试，做好准备才能考出好成绩。你也可以先<a href=\"http://wish.stuzone.com\">去许个愿。</a>";
+                return $courseStr;
+            case 205:
+                $courseStr = "亲，你可能因尚未评教而无法查询成绩。请使用电脑从办事大厅(http://ehall.scuec.edu.cn/new/index.html"." )登录教务系统，完成评教后再来查询。不要错过评教时间哦。/:,@-D";
+                return $courseStr;
         }
-        $items = [
-                new NewsItem(
-                    [
-                        'title'       => '我的成绩',
-                        'description' => $replyText,
-                    ]
-                )
-            ];
-        return $items;
+        $courseStr = SchoolDatetime::getDateInfo()."---已出成绩的课程---\n";
+        foreach ($arrScore['info'] as $key => $item) {
+            if ($item['score'] >= 90 && $item['score'] <= 100) {//成绩90分以上加一朵玫瑰^.^
+                $item['score'] = $item['score']." /:rose";
+            }
+            $courseStr .= "[{$item['type']}]".$item['name']
+                    ."，分数: ".$item['score']
+                    ."，学分: ".$item['credits']
+                    ."，班级排名: ".$item['rank']."\n";
+
+        }
+        $courseStr .= "\n成绩信息更新于：".$arrScore['update_time'];
+
+        return $courseStr;
     }
 
     /**
@@ -474,4 +493,5 @@ class AccountInfoController extends Controller
         }
         echo json_encode($retArray);
     }
+
 }

@@ -229,7 +229,7 @@ class TextMessageHandler implements EventHandlerInterface
                         return $content;
                     }
                 } catch (\Exception $exception) {
-                    Log::error('openid：'.$message['FromUserName'].'  error：'.$exception->getTraceAsString());
+                    Log::error('openid：'.$message['FromUserName'].$exception->getTraceAsString());
                 }
                 break;
             case 'exam':
@@ -242,7 +242,21 @@ class TextMessageHandler implements EventHandlerInterface
                         return $content;
                     }
                 } catch (\Exception $exception) {
-                    Log::error('openid：'.$message['FromUserName'].'  error：'.$exception->getTraceAsString());
+                    Log::error('openid：'.$message['FromUserName'].$exception->getTraceAsString());
+                }
+                break;
+            case 'score':
+                $account = new AccountInfoController();
+                try {
+                    $content = $account->getScoreMessage();
+                    Log::error($content);
+                    if (is_array($content)) {
+                        return ($content['message']);
+                    } else {
+                        return $content;
+                    }
+                } catch (\Exception $exception) {
+                    Log::error('openid：'.$message['FromUserName'].$exception->getTraceAsString());
                 }
                 break;
             case 'test2':
@@ -308,8 +322,10 @@ class TextMessageHandler implements EventHandlerInterface
             return 'rebinding';
         } elseif (($keyword == '课表')) {
             return 'timetable';
-        } elseif (($keyword == '考试') || $keyword == '查考试' || $keyword == '考试安排'){
+        } elseif (($keyword == '考试') || $keyword == '查考试' || $keyword == '考试安排') {
             return 'exam';
+        } elseif ($keyword == '成绩' || $keyword == '查成绩') {
+            return 'score';
         }
     }
 

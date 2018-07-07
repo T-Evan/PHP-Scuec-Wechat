@@ -79,7 +79,7 @@ class StudentsController extends Controller
     public function test()
     {
         $test =new AccountInfoController();
-        dd($test->getTableMessage());
+        $test->getScoreMessage();
     }
 
     public function cookie($type)
@@ -95,7 +95,7 @@ class StudentsController extends Controller
             $student = Student::select('account', $password, 'openid')
                 ->where('openid', $openid)
                 ->get()->first();
-            if ($student->account==null || $student->$password==null) {
+            if (!isset($student->account)) {
                 return ['data'=>null,'message'=>'用户不存在'];
             }
             $studentRequest = new StudentRequest();

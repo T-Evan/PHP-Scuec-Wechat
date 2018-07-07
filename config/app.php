@@ -39,6 +39,9 @@ return [
 
     'exam_cache_time' => env('EXAM_CACHE_TIME', null),
 
+    'score_cache_time' => env('SCORE_CACHE_TIME', null),
+
+
     'semester_begin_date' => env('semester_begin_date', null),
 
     'semester_end_date'=> env('semester_end_date', null),
