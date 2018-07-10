@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\StudentsController;
 use App\Http\Service\HelperService;
 use App\Http\Service\SchoolDatetime;
 use EasyWeChat\Kernel\Messages\NewsItem;
@@ -32,6 +31,12 @@ class AccountInfoController extends Controller
     const TIMETABLE = 10001;
     const EXAM_SCORE = 10002;
     const EXAM_ARRANGEMENT = 10003;
+
+    /**
+     * constants for setFlag() and getFlag()
+     */
+    const FLAG_CHECK = 10001;
+    const FLAG_LIKE = 10002;
 
     /**
      * Notes:
@@ -420,6 +425,8 @@ class AccountInfoController extends Controller
         /* 成绩 */
         $account_info_detail = new AccountInfoDetailController();
         $arrScore = $account_info_detail->getScoreInfo();
+        $message = app('wechat')->server->getMessage();
+        $openid = $message['FromUserName'];
         if (!is_array($arrScore)) {
             switch ($arrScore) {
                 case '用户不存在':
@@ -452,7 +459,9 @@ class AccountInfoController extends Controller
                     ."，班级排名: ".$item['rank']."\n";
 
         }
+        $courseStr .= "\n<a href=\"". config('app.base_url') ."/scratchoff/index.html?ver=6.0&openid={$openid}\">刮刮乐，玩儿心跳</a>";
         $courseStr .= "\n成绩信息更新于：".$arrScore['update_time'];
+
 
         return $courseStr;
     }
@@ -494,4 +503,27 @@ class AccountInfoController extends Controller
         echo json_encode($retArray);
     }
 
+    /**
+     * Notes:为前端提供api接口
+     * @param $openid
+     * @return array
+     * @throws \App\Exceptions\SchoolInfoException
+     */
+    public function scoreApi($openid)
+    {
+        $matchCount = preg_match(config('app.openid_regex'), $openid, $match);
+        if ($matchCount == true) {
+            $openid = $match[0];
+            $redis= Redis::connection('score');
+            $score_cache = $redis->get('score_'.$openid);
+            //将json转换为前端需要的格式
+            $new_score_array = json_decode($score_cache);
+            foreach ($new_score_array as $key=>$value){
+                $value->hidden=false;
+                $value->is_checked=true;
+            }
+            $new_score_array = array('status'=>200,'data'=>$new_score_array);
+        }
+        echo json_encode($new_score_array);
+    }
 }
