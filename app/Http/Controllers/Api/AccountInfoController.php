@@ -543,12 +543,11 @@ class AccountInfoController extends Controller
                             break;
                         case 'like':
                             if ($request->data == 'false') {
-                                echo $this->redis->hSet("user:public:score:flag_likes", $openid, 0);
+                                echo $redis->hSet("user:public:score:flag_likes", $openid, 0);
                             } elseif ($request->data == 'true') {
-                                echo $this->redis->hSet("user:public:score:flag_likes", $openid, 1);
+                                echo $redis->hSet("user:public:score:flag_likes", $openid, 1);
                             }
                             break;
-
                 }
             }
         }

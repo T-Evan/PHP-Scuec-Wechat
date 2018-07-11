@@ -307,7 +307,6 @@ $(document).ready(function() {
             type: 'POST',
             dataType: 'json',
             data: {
-                openid: openId,
                 act: 'like',
                 data: likeMark
             },
