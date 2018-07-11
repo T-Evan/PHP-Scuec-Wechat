@@ -507,7 +507,6 @@ class AccountInfoController extends Controller
      * Notes:为前端提供api接口
      * @param $openid
      * @return array
-     * @throws \App\Exceptions\SchoolInfoException
      */
     public function scoreApi($openid)
     {
