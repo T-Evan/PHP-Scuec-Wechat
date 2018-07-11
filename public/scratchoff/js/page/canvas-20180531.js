@@ -82,7 +82,7 @@ $(document).ready(function() {
                             var className = _this.parent().parent().children("h1").text(); //TODO
 
                             $.ajax({ // 擦除成功 发送参数
-                                url: 'api.php',
+                                url: 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId,
                                 type: 'POST',
                                 dataType: 'json',
                                 data: {
@@ -155,7 +155,7 @@ $(document).ready(function() {
         var path = 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId;
         $.ajax({
                 url: 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId,
-                type: 'GET',
+                type: 'POST',
                 dataType: 'json',
                 timeout: 15000,
             })
@@ -305,7 +305,7 @@ $(document).ready(function() {
             var likeMark = 'false';
         }
         $.ajax({
-            url: 'api.php',
+            url: 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId,
             type: 'POST',
             dataType: 'json',
             data: {

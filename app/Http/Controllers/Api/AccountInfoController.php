@@ -51,10 +51,10 @@ class AccountInfoController extends Controller
 
     public function judgeAccount(Request $request)
     {
-        $userInfoArray=$request->toArray();
+        $userInfoArray = $request->toArray();
         $res = HelperService::get('http://id.scuec.edu.cn/authserver/login');
         $data = $res['res']->getBody()->getContents();
-        $cookie_jar= $res['cookie'];
+        $cookie_jar = $res['cookie'];
 
         $crawler = new Crawler();
         $crawler->addHtmlContent($data);
@@ -99,7 +99,7 @@ class AccountInfoController extends Controller
                     $key = array(
                         'status' => self::NEED_CAPTURE,
                         'message' => "你尝试的次数过多，请点击链接进行身份认证后，重新进行绑定！",
-                    'data' => null
+                        'data' => null
                     );
                     return $this->response->array($key);
                     break;
@@ -126,7 +126,7 @@ class AccountInfoController extends Controller
         $termWeek = SchoolDatetime::getSchoolWeek();    // 本周的学期周数
         if ($termWeek > 20) {   // 如果大于20周课表查询关闭
             $content = "\n本学期已经结束了哦，课表查询功能自动关闭。学霸们，下个学期继续努力吧。";
-            $content = HelperService::todyInfo().$content;
+            $content = HelperService::todyInfo() . $content;
             return $content;
         }
 
@@ -163,9 +163,9 @@ class AccountInfoController extends Controller
                     if (isset($each['raw'])) {
                         $replyText .= "\n" . $each['raw'] . "\n";
                         $this->logger->error("invalid course information found", array(
-                                "openid" => $openid,
-                                "serialized" => serialize($timetable)
-                            ));
+                            "openid" => $openid,
+                            "serialized" => serialize($timetable)
+                        ));
                     } else {
                         $beginTimeIndex = $each['from_section'] - 1;
 
@@ -191,19 +191,19 @@ class AccountInfoController extends Controller
                                 /* 如果是体育课，则显示体育课的时间*/
                                 if (preg_match('/^体育[1234]/', $each['name']) && ($beginTimeIndex == 4 || $beginTimeIndex == 6)) {
                                     $PELessonBeginTime = array(
-                                            4 => '13:40',
-                                            6 => '15:00'
-                                        );
+                                        4 => '13:40',
+                                        6 => '15:00'
+                                    );
                                     $lessonBeginTimeStr = $PELessonBeginTime[$beginTimeIndex];
                                 } else {
                                     $lessonBeginTimeStr = $beginTime[$beginTimeIndex];
                                 }
 
                                 $replyText .= "---- {$lessonBeginTimeStr} ----\n"
-                                        . "课程名: {$each['name']}\n"
-                                        . "时间: {$each['from_week']}-{$each['to_week']}周, {$each['from_section']}-{$each['to_section']}节\n"
-                                        . "地点: {$each['place']}\n"
-                                        . "教师: {$each['teacher']}\n\n";
+                                    . "课程名: {$each['name']}\n"
+                                    . "时间: {$each['from_week']}-{$each['to_week']}周, {$each['from_section']}-{$each['to_section']}节\n"
+                                    . "地点: {$each['place']}\n"
+                                    . "教师: {$each['teacher']}\n\n";
                             }
                         } else {
                             continue;
@@ -223,14 +223,14 @@ class AccountInfoController extends Controller
                     if (isset($each['origin']['raw']) || isset($each['modified']['raw'])) {
                         $adjInfoString .= $each['origin']['raw'] . "\n=>" . $each['modified']['raw'] . "\n\n";
                     } elseif ((
-                                $each['origin']['from_week'] >= $currWeek &&
-                                $each['origin']['to_week'] <= $currWeek
-                            ) ||
-                            (
-                                $each['modified']['from_week'] >= $currWeek &&
-                                $each['modified']['to_week'] <= $currWeek
-                            )
-                        ) {
+                            $each['origin']['from_week'] >= $currWeek &&
+                            $each['origin']['to_week'] <= $currWeek
+                        ) ||
+                        (
+                            $each['modified']['from_week'] >= $currWeek &&
+                            $each['modified']['to_week'] <= $currWeek
+                        )
+                    ) {
                         $dayIndex = $each['origin']['day_in_week'] - 1;
                         $className = "";
                         foreach ($timetable['data']['timetable'][$dayIndex] as $value) {
@@ -242,8 +242,8 @@ class AccountInfoController extends Controller
                         $toWeekStr = ($each['modified']['to_week'] - $each['modified']['from_week'] == 0) ? ($each['modified']['from_week']) : ("{$each['modified']['from_week']}-{$each['modified']['to_week']}");
 
                         $adjInfoString .= "课程名: {$className}\n"
-                                . "原上课时间: 第{$fromWeekStr}周," . SchoolDatetime::weekTranslate(intval($each['origin']['day_in_week'])) . ",第{$each['origin']['from_section']}-{$each['origin']['to_section']}节\n"
-                                . "调整后时间: 第{$toWeekStr}周," . SchoolDatetime::weekTranslate(intval($each['modified']['day_in_week'])) . ",第{$each['modified']['from_section']}-{$each['origin']['to_section']}节\n\n";
+                            . "原上课时间: 第{$fromWeekStr}周," . SchoolDatetime::weekTranslate(intval($each['origin']['day_in_week'])) . ",第{$each['origin']['from_section']}-{$each['origin']['to_section']}节\n"
+                            . "调整后时间: 第{$toWeekStr}周," . SchoolDatetime::weekTranslate(intval($each['modified']['day_in_week'])) . ",第{$each['modified']['from_section']}-{$each['origin']['to_section']}节\n\n";
                     }
                 }
             }
@@ -257,9 +257,9 @@ class AccountInfoController extends Controller
                 $replyText .= "你今天没有课哦，可以去轻松一下啦 :) \n";
 
                 // BEGIN OF APRIL FOOL CODE BLOCKS
-                    // temprary codes for April Fool's Day. CAN BE REMOVE ANY TIME, BUT YOU MUST UNCOMMENT THE PREVIOUS LINE!
-                    //$replyText .= "今天真的没有课，真的，没骗你 :)\n";
-                    // END OF APRIL FOOL
+                // temprary codes for April Fool's Day. CAN BE REMOVE ANY TIME, BUT YOU MUST UNCOMMENT THE PREVIOUS LINE!
+                //$replyText .= "今天真的没有课，真的，没骗你 :)\n";
+                // END OF APRIL FOOL
             }
 
             /* show the course count of tomorrow */
@@ -336,23 +336,24 @@ class AccountInfoController extends Controller
             // $extraInfo = "\n- 遇到课表错误，记得@程序员反馈哦\n".$updateDateStr;
 
             // BEGIN OF APRIL FOOL CODE BLOCKS
-            $update_time = "\n\n课表更新于：".$timetable['update_time'];
+            $update_time = "\n\n课表更新于：" . $timetable['update_time'];
             $extraInfo = "\n- 要查询所有课程，请查看一周课表\n" . $updateDateStr;
             // END OF APRIL FOOL CODE BLOCKS
             $news = [
-                    new NewsItem(
-                        [
-                            'title' => $dateString,
-                            'description' => $replyText . $adjInfoString . $nextDayCoursePrompt .$update_time. $extraInfo,
-                            'url' => config('app.base_url') . '/schedule/index.html?openid=' . $openid,
-                        ]
-                    )
-                ];
+                new NewsItem(
+                    [
+                        'title' => $dateString,
+                        'description' => $replyText . $adjInfoString . $nextDayCoursePrompt . $update_time . $extraInfo,
+                        'url' => config('app.base_url') . '/schedule/index.html?openid=' . $openid,
+                    ]
+                )
+            ];
         } else {
             $news = "出现了一些小问题，你可以稍后再试一次。";
         }
         return $news;
     }
+
     public function getExamMessage()
     {
         /* 考试 */
@@ -372,7 +373,7 @@ class AccountInfoController extends Controller
             return $news;
         }
         $courseCount = count($arrange['data']);
-        $content =HelperService::todyInfo()."\n---已安排考试课程---";
+        $content = HelperService::todyInfo() . "\n---已安排考试课程---";
         $course = $arrange['data'];
         /*example
          array:4 [▼
@@ -392,11 +393,11 @@ class AccountInfoController extends Controller
             //未考试时页面表中该项由“ing”变为空，因此之前的正则抓取有bug，先改用结束作为判断标记
           ]
          */
-        if ($courseCount>0) {
-            for ($i=0; $i < $courseCount; $i++) {
+        if ($courseCount > 0) {
+            for ($i = 0; $i < $courseCount; $i++) {
                 $time = substr(strip_tags($course[$i][7]), 5); // 时间，截去年份
                 $name = $course[$i][2];    // 课程名称
-                $content .= "\n".($i+1)."-[".$course[$i][4]."]".$name;
+                $content .= "\n" . ($i + 1) . "-[" . $course[$i][4] . "]" . $name;
                 if (isset($course[$i][11]) && $course[$i][11] == '已结束') {
                     $time = substr($time, 0, 5);
                     $content .= "，时间: " . $time . " (已结束)";
@@ -404,22 +405,23 @@ class AccountInfoController extends Controller
                     $class = $course[$i][8];  // 考场
                     if (preg_match("/11|15/", $class)) {
                         $class = substr($class, 9); // 去掉楼栋中文
-                        $floor = substr($class, 0, 2)."#";
+                        $floor = substr($class, 0, 2) . "#";
                         $class = substr($class, 2);
-                        $class = $floor.$class;
+                        $class = $floor . $class;
                     }
-                    $content .= "，时间: ".$time."，考场: ".$class."，座次: ".$course[$i][6];
+                    $content .= "，时间: " . $time . "，考场: " . $class . "，座次: " . $course[$i][6];
                 }
             }
-            $content .= "\n\n考试信息更新于：".$arrange['update_time'];
+            $content .= "\n\n考试信息更新于：" . $arrange['update_time'];
             $bindingLink = HelperService::getBindingLink("ssfw");
-            $content .= "\n\n<a href=\"https://test.stuzone.com/zixunminda-blog/why-extend-cache-time.html\">关于延长缓存时间的更新说明</a>\n想要马上更新考试信息,可以重新".$bindingLink;
+            $content .= "\n\n<a href=\"https://test.stuzone.com/zixunminda-blog/why-extend-cache-time.html\">关于延长缓存时间的更新说明</a>\n想要马上更新考试信息,可以重新" . $bindingLink;
         } else {
             $bindingLink = HelperService::getBindingLink("ssfw");
-            $content = HelperService::todyInfo()."\n/:sun 目前没有考试安排，平常努力学习才能考出好成绩哦。\n想要马上更新考试信息,可以重新".$bindingLink;
+            $content = HelperService::todyInfo() . "\n/:sun 目前没有考试安排，平常努力学习才能考出好成绩哦。\n想要马上更新考试信息,可以重新" . $bindingLink;
         }
         return $content;
     }
+
     public function getScoreMessage()
     {
         /* 成绩 */
@@ -440,27 +442,26 @@ class AccountInfoController extends Controller
             }
             return $news;
         }
-        switch ($arrScore['status']){
+        switch ($arrScore['status']) {
             case 204:
-                $courseStr = SchoolDatetime::getDateInfo()."\n/:sun 过儿，目前还没有成绩出来哦。你可以看看还有什么考试，做好准备才能考出好成绩。你也可以先<a href=\"http://wish.stuzone.com\">去许个愿。</a>";
+                $courseStr = SchoolDatetime::getDateInfo() . "\n/:sun 过儿，目前还没有成绩出来哦。你可以看看还有什么考试，做好准备才能考出好成绩。你也可以先<a href=\"http://wish.stuzone.com\">去许个愿。</a>";
                 return $courseStr;
             case 205:
-                $courseStr = "亲，你可能因尚未评教而无法查询成绩。请使用电脑从办事大厅(http://ehall.scuec.edu.cn/new/index.html"." )登录教务系统，完成评教后再来查询。不要错过评教时间哦。/:,@-D";
+                $courseStr = "亲，你可能因尚未评教而无法查询成绩。请使用电脑从办事大厅(http://ehall.scuec.edu.cn/new/index.html" . " )登录教务系统，完成评教后再来查询。不要错过评教时间哦。/:,@-D";
                 return $courseStr;
         }
-        $courseStr = SchoolDatetime::getDateInfo()."---已出成绩的课程---\n";
+        $courseStr = SchoolDatetime::getDateInfo() . "---已出成绩的课程---\n";
         foreach ($arrScore['info'] as $key => $item) {
             if ($item['score'] >= 90 && $item['score'] <= 100) {//成绩90分以上加一朵玫瑰^.^
-                $item['score'] = $item['score']." /:rose";
+                $item['score'] = $item['score'] . " /:rose";
             }
-            $courseStr .= "[{$item['type']}]".$item['name']
-                    ."，分数: ".$item['score']
-                    ."，学分: ".$item['credits']
-                    ."，班级排名: ".$item['rank']."\n";
-
+            $courseStr .= "[{$item['type']}]" . $item['name']
+                . "，分数: " . $item['score']
+                . "，学分: " . $item['credits']
+                . "，班级排名: " . $item['rank'] . "\n";
         }
-        $courseStr .= "\n<a href=\"". config('app.base_url') ."/scratchoff/index.html?ver=6.0&openid={$openid}\">刮刮乐，玩儿心跳</a>";
-        $courseStr .= "\n成绩信息更新于：".$arrScore['update_time'];
+        $courseStr .= "\n<a href=\"" . config('app.base_url') . "/scratchoff/index.html?ver=6.0&openid={$openid}\">刮刮乐，玩儿心跳</a>";
+        $courseStr .= "\n成绩信息更新于：" . $arrScore['update_time'];
 
 
         return $courseStr;
@@ -476,8 +477,8 @@ class AccountInfoController extends Controller
         $matchCount = preg_match(config('app.openid_regex'), $openid, $match);
         if ($matchCount == true) {
             $openid = $match[0];
-            $redis= Redis::connection('timetable');
-            $timetable_cache = $redis->get('timetable_'.$openid);
+            $redis = Redis::connection('timetable');
+            $timetable_cache = $redis->get('timetable_' . $openid);
             if ($timetable_cache !== false) {
                 $arrTimetable = json_decode($timetable_cache, true);
                 $curWeek = SchoolDatetime::getSchoolWeek();
@@ -485,20 +486,20 @@ class AccountInfoController extends Controller
                 $curWeek = $curWeek ? $curWeek : 1;
                 $arrTimetable['current_week'] = $curWeek;
                 $retArray = array(
-                        'status' => 200,
-                        'data' => $arrTimetable
-                    );
+                    'status' => 200,
+                    'data' => $arrTimetable
+                );
             } else {
                 $retArray = array(
-                        'status' => 404,
-                        'data' => null
-                    );
+                    'status' => 404,
+                    'data' => null
+                );
             }
         } else {
             $retArray = array(
-                    'status' => 405,
-                    'data' => null
-                );
+                'status' => 405,
+                'data' => null
+            );
         }
         echo json_encode($retArray);
     }
@@ -506,23 +507,40 @@ class AccountInfoController extends Controller
     /**
      * Notes:为前端提供api接口
      * @param $openid
-     * @return array
+     * @param Request $request
+     * @return void
      */
-    public function scoreApi($openid)
+    public function scoreApi($openid, Request $request)
     {
         $matchCount = preg_match(config('app.openid_regex'), $openid, $match);
         if ($matchCount == true) {
             $openid = $match[0];
-            $redis= Redis::connection('score');
-            $score_cache = $redis->get('score_'.$openid);
-            //将json转换为前端需要的格式
-            $new_score_array = json_decode($score_cache);
-            foreach ($new_score_array as $key=>$value){
-                $value->hidden=false;
-                $value->is_checked=true;
+            $redis = Redis::connection('score');
+            $act_method = $request->act;
+            if (empty($act_method)) {
+                $score_cache = $redis->get('score_' . $openid);
+                //将json转换为前端需要的格式
+                $new_score_array = json_decode($score_cache);
+                $checked_score_array = $redis->lRange("user:{$openid}:score:checked", 0,-1);
+                foreach ($new_score_array as $key => $value) {
+                    $value->hidden = false;
+                    $value->is_checked = in_array($value->name,$checked_score_array)?true:false;
+                }
+                $new_score_array = array('status' => 200, 'data' => $new_score_array);
+                echo json_encode($new_score_array);
+            } else {
+                $act_data = $request ->data;
+                switch ($act_method) {
+                case 'checked':
+                    if (strlen($act_data) <= 100) {
+                        $redis->rPush("user:{$openid}:score:checked", $act_data);
+                        $redis->lTrim("user:{$openid}:score:checked", 0, 30);
+                    } else {
+
+                    }
+                    break;
+                }
             }
-            $new_score_array = array('status'=>200,'data'=>$new_score_array);
         }
-        echo json_encode($new_score_array);
     }
 }
