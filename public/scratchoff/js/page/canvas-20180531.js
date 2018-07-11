@@ -152,7 +152,6 @@ $(document).ready(function() {
     function fillHtml() {
         // console.log("技术支持：比特工场。欢迎有互联网梦想的同学加入我们！");
         var openId = getUrlParam("openid");
-        var path = 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId;
         $.ajax({
                 url: 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId,
                 type: 'POST',
@@ -223,17 +222,16 @@ $(document).ready(function() {
                     $(".mod-btn-y").click(() => {
                         _hmt.push(['_trackEvent', '黑名单', '放入']); //百度统计事件转化代码
                         var className = cradLi.children("h1").text();
-                        var score = cradLi.children(".score-show").children(".score-canvas").data("scroenum");
+                        console.log(className);
                         var openId = getUrlParam("openid");
                         $.ajax({ //放入 请求
-                            url: 'hide.php',
-                            type: 'PUT',
+                            url: 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId,
+                            type: 'POST',
                             dataType: 'json',
-                            data: JSON.stringify({
-                                openid: openId,
+                            data: {
+                                act: 'black',
                                 course_name: className,
-                                course_score: score
-                            }),
+                            },
                             success: function(res) {
                                 cradLi.fadeOut(1000, () => { cradLi.remove() });
                                 $(".mod").remove();

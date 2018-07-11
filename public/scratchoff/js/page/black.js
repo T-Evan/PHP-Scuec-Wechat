@@ -42,7 +42,7 @@ $(document).ready(function() {
     var path = 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId;
     $.ajax({ //主体请求
         url: path,
-        type: 'GET',
+        type: 'POST',
         dataType: 'json',
         timeout: 15000,
         success: function(res) {
@@ -70,14 +70,14 @@ $(document).ready(function() {
                 }
                 cardLi += '<div class="card-li ' + hiddenBlack + '">';
                 cardLi += '<img class="li-img-r"  src="img/return.png">'
-                cardLi += '<h1 class="black-color">' + data[i].class_name + '</h1>'; //scoreName
+                cardLi += '<h1 class="black-color">' + data[i].name + '</h1>'; //scoreName
                 cardLi += '<div class="score-show">' +
                     '<canvas class="score-canvas">浏览器暂不支持该功能</canvas>' +
                     '<canvas class="score-shadow ' + hideShadow + '">浏览器暂不支持该功能</canvas>' +
 
                     '</div>';
                 cardLi += '<div class="dash-border"></div>';
-                cardLi += '<h3 class="black-color">【' + data[i].class_type + '】</h3>'; //scoreClass
+                cardLi += '<h3 class="black-color">【' + data[i].type + '】</h3>'; //scoreClass
                 cardLi += '</div>';
                 // }
             };
@@ -110,19 +110,17 @@ $(document).ready(function() {
             $(".mod-btn-y").click(() => {
                 _hmt.push(['_trackEvent', '黑名单', '移出']); //百度统计事件转化代码
                 var className = cradLi.children("h1").text();
-                var score = cradLi.children(".score-show").children(".score-canvas").attr("scorenum");
                 var openId = getUrlParam("openid");
-                console.log("score:"+score);
+                console.log(className);
                 $.ajax({ //移出请求
-                    url: './hide.php',
-                    type: 'PUT',
+                    url: 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId,
+                    type: 'POST',
                     dataType: 'json',
-                    data: JSON.stringify({
-                        openid: openId,
+                    data: {
+                        act: 'black',
                         course_name: className,
-                        course_score: score,
-                        discard: true
-                    }),
+                        discard: true,
+                    },
                     success: function(res) {
                         cradLi.fadeOut(1000, () => {
                             cradLi.remove()

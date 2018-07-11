@@ -516,29 +516,39 @@ class AccountInfoController extends Controller
         if ($matchCount == true) {
             $openid = $match[0];
             $redis = Redis::connection('score');
-            $act_method = $request->act;
-            if (empty($act_method)) {
+            if (empty($request->act)) {
                 $score_cache = $redis->get('score_' . $openid);
                 //将json转换为前端需要的格式
                 $new_score_array = json_decode($score_cache);
-                $checked_score_array = $redis->lRange("user:{$openid}:score:checked", 0,-1);
+                $checked_score_array = $redis->lRange("user:{$openid}:score:checked", 0, -1);
+                $black_score_array = $redis->hgetall("user:{$openid}:score:hidden");
                 foreach ($new_score_array as $key => $value) {
-                    $value->hidden = false;
-                    $value->is_checked = in_array($value->name,$checked_score_array)?true:false;
+                    $value->hidden = key_exists($value->name, $black_score_array)?true:false;
+                    $value->is_checked = in_array($value->name, $checked_score_array)?true:false;
                 }
                 $new_score_array = array('status' => 200, 'data' => $new_score_array);
                 echo json_encode($new_score_array);
             } else {
-                $act_data = $request ->data;
-                switch ($act_method) {
-                case 'checked':
-                    if (strlen($act_data) <= 100) {
-                        $redis->rPush("user:{$openid}:score:checked", $act_data);
-                        $redis->lTrim("user:{$openid}:score:checked", 0, 30);
-                    } else {
+                switch ($request->act) {
+                        case 'checked':
+                            $redis->rPush("user:{$openid}:score:checked", $request->data);
+                            $redis->lTrim("user:{$openid}:score:checked", 0, 30);
+                            break;
+                        case 'black':
+                            if ($request->discard){
+                                echo $redis->hDel("user:{$openid}:score:hidden", $request->course_name);
+                            }else{
+                                echo $redis->hSet("user:{$openid}:score:hidden", $request->course_name, 1);
+                            }
+                            break;
+                        case 'like':
+                            if ($request->data == 'false') {
+                                echo $this->redis->hSet("user:public:score:flag_likes", $openid, 0);
+                            } elseif ($request->data == 'true') {
+                                echo $this->redis->hSet("user:public:score:flag_likes", $openid, 1);
+                            }
+                            break;
 
-                    }
-                    break;
                 }
             }
         }
