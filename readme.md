@@ -19,7 +19,10 @@
 ## 开发环境部署/安装
 
 本项目代码使用 PHP 框架 [Laravel 5.5](https://d.laravel-china.org/docs/5.5/) 开发，本地开发环境使用 [Laravel Homestead](https://d.laravel-china.org/docs/5.5/homestead)。
-
+1. 参考.example.env修改.env
+2. 执行composer install
+3. 执行php artisan key:generate
+4. 执行php artisan migrate
 
 ## 扩展包使用情况
 

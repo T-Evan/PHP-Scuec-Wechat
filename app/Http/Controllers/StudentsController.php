@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Api\AccountInfoController;
-use App\Http\Controllers\Api\AccountInfoDetailController;
 use App\Http\Requests\StudentRequest;
-use App\Http\Service\TimeTableReplyService;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
-use Log;
 
 class StudentsController extends Controller
 {
@@ -17,8 +14,9 @@ class StudentsController extends Controller
     {
         $array = [
             'type' => $request->type,
-            'openid' => $request->openid
+            'openid' => $request->openid,
         ];
+
         return view('static_pages.login', $array);
     }
 
@@ -31,7 +29,7 @@ class StudentsController extends Controller
         //学校认证平台post字段为username，因此需要将account重新构造数组
         $user_info_array = [
             'username' => $account,
-            'password' => $password
+            'password' => $password,
         ];
         switch ($type) {
             case 'ssfw':
@@ -48,18 +46,18 @@ class StudentsController extends Controller
                 $student = Student::create([
                             'openid' => $openid,
                             'account' => $account,
-                            $type . '_password' => encrypt($password) //拼接要保存的密码类型
+                            $type.'_password' => encrypt($password), //拼接要保存的密码类型
                         ]);
                 $student->save();
                 session()->flush();
                 session()->flash('success', '完成：初步绑定成功！点击左上角返回聊天窗口，再次回复关键字即可。');
             } else {
                 $student->update(['account' => $account,
-                            $type . '_password' => encrypt($password)]);
+                            $type.'_password' => encrypt($password), ]);
                 session()->flush();
 
                 //重新绑定，刷新cookie，通过绑定增加一定的操作复杂度，防止用户不停刷新
-                $redis= Redis::connection('exam');
+                $redis = Redis::connection('exam');
                 $redis->del('exam_'.$openid);
 
                 session()->flash('info', '提醒：账号绑定信息更新成功！缓存数据已刷新。点击左上角返回聊天窗口，再次回复关键字即可。');
@@ -71,14 +69,15 @@ class StudentsController extends Controller
         $array = [
             'type' => $type,
             'openid' => $openid,
-            'message' => $result['message'] //主要用做刷新缓存函数调用此函数时的判断逻辑
+            'message' => $result['message'], //主要用做刷新缓存函数调用此函数时的判断逻辑
         ];
+
         return view('static_pages.login', $array);
     }
 
     public function test()
     {
-        $test =new AccountInfoController();
+        $test = new AccountInfoController();
         $test->getScoreMessage();
     }
 
@@ -91,25 +90,26 @@ class StudentsController extends Controller
         $key = $type.'_'.$openid;
         $cookie = Redis::get($key);
         if (!$cookie) {
-            $password =$type.'_password'; //拼接数据表的密码字段
+            $password = $type.'_password'; //拼接数据表的密码字段
             $student = Student::select('account', $password, 'openid')
                 ->where('openid', $openid)
                 ->get()->first();
             if (!isset($student->account)) {
-                return ['data'=>null,'message'=>'用户不存在'];
+                return ['data' => null, 'message' => '用户不存在'];
             }
             $studentRequest = new StudentRequest();
-            $studentRequest->account =  $student->account;
-            $studentRequest->password =  decrypt($student->toArray()[$password]);
+            $studentRequest->account = $student->account;
+            $studentRequest->password = decrypt($student->toArray()[$password]);
             $studentRequest->openid = $student->openid;
-            $studentRequest->type =  $type;
+            $studentRequest->type = $type;
             $res = $this->store($studentRequest)->getData();
-            if ($res['message']=='用户账号密码正确') {
+            if ('用户账号密码正确' == $res['message']) {
                 $cookie = Redis::get($key);
             } else {
-                return ['data'=>null,'message'=>'用户信息有误'];
+                return ['data' => null, 'message' => '用户信息有误'];
             }
         }
-        return ['data'=>$cookie,'message'=>'获取cookie成功'];
+
+        return ['data' => $cookie, 'message' => '获取cookie成功'];
     }
 }
