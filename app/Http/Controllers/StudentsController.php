@@ -49,7 +49,7 @@ class StudentsController extends Controller
                             $type.'_password' => encrypt($password), //拼接要保存的密码类型
                         ]);
                 $student->save();
-                session()->flush();
+                session()->flush(); //清空缓存
                 session()->flash('success', '完成：初步绑定成功！点击左上角返回聊天窗口，再次回复关键字即可。');
             } else {
                 $student->update(['account' => $account,

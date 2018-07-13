@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     //Laravel基本配置，更改需谨慎
     'name' => env('APP_NAME', 'Laravel'),
 
@@ -35,21 +34,21 @@ return [
 
     'timetable_url' => env('TIMETABLE_URL', null),
 
+    'cookie_cache_time' => env('COOKIE_TIME', null),
+
     'timetable_cache_time' => env('TIMETABLE_CACHE_TIME', null),
 
     'exam_cache_time' => env('EXAM_CACHE_TIME', null),
 
     'score_cache_time' => env('SCORE_CACHE_TIME', null),
 
-
     'semester_begin_date' => env('semester_begin_date', null),
 
-    'semester_end_date'=> env('semester_end_date', null),
+    'semester_end_date' => env('semester_end_date', null),
 
     'timeZone' => env('timeZone', null),
 
-    'holidayPrompt'=> env('holidayPrompt', null),
-
+    'holidayPrompt' => env('holidayPrompt', null),
 
     /*
     |--------------------------------------------------------------------------
@@ -63,7 +62,6 @@ return [
     */
 
     'providers' => [
-
         /*
          * Laravel Framework Service Providers...
          */
@@ -104,7 +102,6 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
     ],
 
     /*
@@ -119,7 +116,6 @@ return [
     */
 
     'aliases' => [
-
         'App' => Illuminate\Support\Facades\App::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
         'Auth' => Illuminate\Support\Facades\Auth::class,
@@ -153,7 +149,5 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
     ],
-
 ];
