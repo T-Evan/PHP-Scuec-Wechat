@@ -4,9 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Service\HelperService;
 use App\Http\Service\SchoolDatetime;
+use App\Models\Common;
+use App\Models\CommonLog;
 use EasyWeChat\Kernel\Messages\NewsItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\BufferHandler;
+use Monolog\Handler\Mongo;
 use Symfony\Component\DomCrawler\Crawler;
 
 class AccountInfoController extends Controller
@@ -137,8 +143,8 @@ class AccountInfoController extends Controller
             return $content;
         }
 
-        $message = app('wechat')->server->getMessage();
-        $openid = $message['FromUserName'];
+        $common = app('wechat_common');
+        $openid = $common->openid;
         /* 课表 */
         $account_info_detail = new AccountInfoDetailController();
         $timetable = $account_info_detail->getTimeTable();
@@ -153,7 +159,6 @@ class AccountInfoController extends Controller
                         HelperService::getBindingLink('ssfw');
                     break;
             }
-
             return $news;
         }
         if (200 == $timetable['status']) {
@@ -438,8 +443,8 @@ class AccountInfoController extends Controller
         /* 成绩 */
         $account_info_detail = new AccountInfoDetailController();
         $arrScore = $account_info_detail->getScoreInfo();
-        $message = app('wechat')->server->getMessage();
-        $openid = $message['FromUserName'];
+        $common = app('wechat_common');
+        $openid = $common->openid;
         if (!is_array($arrScore)) {
             switch ($arrScore) {
                 case '用户不存在':
@@ -457,10 +462,17 @@ class AccountInfoController extends Controller
         switch ($arrScore['status']) {
             case 204:
                 $courseStr = SchoolDatetime::getDateInfo()."\n/:sun 过儿，目前还没有成绩出来哦。你可以看看还有什么考试，做好准备才能考出好成绩。你也可以先<a href=\"http://wish.stuzone.com\">去许个愿。</a>";
+                app('common_log')->addInfo($arrScore['message']);
 
                 return $courseStr;
             case 205:
                 $courseStr = '亲，你可能因尚未评教而无法查询成绩。请使用电脑从办事大厅(http://ehall.scuec.edu.cn/new/index.html'.' )登录教务系统，完成评教后再来查询。不要错过评教时间哦。/:,@-D';
+                app('common_log')->addInfo($arrScore['message']);
+
+                return $courseStr;
+            case 408:
+                $courseStr = '小塔暂时勾搭不到服务器~稍后再试吧>_<';
+                app('common_log')->addInfo($arrScore['message']);
 
                 return $courseStr;
         }
@@ -513,8 +525,8 @@ class AccountInfoController extends Controller
     }
     public function guaguale()
     {
-        $message = app('wechat')->server->getMessage();
-        $openid = $message['FromUserName'];
+        $common = app('wechat_common');
+        $openid = $common->openid;
         $redis = Redis::connection('score');
         $redis->hset('user:public:score:flag_likes', $openid, 1);
         return $this->getScoreMessage();

@@ -12,10 +12,11 @@ use App\Http\Controllers\Api\AccountInfoController;
 use App\Http\Service\HelperService;
 use App\Http\Service\KuaiDiApiService;
 use App\Http\Service\OuterApiService;
+use App\Models\Common;
+use App\Models\Log;
 use EasyWeChat\Kernel\Contracts\EventHandlerInterface;
 use EasyWeChat\Kernel\Messages\News;
 use EasyWeChat\Kernel\Messages\NewsItem;
-use Log;
 
 class TextMessageHandler implements EventHandlerInterface
 {
@@ -241,7 +242,7 @@ class TextMessageHandler implements EventHandlerInterface
                         return $content;
                     }
                 } catch (\Exception $exception) {
-                    Log::error('openid：'.$message['FromUserName'].$exception->getTraceAsString());
+                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
                 }
                 break;
             case 'exam':
@@ -254,7 +255,7 @@ class TextMessageHandler implements EventHandlerInterface
                         return $content;
                     }
                 } catch (\Exception $exception) {
-                    Log::error('openid：'.$message['FromUserName'].$exception->getTraceAsString());
+                    Common::writeLog($exception->getTraceAsString());
                 }
                 break;
             case 'score':

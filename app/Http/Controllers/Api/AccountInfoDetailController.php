@@ -14,8 +14,8 @@ class AccountInfoDetailController extends Controller
 {
     public function getTimeTable($year = null, $term = null, $debug = false)
     {
-        $message = app('wechat')->server->getMessage();
-        $openid = $message['FromUserName'];
+        $common = app('wechat_common');
+        $openid = $common->openid;
         $redis = Redis::connection('timetable');
         $timetable_cache = $redis->get('timetable_'.$openid);
         if (!empty($timetable_cache)) {
@@ -52,6 +52,7 @@ class AccountInfoDetailController extends Controller
          * 处理课表，抽出不带“未安排课程”子表格的html代码段（这样写比正则匹配快多了[当然可能是我正则写的烂）
          * 值得注意的是，有些人没有“未安排课程子表”。
          */
+        $nofitTable = '';
         $trimedTable = strstr($table_html, '="CourseFormTab');
         if (false !== strpos($trimedTable, 'NoFitCourse')) {
             $nofitTable = strstr($trimedTable, 'NoFitCourse'); //抽出“未安排课程”之后的html代码段
@@ -97,83 +98,83 @@ class AccountInfoDetailController extends Controller
                     'teacher' => $nofitarr[$key][0][1],
                 ); //构造数组
             }
+        }
+        /* 解析教务系统课程表。
+         * 以下代码可以实现：将每天的课程放到对应的数组里（星期一=>[0], 星期二=>[1], etc.）。
+         * 解析的难度在于，课表会使用rowspan属性来控制单个课程占据行单元格的数量。因此，每行的td个数
+         * 不定，其数量受到上一行课程的影响（占据下行的单元格）。
+         * 如果在解析每行时，将该特定行对下行造成的影响（占据单元格的数量）记录下来，就可以在解析下一行时，
+         * 实现对td的定位（即确认下行的某个td输入本周的第几天），
+         */
+        /*
+         * $skipCount 用于对课程超出长度的计数(即解析往后的行时应跳过的节数)，每个元素对应一周的每一天。
+         * for example, 如果第一天第一次课为1-3节，那么在解析第一行后，$skipCount[0] == 2。当解析
+         * 行时，会将此值减一。该值会在解析的过程中被累加。
+         */
+        /* 解析的结果会被存入$timetable内。*/
+        $skipCount = array(0, 0, 0, 0, 0, 0, 0);
+        $timetable = array();
 
-            /* 解析教务系统课程表。
-             * 以下代码可以实现：将每天的课程放到对应的数组里（星期一=>[0], 星期二=>[1], etc.）。
-             * 解析的难度在于，课表会使用rowspan属性来控制单个课程占据行单元格的数量。因此，每行的td个数
-             * 不定，其数量受到上一行课程的影响（占据下行的单元格）。
-             * 如果在解析每行时，将该特定行对下行造成的影响（占据单元格的数量）记录下来，就可以在解析下一行时，
-             * 实现对td的定位（即确认下行的某个td输入本周的第几天），
-             */
+        /* 遍历所有行(<tr>) */
+        foreach ($arrTr as $trNum => $row) {
             /*
-             * $skipCount 用于对课程超出长度的计数(即解析往后的行时应跳过的节数)，每个元素对应一周的每一天。
-             * for example, 如果第一天第一次课为1-3节，那么在解析第一行后，$skipCount[0] == 2。当解析
-             * 行时，会将此值减一。该值会在解析的过程中被累加。
+             * 匹配td标签。其实开头有两个不属于课表内容的td(一个空td和一个表头td)，但是该正则表达式
+             * 匹配不到它们。
              */
-            /* 解析的结果会被存入$timetable内。*/
-            $skipCount = array(0, 0, 0, 0, 0, 0, 0);
-            $timetable = array();
-
-            /* 遍历所有行(<tr>) */
-            foreach ($arrTr as $trNum => $row) {
-                /*
-                 * 匹配td标签。其实开头有两个不属于课表内容的td(一个空td和一个表头td)，但是该正则表达式
-                 * 匹配不到它们。
-                 */
-                $matchCount = preg_match_all("/<td colspan=\"?\d+\"?\srowspan=\"(\d+?)\"\s?>(.+?)<\/td>/s", $row, $arrTd);
-                if (0 == $matchCount) {
-                    // 经检查有些tr标签内的确没有课程（这种课表的特征是tr标签内只有1个表示第几节的td标签），不能被匹配，因此不将其作为异常来处理
-                    if (1 == preg_match('/<td/', $row)) {
-                        for ($i = 0; $i < 7; ++$i) {
-                            --$skipCount[$i];
-                        }
-                        continue;
-                    } else {
-                        throw new SchoolInfoException('cannot match any td tag', 500, array(
+            $matchCount = preg_match_all("/<td colspan=\"?\d+\"?\srowspan=\"(\d+?)\"\s?>(.+?)<\/td>/s", $row, $arrTd);
+            if (0 == $matchCount) {
+                // 经检查有些tr标签内的确没有课程（这种课表的特征是tr标签内只有1个表示第几节的td标签），不能被匹配，因此不将其作为异常来处理
+                if (1 == preg_match('/<td/', $row)) {
+                    for ($i = 0; $i < 7; ++$i) {
+                        --$skipCount[$i];
+                    }
+                    continue;
+                } else {
+                    throw new SchoolInfoException('cannot match any td tag', 500, array(
                             'timetable' => base64_encode($trimedTable),
                             'tr' => base64_encode($row),
                         ));
-                    }
                 }
+            }
 
-                $tdNum = 0;
-                /*
-                 * 下面的循环用于将本行的课程放置于$timetable对应的位置；位置通过$skipCount的值来判断。
-                 * 若对应列的计数不为零，即本行的此单元格被上行所占，本行中的<td>不应属于该列。因此应将对应
-                 * 计数减一，并跳过该列，即continue; 若对应值为0, 则读入本行一个<td>的内容，并写入$timetable.
-                 * 需要注意的是，第0行一定有7个<td>.
-                 * 变量$i指的是星期（0为周一，1为周二，etc.）
-                 */
-                for ($i = 0; $i < 7; ++$i) {
-                    if (0 != $skipCount[$i]) {
-                        --$skipCount[$i];
-                        continue;
-                    } else {
-                        $fromSection = $trNum + 1;
-                        /* 处理<td>标签中，使用<hr>分割的位置冲突课程, 如果有<hr>，则分割解析后再存入。 */
-                        if (false !== strpos($arrTd[2][$tdNum], '<hr>')) {
-                            $hrClass = explode('<hr>', $arrTd[2][$tdNum]);
-                            foreach ($hrClass as $eachClass) {
-                                $timetable[$i][] = array(
+            $tdNum = 0;
+            /*
+             * 下面的循环用于将本行的课程放置于$timetable对应的位置；位置通过$skipCount的值来判断。
+             * 若对应列的计数不为零，即本行的此单元格被上行所占，本行中的<td>不应属于该列。因此应将对应
+             * 计数减一，并跳过该列，即continue; 若对应值为0, 则读入本行一个<td>的内容，并写入$timetable.
+             * 需要注意的是，第0行一定有7个<td>.
+             * 变量$i指的是星期（0为周一，1为周二，etc.）
+             */
+            for ($i = 0; $i < 7; ++$i) {
+                if (0 != $skipCount[$i]) {
+                    --$skipCount[$i];
+                    continue;
+                } else {
+                    $fromSection = $trNum + 1;
+                    /* 处理<td>标签中，使用<hr>分割的位置冲突课程, 如果有<hr>，则分割解析后再存入。 */
+                    if (false !== strpos($arrTd[2][$tdNum], '<hr>')) {
+                        $hrClass = explode('<hr>', $arrTd[2][$tdNum]);
+                        foreach ($hrClass as $eachClass) {
+                            $timetable[$i][] = array(
                                     $fromSection,
                                     trim(HelperService::removeHtmlEntities(strip_tags($eachClass, '<br>'))),
                                 );
-                            }
-                        } else {
-                            $timetable[$i][] = array(
+                        }
+                    } else {
+                        $timetable[$i][] = array(
                                 $fromSection,
                                 trim(HelperService::removeHtmlEntities(strip_tags($arrTd[2][$tdNum], '<br>'))),
                             );
-                        }
-                        /* 将新累积的单元格数量(rowspan)累加到$skipCount数组中，并使$tdNum指向下一个td */
-                        $skipCount[$i] += intval($arrTd[1][$tdNum]) - 1;
-                        ++$tdNum;
                     }
+                    /* 将新累积的单元格数量(rowspan)累加到$skipCount数组中，并使$tdNum指向下一个td */
+                    $skipCount[$i] += intval($arrTd[1][$tdNum]) - 1;
+                    ++$tdNum;
                 }
             }
-            $parsedTimetable = $this->parseTimetable($timetable);
+        }
+        $parsedTimetable = $this->parseTimetable($timetable);
 
-            $rtnArray = array(
+        $rtnArray = array(
                 'status' => 200,
                 'message' => __CLASS__.': get timetable successfully',
                 'data' => array(
@@ -182,29 +183,26 @@ class AccountInfoDetailController extends Controller
                 ),
                 'update_time' => '刚刚',
             );
-            //添加未安排课程信息
-            if (isset($no_arrange)) {
-                $rtnArray['data']['no_arrange'] = $no_arrange;
-            }
-
-            $redis->setex(
-                'timetable_'.$openid,
-                config('app.timetable_cache_time'),
-                json_encode($rtnArray['data'])
-            ); //缓存课表两小时
-            if (true == $debug) {
-                $rtnArray['raw_timetable'] = $trimedTable;
-            }
-
-            return $rtnArray;
+        //添加未安排课程信息
+        if (isset($no_arrange)) {
+            $rtnArray['data']['no_arrange'] = $no_arrange;
         }
+        $redis->setex(
+            'timetable_'.$openid,
+            config('app.timetable_cache_time'),
+            json_encode($rtnArray['data'])
+        ); //缓存课表两小时
+        if (true == $debug) {
+            $rtnArray['raw_timetable'] = $trimedTable;
+        }
+
+        return $rtnArray;
     }
 
     public function getScoreInfo($year = false, $term = false)
     {
-        $message = app('wechat')->server->getMessage();
-        $openid = $message['FromUserName'];
-//        $openid = 'onzftwySIXNVZolvsw_hUvvT8UN0';
+        $common = app('wechat_common');
+        $openid = $common->openid;
         $redis = Redis::connection('score');
         $score_cache = $redis->get('score_'.$openid);
         if (!empty($score_cache)) {
@@ -248,12 +246,20 @@ class AccountInfoDetailController extends Controller
             $jar1,
             'http://ssfw.scuec.edu.cn/ssfw/index.do'
         );
-        $score_html = $res['res']->getbody()->getcontents();
+        if (!isset($res['res'])) {
+            return array(
+                'status' => 408,
+                'message' => __CLASS__.'：'.__FUNCTION__.'：'.__LINE__.': 请求超时',
+                'info' => '',
+                'update_time' => '刚刚',
+            );
+        }
+        $score_html = $res['res']->getbody();
 
         if (false !== strpos($score_html, '评教')) {  //判断是否评教
             return array(
                 'status' => 205,
-                'message' => __CLASS__.': 未评教',
+                'message' => __CLASS__.'：'.__FUNCTION__.'：'.__LINE__.': 未评教',
                 'info' => '',
                 'update_time' => '刚刚',
             );
@@ -320,8 +326,8 @@ class AccountInfoDetailController extends Controller
 
     public function getExamArrangement()
     {
-        $message = app('wechat')->server->getMessage();
-        $openid = $message['FromUserName'];
+        $common = app('wechat_common');
+        $openid = $common->openid;
         $redis = Redis::connection('exam');
         $exam_cache = $redis->get('exam_'.$openid);
         if (!empty($exam_cache)) {

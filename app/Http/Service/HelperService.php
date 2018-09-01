@@ -69,7 +69,7 @@ class HelperService
         $request_array = [
             'cookies' => $cookie_jar,
             //                'debug' => true,
-            'timeout' => 5,
+            'timeout' => 3,
             'headers' => [
                 'User-Agent' => self::DEFAULT_USER_AGENT,
                 'Referer' => $referer

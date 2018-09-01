@@ -2,10 +2,15 @@
 
 namespace App\Providers;
 
+use App\Models\Common;
+use App\Models\CommonLog;
 use EasyWeChat\Kernel\Log\LogManager;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use EasyWeChat\Factory;
 use Config;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\BufferHandler;
 
 class WeChatServiceProvider extends ServiceProvider
 {
@@ -43,6 +48,20 @@ class WeChatServiceProvider extends ServiceProvider
         $this->app->singleton('wechat_log', function ($app) {
             $log = new LogManager(app('wechat'));
             return $log;
+        });
+
+        $this->app->singleton('wechat_common', function ($app) {
+            return new Common();
+        });
+
+        $this->app->singleton('common_log', function ($app) {
+            $handler = new CommonLog("/app/storage/logs/laravel.log");
+            $handler->setFormatter(
+                new LineFormatter("[%datetime%]%level_name% %message% %context% %extra%\n", 'i:s', true, true)
+            );
+            $monolog = Log::getMonolog();
+            $monolog->pushHandler(new BufferHandler($handler));
+            return $monolog;
         });
     }
 
