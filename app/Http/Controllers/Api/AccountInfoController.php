@@ -159,7 +159,7 @@ class AccountInfoController extends Controller
         }
         if (200 == $timetable['status']) {
             /* 课表index以周一为0, so $currDay ranges from 0 to 6 */
-            $currDay = intval(date('N') - 1);
+            $currDay = intval(date('N')) - 1;
             $currWeek = SchoolDatetime::getSchoolWeek();
             /* 处理课程信息 */
             $currDayTable = $timetable['data']['timetable'][$currDay] ?? [];
