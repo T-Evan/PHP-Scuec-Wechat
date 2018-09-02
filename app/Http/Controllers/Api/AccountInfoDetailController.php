@@ -90,12 +90,12 @@ class AccountInfoDetailController extends Controller
             }
             /* 解析的结果会被存入$no_arrange内。*/
             $no_arrange = array();
-            foreach ($nofitarr[0][0] as $key => $value) {
-                preg_match_all("/(\d{1,2})/", $nofitarr[$key][0][1], $week); //匹配上课时间
-                preg_match('/.+(?=&)/', $nofitarr[$key][0][0], $name); //匹配课程名字
+            foreach ($nofitarr[0] as $key => $nofit_arrr) {
+                //reg_match_all("/(\d{1,2})/", $nofit_arrr[0], $week); //匹配上课时间
+                preg_match('/.+(?=&)/', $nofit_arrr[0], $name); //匹配课程名字
                 $no_arrange[$key] = array(
                     'name' => $name[0],
-                    'teacher' => $nofitarr[$key][0][1],
+                    'teacher' => $nofit_arrr[1],
                 ); //构造数组
             }
         }

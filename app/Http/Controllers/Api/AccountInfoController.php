@@ -5,14 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Service\HelperService;
 use App\Http\Service\SchoolDatetime;
 use App\Models\Common;
-use App\Models\CommonLog;
 use EasyWeChat\Kernel\Messages\NewsItem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
-use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\BufferHandler;
-use Monolog\Handler\Mongo;
 use Symfony\Component\DomCrawler\Crawler;
 
 class AccountInfoController extends Controller
@@ -159,15 +154,15 @@ class AccountInfoController extends Controller
                         HelperService::getBindingLink('ssfw');
                     break;
             }
+
             return $news;
         }
         if (200 == $timetable['status']) {
-            date_default_timezone_set(config('app.timeZone'));
             /* 课表index以周一为0, so $currDay ranges from 0 to 6 */
-            $currDay = intval(date('N')) - 1;
+            $currDay = intval(date('N') - 1);
             $currWeek = SchoolDatetime::getSchoolWeek();
             /* 处理课程信息 */
-            $currDayTable = isset($timetable['data']['timetable'][$currDay]) ? $timetable['data']['timetable'][$currDay] : [];
+            $currDayTable = $timetable['data']['timetable'][$currDay] ?? [];
             $beginTime = array('08:00', '08:55', '10:00', '10:55', '14:10', '15:05', '16:00', '16:55', '18:40', '19:30', '20:20');
             $replyText = '';
             if (count($currDayTable) > 0) {
@@ -523,14 +518,27 @@ class AccountInfoController extends Controller
 
         return $courseStr;
     }
+
     public function guaguale()
     {
         $common = app('wechat_common');
         $openid = $common->openid;
         $redis = Redis::connection('score');
         $redis->hset('user:public:score:flag_likes', $openid, 1);
+
         return $this->getScoreMessage();
     }
+
+    public function guaguale_close()
+    {
+        $common = app('wechat_common');
+        $openid = $common->openid;
+        $redis = Redis::connection('score');
+        $redis->hdel('user:public:score:flag_likes', $openid);
+
+        return $this->getScoreMessage();
+    }
+
     /**
      * Notes:为前端提供api接口.
      *

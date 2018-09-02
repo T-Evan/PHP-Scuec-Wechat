@@ -10,7 +10,7 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
-    'timezone' => 'Asia/Shanghai',
+    'timezone' => env('timeZone', 'Asia/Shanghai'),
 
     'locale' => 'zh_CN',
 

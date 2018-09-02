@@ -7,7 +7,7 @@
  */
 namespace App\Http\Service;
 
-date_default_timezone_set("Asia/Shanghai");
+use App\Models\Common;
 
 class SchoolDatetime
 {

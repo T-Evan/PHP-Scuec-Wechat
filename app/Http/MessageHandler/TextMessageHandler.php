@@ -13,7 +13,6 @@ use App\Http\Service\HelperService;
 use App\Http\Service\KuaiDiApiService;
 use App\Http\Service\OuterApiService;
 use App\Models\Common;
-use App\Models\Log;
 use EasyWeChat\Kernel\Contracts\EventHandlerInterface;
 use EasyWeChat\Kernel\Messages\News;
 use EasyWeChat\Kernel\Messages\NewsItem;
@@ -255,7 +254,7 @@ class TextMessageHandler implements EventHandlerInterface
                         return $content;
                     }
                 } catch (\Exception $exception) {
-                    Common::writeLog($exception->getTraceAsString());
+                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
                 }
                 break;
             case 'score':
@@ -268,10 +267,10 @@ class TextMessageHandler implements EventHandlerInterface
                         return $content;
                     }
                 } catch (\Exception $exception) {
-                    Log::error('openid：'.$message['FromUserName'].$exception->getTraceAsString());
+                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
                 }
                 break;
-            case 'score-scratchoff':
+            case 'score_scratchoff':
                 $account = new AccountInfoController();
                 try {
                     $content = $account->guaguale();
@@ -281,7 +280,20 @@ class TextMessageHandler implements EventHandlerInterface
                         return $content;
                     }
                 } catch (\Exception $exception) {
-                    Log::error('openid：'.$message['FromUserName'].$exception->getTraceAsString());
+                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
+                }
+                break;
+            case 'score_scratchoff_close':
+                $account = new AccountInfoController();
+                try {
+                    $content = $account->guaguale_close();
+                    if (is_array($content)) {
+                        return new News($content);
+                    } else {
+                        return $content;
+                    }
+                } catch (\Exception $exception) {
+                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
                 }
                 break;
             case 'test2':
@@ -353,7 +365,9 @@ class TextMessageHandler implements EventHandlerInterface
         } elseif ('成绩' == $keyword || '查成绩' == $keyword) {
             return 'score';
         } elseif ('刮刮乐' == $keyword || '成绩刮刮乐' == $keyword || '开启刮刮乐' == $keyword) {
-            return 'score-scratchoff';
+            return 'score_scratchoff';
+        } elseif ('关闭刮刮乐' == $keyword) {
+            return 'score_scratchoff_close';
         }
     }
 
