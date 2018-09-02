@@ -296,6 +296,39 @@ class TextMessageHandler implements EventHandlerInterface
                     Common::writeLog($exception->getMessage().$exception->getTraceAsString());
                 }
                 break;
+            case 'security_education_tiny_course':
+                $content = '<a href="http://wb.mycourse.cn/svnweiban/">点此进入安全微课</a>';
+
+                return $content;
+                break;
+            case 'new_market':
+                $items = [
+                    new NewsItem(
+                        [
+                            'title' => '点击进入学生市场',
+                            'description' => '',
+                            'url' => 'https://ng.bitworkshop.net/login/',
+                            'image' => config('app.base_url').'/img/new_market.jpg',
+                        ]
+                    ),
+                ];
+
+                return new News($items);
+                break;
+            case 'xuyuanqiang':
+                $items = [
+                    new NewsItem(
+                        [
+                            'title' => '许愿墙',
+                            'description' => "这里是资讯民大许愿墙。\n你和小塔，只差一个心愿。",
+                            'url' => 'http://wish.stuzone.com/',
+                            'image' => 'http://ww1.sinaimg.cn/large/98d2e36bjw1eruqmaxcnwj20go099ad3.jpg',
+                        ]
+                    ),
+                ];
+
+                return new News($items);
+                break;
             case 'test2':
                 $items = [
                     new NewsItem(
@@ -368,6 +401,16 @@ class TextMessageHandler implements EventHandlerInterface
             return 'score_scratchoff';
         } elseif ('关闭刮刮乐' == $keyword) {
             return 'score_scratchoff_close';
+        } elseif ('安全微课' == $keyword || '微课' == $keyword) {
+            return 'security_education_tiny_course';
+        } elseif (false !== strpos($keyword, '二手') ||
+            false !== strpos($keyword, '闲置') ||
+            false !== strpos($keyword, '跳蚤') ||
+            false !== strpos($keyword, '学生市场')
+        ) {
+            return 'new_market';
+        } elseif (false !== strpos($keyword, '许愿') || '心愿墙' == $keyword || '表白墙' == $keyword) {
+            return 'xuyuanqiang';
         }
     }
 
