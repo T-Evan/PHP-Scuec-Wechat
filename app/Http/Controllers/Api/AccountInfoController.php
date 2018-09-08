@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Service\HelperService;
 use App\Http\Service\SchoolDatetime;
-use App\Models\Common;
 use EasyWeChat\Kernel\Messages\NewsItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
@@ -293,7 +292,8 @@ class AccountInfoController extends Controller
                                 } else {
                                     $isOddWeek = true;
                                 }
-                                if (!((2 == $each['special'] && !$isOddWeek) || (1 == $each['special'] && $isOddWeek))) {
+                                if (!((2 == $each['special'] && !$isOddWeek) ||
+                                    (1 == $each['special'] && $isOddWeek))) {
                                     --$nextDayCourseCount;
                                 } else {
                                     /* get the course name */
@@ -539,12 +539,46 @@ class AccountInfoController extends Controller
         return $this->getScoreMessage();
     }
 
+    public function getMoneyMessage()
+    {
+        /* 校园卡余额*/
+        $account_info_detail = new AccountInfoDetailController();
+        $arrMoney = $account_info_detail->getMoney();
+        if (!is_array($arrMoney)) {
+            switch ($arrMoney) {
+                case '用户不存在':
+                    $news = "绑定账号后即可查询考试安排，提前做好复习准备，沉着应对考试。/:,@f\n请先".
+                        HelperService::getBindingLink('ssfw');
+                    break;
+                case '用户信息有误':
+                    $news = '你绑定的账号信息貌似有误 /:P-( 需要重新'.
+                        HelperService::getBindingLink('ssfw');
+                    break;
+            }
+
+            return $news;
+        }
+        $contentstr = '校园卡余额为'.$arrMoney['KNYE']."元";
+        /*
+        if (0 !== $arrMoney['totalAmount']) {
+            $contentstr = $contentstr.'当月消费为'.$arrMoney['totalAmount']."元\n其中\n";
+            foreach ($arrMoney['consumeType'] as $value) {
+                $contentstr = $contentstr.$value."元\n";
+            }
+        } else {//当月没有消费记录
+            $contentstr = $contentstr.'本月还没有消费记录噢~';
+
+            return $contentstr;
+        }
+        $contentstr = $contentstr.'查询校园卡消费明细请回复"校园卡消费详情"';
+        */
+        return $contentstr;
+    }
+
     /**
      * Notes:为前端提供api接口.
      *
      * @param $openid
-     *
-     * @throws \App\Exceptions\SchoolInfoException
      */
     public function tableApi($openid)
     {
@@ -604,24 +638,24 @@ class AccountInfoController extends Controller
                 echo json_encode($new_score_array);
             } else {
                 switch ($request->act) {
-                        case 'checked':
-                            $redis->rPush("user:{$openid}:score:checked", $request->data);
-                            $redis->lTrim("user:{$openid}:score:checked", 0, 30);
-                            break;
-                        case 'black':
-                            if ($request->discard) {
-                                echo $redis->hDel("user:{$openid}:score:hidden", $request->course_name);
-                            } else {
-                                echo $redis->hSet("user:{$openid}:score:hidden", $request->course_name, 1);
-                            }
-                            break;
-                        case 'like':
-                            if ('false' == $request->data) {
-                                echo $redis->hSet('user:public:score:flag_likes', $openid, 0);
-                            } elseif ('true' == $request->data) {
-                                echo $redis->hSet('user:public:score:flag_likes', $openid, 1);
-                            }
-                            break;
+                    case 'checked':
+                        $redis->rPush("user:{$openid}:score:checked", $request->data);
+                        $redis->lTrim("user:{$openid}:score:checked", 0, 30);
+                        break;
+                    case 'black':
+                        if ($request->discard) {
+                            echo $redis->hDel("user:{$openid}:score:hidden", $request->course_name);
+                        } else {
+                            echo $redis->hSet("user:{$openid}:score:hidden", $request->course_name, 1);
+                        }
+                        break;
+                    case 'like':
+                        if ('false' == $request->data) {
+                            echo $redis->hSet('user:public:score:flag_likes', $openid, 0);
+                        } elseif ('true' == $request->data) {
+                            echo $redis->hSet('user:public:score:flag_likes', $openid, 1);
+                        }
+                        break;
                 }
             }
         }

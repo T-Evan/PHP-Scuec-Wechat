@@ -9,6 +9,7 @@
 namespace App\Http\MessageHandler;
 
 use App\Http\Controllers\Api\AccountInfoController;
+use App\Http\Controllers\Api\LibInfoController;
 use App\Http\Service\HelperService;
 use App\Http\Service\KuaiDiApiService;
 use App\Http\Service\OuterApiService;
@@ -329,6 +330,32 @@ class TextMessageHandler implements EventHandlerInterface
 
                 return new News($items);
                 break;
+            case 'borrow':
+                $account = new LibInfoController();
+                try {
+                    $content = $account->getMessage();
+                    if (is_array($content)) {
+                        return new News($content);
+                    } else {
+                        return $content;
+                    }
+                } catch (\Exception $exception) {
+                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
+                }
+                break;
+            case 'moneyInfo':
+                $account = new AccountInfoController();
+                try {
+                    $content = $account->getMoneyMessage();
+                    if (is_array($content)) {
+                        return new News($content);
+                    } else {
+                        return $content;
+                    }
+                } catch (\Exception $exception) {
+                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
+                }
+                break;
             case 'test2':
                 $items = [
                     new NewsItem(
@@ -411,6 +438,12 @@ class TextMessageHandler implements EventHandlerInterface
             return 'new_market';
         } elseif (false !== strpos($keyword, '许愿') || '心愿墙' == $keyword || '表白墙' == $keyword) {
             return 'xuyuanqiang';
+        } elseif (('校园卡余额' == $keyword) || ('余额' == $keyword)) {
+            return 'moneyInfo';
+        } elseif ('校园卡消费详情' == $keyword) {
+            return 'moneyInfoDetail';
+        } elseif (('借阅' == $keyword) || ('当前借阅' == $keyword) || ('借阅查询' == $keyword)) {
+            return 'borrow';
         }
     }
 

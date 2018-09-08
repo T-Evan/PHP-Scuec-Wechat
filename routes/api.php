@@ -23,5 +23,6 @@ $api->version('v1', function ($api) {
     $api->get('students/ssfw/timetable/{openid}', 'App\Http\Controllers\Api\AccountInfoController@tableApi');
     $api->post('students/ssfw/score/{openid}', 'App\Http\Controllers\Api\AccountInfoController@scoreApi');
     $api->post('students/lib', 'App\Http\Controllers\Api\LibInfoController@judgeAccount');
+    $api->post('students/lib/booklist', 'App\Http\Controllers\Api\LibInfoController@getBookList');
 
 });

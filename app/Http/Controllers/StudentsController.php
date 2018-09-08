@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Api\AccountInfoController;
+use App\Http\Controllers\Api\AccountInfoDetailController;
+use App\Http\Controllers\Api\LibInfoController;
 use App\Http\Requests\StudentRequest;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -79,8 +81,16 @@ class StudentsController extends Controller
 
     public function test()
     {
+        $user_info_array = [
+            'username' => '201621093024',
+            'password' => 'x753951scz',
+        ];
+//        $result = $this->api->post('students/lib', $user_info_array); //dingo内部调用
+//        $test = new LibInfoController();
+//        $res = $test->getMessage();
         $test = new AccountInfoController();
-        $test->getTableMessage();
+        $res = $test ->getMoneyMessage();
+        dd($res);
     }
 
     public function cookie($type)
@@ -99,6 +109,9 @@ class StudentsController extends Controller
             }
             $studentRequest = new StudentRequest();
             $studentRequest->account = $student->account;
+            if (null == $student->toArray()[$password]) {
+                return ['data' => null, 'message' => '用户信息有误'];
+            }
             $studentRequest->password = decrypt($student->toArray()[$password]);
             $studentRequest->openid = $student->openid;
             $studentRequest->type = $type;

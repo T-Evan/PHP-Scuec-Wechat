@@ -12,6 +12,32 @@ use Illuminate\Support\Facades\Redis;
 
 class AccountInfoDetailController extends Controller
 {
+    public function getMoney()
+    {
+        $student_controller = new StudentsController();
+        $cookie_array = $student_controller->cookie('ssfw');
+        if (null == $cookie_array['data']) {
+            return $cookie_array['message'];
+        }
+        $cookie = unserialize($cookie_array['data']);
+        $res = HelperService::get(
+            'http://ehall.scuec.edu.cn/publicapp/sys/myyktzd/mySmartCard/loadSmartCardBillMain.do',
+            $cookie,
+            'http://ssfw.scuec.edu.cn/ssfw/index.do'
+        );
+        $moneyInfo = json_decode($res['res']->getbody()->getcontents(),true);
+        $final = array(
+            'KNYE' => $moneyInfo['remining'], //卡内余额
+        );
+//        $res = HelperService::get(
+//            'http://ehall.scuec.edu.cn/publicapp/sys/myyktzd/mySmartCard/getBillDetail.do',
+//            $cookie,
+//            'http://ssfw.scuec.edu.cn/ssfw/index.do'
+//        );
+        //TODO:9.8 消费详情接口未返回数据，校园卡消费详情功能待开发
+        return $final;
+    }
+
     public function getTimeTable($year = null, $term = null, $debug = false)
     {
         $common = app('wechat_common');

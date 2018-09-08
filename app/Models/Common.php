@@ -21,8 +21,8 @@ class Common extends Model
     public function getOpenid()
     {
         $message = app('wechat')->server->getMessage();
-        return $message['FromUserName'] ?? null;
-//        return 'onzftwySIXNVZolvsw_hUvvT8UN0';
+//        return $message['FromUserName'] ?? null;
+        return 'onzftwySIXNVZolvsw_hUvvT8UN0';
     }
 
 

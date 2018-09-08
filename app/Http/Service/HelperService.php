@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: YiWan
  * Date: 2018/6/17
- * Time: 4:56
+ * Time: 4:56.
  */
 
 namespace App\Http\Service;
@@ -19,12 +19,14 @@ class HelperService
     'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36';
 
     /**
-     * Notes:
+     * Notes:.
+     *
      * @param $body
      * @param $apiStr
      * @param $postType
      * @param string $referer
-     * @param null $cookie_jar
+     * @param null   $cookie_jar
+     *
      * @return array|string
      */
     public static function post($body, $apiStr, $postType, $referer = null, $cookie_jar = null)
@@ -42,8 +44,8 @@ class HelperService
             'timeout' => 5,
             'headers' => [
                 'User-Agent' => self::DEFAULT_USER_AGENT,
-                'Referer' => $referer
-            ]
+                'Referer' => $referer,
+            ],
         ];
 
         try {
@@ -56,7 +58,7 @@ class HelperService
 
         return array(
             'cookie' => $cookie_jar,
-            'res' => $res
+            'res' => $res,
         );
     }
 
@@ -72,7 +74,7 @@ class HelperService
             'timeout' => 3,
             'headers' => [
                 'User-Agent' => self::DEFAULT_USER_AGENT,
-                'Referer' => $referer
+                'Referer' => $referer,
             ],
         ];
 
@@ -84,38 +86,50 @@ class HelperService
 
         return array(
             'cookie' => $cookie_jar,
-            'res' => $res
+            'res' => $res,
         );
     }
 
     /**
      * Notes:解析html函数，默认获取标签内文字，不支持获取某一标签中的属性
-     * 解释失败默认返回false
+     * 解释失败默认返回false.
+     *
      * @param $dom :Html文本
      * @param $filterType :解析类型,filter或filterXPath,参考domCrawler文档
      * @param $filterRule :解析规则
+     *
      * @return bool|string
      */
-    public static function domCrawler($dom, $filterType, $filterRule)
+    public static function domCrawler($dom, $filterType, $filterRule, $attr = '')
     {
         $crawler = new Crawler();
         $crawler->addHtmlContent($dom);
         switch ($filterType) {
             case 'filter':
                 try {
-                    $res = $crawler->filter($filterRule)->text();
+                    if ($attr) {
+                        $res = $crawler->filter($filterRule)->attr($attr);
+                    } else {
+                        $res = $crawler->filter($filterRule)->text();
+                    }
                 } catch (\InvalidArgumentException $e) {
                     // Handle the current node list is empty..
                     return false;
                 }
+
                 return $res;
             case 'filterXPath':
                 try {
-                    $res = $crawler->filterXPath($filterRule)->text();
+                    if ($attr) {
+                        $res = $crawler->filterXPath($filterRule)->attr($attr);
+                    } else {
+                        $res = $crawler->filterXPath($filterRule)->text();
+                    }
                 } catch (\InvalidArgumentException $e) {
                     // Handle the current node list is empty..
                     return false;
                 }
+
                 return $res;
         }
     }
@@ -126,8 +140,10 @@ class HelperService
      * https://blog.csdn.net/lyq8479/article/details/9393097
      * 代码实现参考自:
      * https://blog.csdn.net/u012767761/article/details/71272780
-     * 关于unicode编码的转化，显示emoji表情
+     * 关于unicode编码的转化，显示emoji表情.
+     *
      * @param $str
+     *
      * @return mixed
      */
     public static function getEmoji($str)
@@ -139,14 +155,15 @@ class HelperService
 
     public static function getContent($str, $keyword)    // 匹配字符串中关键词后面的内容
     {
-        $pregStr = "/(?<=".$keyword.").*/u";    // 正则表达式语法，向后查找
+        $pregStr = '/(?<='.$keyword.').*/u';    // 正则表达式语法，向后查找
         preg_match($pregStr, $str, $matches);   // 使用向后查找可以匹配例如“图书图书”的情况
         $content = trim($matches[0]);   // 去除前后空格
         // http://www.php.net/manual/zh/function.strpos.php
-        if (strpos($content, '+') !== false) {  // 如果获得的字符串前面有+号则去除
+        if (false !== strpos($content, '+')) {  // 如果获得的字符串前面有+号则去除
             $content = preg_replace("/\+/", '', $content, 1);   // 去除加号，且只去除一次，解决用户多输入+号的情况
             $content = trim($content);
         }
+
         return $content;
     }
 
@@ -155,19 +172,19 @@ class HelperService
         $app = app('wechat');
         $message = $app->server->getMessage();
         $openid = $message['FromUserName'];
-        if ($type == 'ssfw') {
+        if ('ssfw' == $type) {
             $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/ssfw/'.
                 $openid.'">〖绑定账号〗</a>';
         }
-        if ($type == 'lib') {
+        if ('lib' == $type) {
             $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/lib/'.
                 $openid.'">〖绑定账号〗</a>';
         }
-        if ($type == 'lab') {
+        if ('lab' == $type) {
             $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/lab/'.
                 $openid.'">〖绑定账号〗</a>';
         }
-        if ($type == 'libName') {
+        if ('libName' == $type) {
             $bindingLink = '<a href="https://wechat.uliuli.fun/students/create/lib/'.
                 $openid.'">〖绑定账号〗</a>';
         }
@@ -178,42 +195,44 @@ class HelperService
     public static function todyInfo()
     {   //今天的详细信息，如今天的日期以及周数
         return SchoolDatetime::getDateInfo();
-        $timeymd = date("Y年n月j日");
-        $weektocn = array('Monday' => "星期一",
-            'Tuesday' => "星期二",
-            'Wednesday' => "星期三",
-            'Thursday' => "星期四",
-            'Friday' => "星期五",
-            'Saturday' => "星期六",
-            'Sunday' => "星期日"
+        $timeymd = date('Y年n月j日');
+        $weektocn = array('Monday' => '星期一',
+            'Tuesday' => '星期二',
+            'Wednesday' => '星期三',
+            'Thursday' => '星期四',
+            'Friday' => '星期五',
+            'Saturday' => '星期六',
+            'Sunday' => '星期日',
         );
-        $weekcn = $weektocn[date("l")];     //将获取到的英文星期信息转换为中文
+        $weekcn = $weektocn[date('l')];     //将获取到的英文星期信息转换为中文
 
         $weeknumcount = SchoolDatetime::getSchoolWeek();
         if ($weeknumcount > SchoolDatetime::getWeekCount()) { // 大于20周不显示周数
             $weeknumcountStr = '少年郎，我咖喱港，这学期干得不错，下学期8月27日、28日注册，8月29日正式上课。暑假快乐~/::P';
         } else {
-            $weeknumcountStr = "本学期第".$weeknumcount."周";
+            $weeknumcountStr = '本学期第'.$weeknumcount.'周';
         }
 
-        $tody_info_str = $timeymd." ".$weekcn."\n".$weeknumcountStr;
+        $tody_info_str = $timeymd.' '.$weekcn."\n".$weeknumcountStr;
+
         return $tody_info_str;
     }
+
     /*
      * 老版资讯民大函数库
      */
 
-
     /**
      * Lets you determine whether an array index is set and whether it has a value.
-     * If the element is empty it returns empty string (or whatever you specify as the default value.)
+     * If the element is empty it returns empty string (or whatever you specify as the default value.).
      *
      * Code from CodeIgniter
      *
      * @param   string
      * @param   array
      * @param   mixed
-     * @return  mixed   depends on what the array contains
+     *
+     * @return mixed depends on what the array contains
      */
     public static function element($key, $array, $default = '')
     {
@@ -222,16 +241,17 @@ class HelperService
 
     /**
      * 生成随机字符串
-     * Code from CodeIgniter
+     * Code from CodeIgniter.
      *
      * @param int $length 随机字符串的长度
+     *
      * @return string $word
      */
     public static function randStr($length = 16)
     {
         $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $word = '';
-        for ($i = 0, $mt_rand_max = strlen($chars) - 1; $i < $length; $i++) {
+        for ($i = 0, $mt_rand_max = strlen($chars) - 1; $i < $length; ++$i) {
             $word .= $chars[mt_rand(0, $mt_rand_max)];
         }
 
@@ -239,12 +259,13 @@ class HelperService
     }
 
     /**
-     * 发送 http(s) 请求（GET/POST/上传文件/JSON）
+     * 发送 http(s) 请求（GET/POST/上传文件/JSON）.
      *
-     * @param string $url 请求的url
-     * @param mixed $data string/array
-     * @param int $timeout a value of timeout
-     * @param string $cookie a cookie string for request
+     * @param string $url     请求的url
+     * @param mixed  $data    string/array
+     * @param int    $timeout a value of timeout
+     * @param string $cookie  a cookie string for request
+     *
      * @return string 返回的结果
      */
     public static function httpRequest($url, $data = null, $timeout = null, $cookie = null)
@@ -256,7 +277,7 @@ class HelperService
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:')); // Disable Expect: header (some server does not support it)
 
         // https 请求
-        if (strpos($url, "https://") !== false) {
+        if (false !== strpos($url, 'https://')) {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);    // 不检查SSL证书
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
             curl_setopt($ch, CURLOPT_SSLVERSION, 1);    // CURL_SSLVERSION_TLSv1
@@ -286,60 +307,74 @@ class HelperService
     }
 
     /**
-     * 判断字符串是否是 JSON（PHP >= 5.3.0）
+     * 判断字符串是否是 JSON（PHP >= 5.3.0）.
      *
      * @param string $string 待判断的 JSON 串
+     *
      * @return bool
      */
     public static function is_JSON($string)
     {
         return is_string($string) && is_object(json_decode($string))
-        && (json_last_error() == JSON_ERROR_NONE) ? true : false;
+        && (JSON_ERROR_NONE == json_last_error()) ? true : false;
     }
 
     /**
-     * 从字符串（http头）中抽出Cookie
+     * 从字符串（http头）中抽出Cookie.
+     *
      * @param string $string 带http头的字符串
+     *
      * @return mixed
      */
-    public static function getCookieFromStr($string){
+    public static function getCookieFromStr($string)
+    {
         $isMatched = preg_match_all("/(Set-Cookie|Cookie):\s(.*?)\r\n/ism", $string, $arrCookies);  //一定要\r\n啊，否则抓到的Cookie会带有\r
         if ($isMatched) {
-            $cookie = implode("; ", $arrCookies[2]);
+            $cookie = implode('; ', $arrCookies[2]);
+        } else {
+            $cookie = '';
         }
-        else {
-            $cookie = "";
-        }
+
         return $cookie;
     }
 
     /**
-     * remove all html entities from a htmlencoded string
+     * remove all html entities from a htmlencoded string.
+     *
      * @param string
+     *
      * @return string
      */
-    public static function removeHtmlEntities($rawStr){
-        $final = preg_replace("/&#?[a-z0-9]{2,8};/is", "", $rawStr);
+    public static function removeHtmlEntities($rawStr)
+    {
+        $final = preg_replace('/&#?[a-z0-9]{2,8};/is', '', $rawStr);
+
         return $final;
     }
 
     /**
      * this function is from User Contributed Notes on http://php.net/base64_encode
-     * return a special string(modify from base64) that can be part of the url
+     * return a special string(modify from base64) that can be part of the url.
+     *
      * @param string
+     *
      * @return string
      */
-    public static function urlBase64Encode($data){
+    public static function urlBase64Encode($data)
+    {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
     /**
      * this function is from User Contributed Notes on http://php.net/base64_encode
-     * corresponding to urlBase64Encode()
+     * corresponding to urlBase64Encode().
+     *
      * @param string
+     *
      * @return string
      */
-    public static function urlBase64Decode($data){
+    public static function urlBase64Decode($data)
+    {
         return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
     }
 }

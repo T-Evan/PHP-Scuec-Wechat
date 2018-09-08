@@ -36,6 +36,8 @@ return [
 
     'cookie_cache_time' => env('COOKIE_TIME', null),
 
+    'libary_cookie_cache_time' => env('LIBARY_COOKIE_TIME', null),
+
     'timetable_cache_time' => env('TIMETABLE_CACHE_TIME', null),
 
     'exam_cache_time' => env('EXAM_CACHE_TIME', null),
