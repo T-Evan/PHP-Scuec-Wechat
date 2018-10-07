@@ -39,7 +39,7 @@ $(document).ready(function() {
     // bb(res);
 
     var openId = getUrlParam("openid");
-    var path = 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId;
+    var path = 'https://wechat3.stuzone.com/api/students/ssfw/score/'+openId;
     $.ajax({ //主体请求
         url: path,
         type: 'POST',
@@ -113,7 +113,7 @@ $(document).ready(function() {
                 var openId = getUrlParam("openid");
                 console.log(className);
                 $.ajax({ //移出请求
-                    url: 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId,
+                    url: 'https://wechat3.stuzone.com/api/students/ssfw/score/'+openId,
                     type: 'POST',
                     dataType: 'json',
                     data: {

@@ -97,7 +97,7 @@ var openid = getUrlParam('openid');
 $.ajax({
 	type: "get",
   dataType: "json",
-  url: "https://wechat.uliuli.fun/api/students/ssfw/timetable/"+openid,
+  url: "https://wechat3.stuzone.com/api/students/ssfw/timetable/"+openid,
   success:function(data){
 
         //显示未安排课程

@@ -13,7 +13,7 @@ use League\Fractal\TransformerAbstract;
 
 class StudentTransformer extends TransformerAbstract
 {
-    public function transform(\App\Models\Student $student)
+    public function transform(\App\Models\StudentInfo $student)
     {
         return [
             $student->toArray(),

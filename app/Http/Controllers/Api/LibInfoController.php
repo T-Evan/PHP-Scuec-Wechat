@@ -93,7 +93,7 @@ class LibInfoController extends Controller
     private function getContent()
     {
         $sContent = HelperService::get('http://coin.lib.scuec.edu.cn/reader/captcha.php');
-        $captcha = new ReadCaptcha($sContent['res']->getBody()->getContents());
+        $captcha = new ReadCaptcha($sContent['res']->getBody()->getContents(), 'libary');
         $captcha = $captcha->showImg();
         $bodys = [
             'number' => $this->user,
@@ -122,7 +122,7 @@ class LibInfoController extends Controller
      *
      * @return array
      */
-    public function getBooklist(Request $request)
+    public function getBooklist(Request $request = null)
     {
         $appendCallNum = $request->appendCallNum ?? true;
         $student_controller = new StudentsController();
@@ -151,29 +151,39 @@ class LibInfoController extends Controller
             $arrTd = array();
             $basicInfo = array($currentBorrow, $maxBorrow);
             $trSet = HelperService::domCrawler($curlResult, 'filter', '.table_line');
+
+            //心情不好，瞎写一通
             preg_match_all('/\S+/', $trSet, $match3);    //解析图书信息
+            preg_match_all('/class="blue"\shref="(.*)">/', $curlResult, $marcHrefArr);    //解析marc_no
+            preg_match_all('/getInLib\((.*)\)/', $curlResult, $getInLib);    //解析getInLib
+            unset($getInLib[1][3]);
+            foreach ($getInLib[1] as $value) {
+                preg_match_all('/\'(.*?)\'/', $value, $res);    //解析getInLib
+                $LibArr[] = $res;
+            }
             $arrTd[] = $match3;
+            $arrTdArr = array();
 
-            foreach ($arrTd as $arrArr) {
-                $marcHref = HelperService::domCrawler($curlResult, 'filterXPath', '//a[contains(@href,"marc")]', 'href');
+            for ($i = 8 , $j = 0; $i < count($arrTd[0][0]); $i += 9, $j++) {
+                $arrTdArr[] = array_slice($arrTd[0][0], $i, 9);
+                $arrTdArr[$j][] = $marcHrefArr[1][$j];
+                $arrTdArr[$j] = array_merge($arrTdArr[$j], $LibArr[$j][1]);
+            }
+
+            foreach ($arrTdArr as $arrArr) {
 //            preg_match('/marc_no=(.*)/', $marcHref, $match4);    //解析图书marcno
-                $arrArr[] = $this->getBookCallNumber($marcHref);  //解析索书号
-                $marcClick = HelperService::domCrawler($curlResult, 'filterXPath', '//input[contains(@value,"续借")]', 'onclick');
-                preg_match("/getInLib\('(\w+)','(\w+)','(\w+)'\)/i", $marcClick, $arrRenewInfo);
-                unset($arrRenewInfo[0]);
-                $arrArr[] = $arrRenewInfo;
-
+                $arrArr[9] = $this->getBookCallNumber($arrArr[9]);  //解析索书号
                 $translated = array(
-                    'barcode' => $arrArr[0][8],
-                    'call_number' => $arrArr[1],
-                    'name' => $arrArr[0][9],
-                    'borrow_date' => $arrArr[0][12],
-                    'due_date' => $arrArr[0][13],
-                    'renew_times' => (int) $arrArr[0][14],
-                    'location' => $arrArr[0][15],
-                    'attachment' => $arrArr[0][16],
-                    'renew_check_code' => $arrArr[2][2],
-                    'index' => $arrArr[2][3],
+                    'barcode' => $arrArr[0],
+                    'name' => $arrArr[1].$arrArr[2].$arrArr[3],
+                    'borrow_date' => $arrArr[4],
+                    'due_date' => $arrArr[5],
+                    'renew_times' => (int) $arrArr[6],
+                    'location' => $arrArr[7],
+                    'attachment' => $arrArr[8],
+                    'call_number' => $arrArr[9],
+                    'renew_check_code' => $arrArr[11],
+                    'index' => $arrArr[12],
                     'renewable' => false,
                     'overdue' => false,
                     'overdue_day_count' => null,
@@ -221,9 +231,8 @@ class LibInfoController extends Controller
     /**
      * get a formed message which can send to the user directly.
      *
-     * @return array
+     * @return string
      *
-     * @throws SchoolInfoException
      */
     public function getMessage()
     {
@@ -238,7 +247,7 @@ class LibInfoController extends Controller
             if (!is_array($bookList)) {
                 switch ($bookList) {
                     case '用户不存在':
-                        $news = "绑定账号后即可查询课表。妈妈再也不用担心我忘记教室了。/::,@\n请先".
+                        $news = "绑定账号后即可查询借阅信息。/::,@\n请先".
                             HelperService::getBindingLink('lib');
                         break;
                     case '用户信息有误':
@@ -286,6 +295,8 @@ class LibInfoController extends Controller
         }
         $resultStr .= (0 != strlen($renewable)) ? "\n\n  ---- 可续借的图书 ----".$renewable : $renewable;
         $resultStr .= (0 != strlen($overdue)) ? "\n\n  ---- 已超期的图书 ----".$overdue : $overdue;
+        $resultStr = "当前借阅 ({$borrowAmount}/{$totalAmount})\n".$resultStr."\n\n关键词\"续借+续借编号\"可以续借对应的书籍。如果遇到问题，记得@程序员哦。";
+        /*长度限制，暂时返回纯文本
         $news = [
             new NewsItem(
                 [
@@ -294,8 +305,9 @@ class LibInfoController extends Controller
                 ]
             ),
         ];
+        */
 
-        return $news;
+        return $resultStr;
     }
 
     /**

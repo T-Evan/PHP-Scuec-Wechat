@@ -63,7 +63,6 @@ return [
             'secret' => env('WECHAT_OFFICIAL_ACCOUNT_SECRET', 'your-app-secret'),    // AppSecret
             'token' => env('WECHAT_OFFICIAL_ACCOUNT_TOKEN', 'your-token'),           // Token
             'aes_key' => env('WECHAT_OFFICIAL_ACCOUNT_AES_KEY', ''),                 // EncodingAESKey
-
             /*
              * OAuth 配置
              *
@@ -74,6 +73,33 @@ return [
             //     'scopes'   => array_map('trim', explode(',', env('WECHAT_OFFICIAL_ACCOUNT_OAUTH_SCOPES', 'snsapi_userinfo'))),
             //     'callback' => env('WECHAT_OFFICIAL_ACCOUNT_OAUTH_CALLBACK', '/examples/oauth_callback.php'),
             // ],
+        ],
+        'iscuecer' => [
+            'app_id'         => 'wxdfff0a26d620924e',    //应用ID
+            'secret'         => '1d52a7d37f4b824d4c49110e872eb971',    //应用密钥
+            'token'          => '24bOs78PgAU9u0eGqKzDIE35WyVgxP',    //Token(令牌)
+            'aes_key'        => 'Qq7K5TjcRYvvuBjs19hO3EX1I2UpPxGUHyC05gXFRSH',    //消息加解密密钥
+        ],
+        //iyaozhen的测试号
+        'test_iyaozhen' => [
+            'app_id'         => 'wx146c7b83ba764c03',
+            'secret'         => '51da23b1f0327d7ae8f685f5502af785',
+            'token'          => '24bOs78PgAU9u0eGqKzDIE35WyVgxP',
+            'aes_key'        => 'rRDOXEvMcCm4uevUntoEO8gg2gJ0a1Cn95vZ1xIQVyg',
+        ],
+        //er1cst的测试号
+        'test_er1cst' => [
+            'app_id'         => 'wxde4b90e67ce954c9',
+            'secret'         => 'd4624c36b6795d1d99dcf0547af5443d',
+            'token'          => 'c2xrMDkyM3JqZWZvMzI0ajNrcmxrZWhl',
+            'aes_key'        => 'rRDOXEvMcCm4uevUntoEO8gg2gJ0a1Cn95vZ1xIQVyg',
+        ],
+        //yiwan的测试号
+        'test_yiwan' => [
+            'app_id'         => 'wxf01054870e6ce5eb',
+            'secret'         => '24b4ec7766e4969ecc0f80306a117f26',
+            'token'          => 'zixunminda',
+            'aes_key'        => 'TilHssS9xYUWmUGtLGaHvUiTOtb2vnByPG42VXweCbC',
         ],
     ],
 

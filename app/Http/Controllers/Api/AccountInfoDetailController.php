@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Exceptions\SchoolInfoException;
 use App\Http\Controllers\StudentsController;
 use App\Http\Service\HelperService;
+use App\Http\Service\ReadCaptcha;
 use App\Http\Service\SchoolDatetime;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
@@ -14,6 +15,7 @@ class AccountInfoDetailController extends Controller
 {
     public function getMoney()
     {
+        /* ehall接口暂不可用
         $student_controller = new StudentsController();
         $cookie_array = $student_controller->cookie('ssfw');
         if (null == $cookie_array['data']) {
@@ -29,13 +31,74 @@ class AccountInfoDetailController extends Controller
         $final = array(
             'KNYE' => $moneyInfo['remining'], //卡内余额
         );
+        */
 //        $res = HelperService::get(
 //            'http://ehall.scuec.edu.cn/publicapp/sys/myyktzd/mySmartCard/getBillDetail.do',
 //            $cookie,
 //            'http://ssfw.scuec.edu.cn/ssfw/index.do'
 //        );
         //TODO:9.8 消费详情接口未返回数据，校园卡消费详情功能待开发
-        return $final;
+
+        // 转换成页面使用的gb2312编码,默认为UTF-8,否则乱码！
+        $isFail = true;
+        for ($i = 0; $i < 5; ++$i ) {
+            if (!$isFail) {
+                break;
+            }
+            $sContent = HelperService::get('http://ecard.scuec.edu.cn/getCheckpic.action');
+//        dd($sContent);
+            $captcha = new ReadCaptcha($sContent['res']->getBody()->getContents(), 'ecard');
+            $captcha = $captcha->showImg();
+            $bodys = [
+                'name' => '201521093018',
+                'passwd' => '016502',
+                'rand' => eval("return $captcha;"),
+                'userType' => '1',
+                'loginType' => '2',
+                'imageField.x' => '33',
+                'imageField.y' => '11',
+            ];
+
+            $res = HelperService::post(
+                $bodys,
+                'http://ecard.scuec.edu.cn/loginstudent.action',
+                'form_params',
+                'http://ecard.scuec.edu.cn/homeLogin.action',
+                $sContent['cookie']
+            );
+
+            $res2 = HelperService::get(
+                'http://ecard.scuec.edu.cn/accounttodayTrjn.action',
+                $res['cookie'],
+                'http://ecard.scuec.edu.cn/accleftframe.action'
+            );
+            $original_body = (string) $res2['res']->getBody();
+            $utf8_body = mb_convert_encoding($original_body, 'UTF-8', 'gb2312');
+            $isFail = strpos($utf8_body, '请重新登陆');
+        }
+        $ecardNo = HelperService::domCrawler($utf8_body, 'filterXPath', '//*[@id="account"]/option', 'value');
+
+        $bodys = [
+            'account' => $ecardNo,
+            'inputObject' => 'all',
+        ];
+        $res3 = HelperService::post(
+            $bodys,
+            'http://ecard.scuec.edu.cn/accounttodatTrjnObject.action',
+            'form_params',
+            'http://ecard.scuec.edu.cn/homeLogin.action',
+            $sContent['cookie']
+        );
+
+        $original_body = (string) $res3['res']->getBody();
+        $utf8_body = mb_convert_encoding($original_body, 'UTF-8', 'gb2312');
+        echo $utf8_body;
+        die;
+
+        $wrong_msg = HelperService::domCrawler($res['res']->getBody()->getContents(), 'filter', '#fontMsg'); //登录失败，返回页面错误信息
+        $res['wrong_msg'] = $wrong_msg;
+
+        return $res;
     }
 
     public function getTimeTable($year = null, $term = null, $debug = false)

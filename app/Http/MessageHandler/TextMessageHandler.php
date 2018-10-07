@@ -10,6 +10,7 @@ namespace App\Http\MessageHandler;
 
 use App\Http\Controllers\Api\AccountInfoController;
 use App\Http\Controllers\Api\LibInfoController;
+use App\Http\Controllers\Api\WakeSignDetailInfosController;
 use App\Http\Service\HelperService;
 use App\Http\Service\KuaiDiApiService;
 use App\Http\Service\OuterApiService;
@@ -150,6 +151,20 @@ class TextMessageHandler implements EventHandlerInterface
 
                 return new News($items);
                 break;
+            case 'yibaobaoxiao':
+                $items = [
+                    new NewsItem(
+                        [
+                            'title' => '【干货】大学生医保报销流程及事宜 ',
+                            'description' => "大学生医保的干货\n希望可以帮到塔粉们~\n有问题可以直接留言指出哦！",
+                            'url' => 'https://mp.weixin.qq.com/s/8ZH5R2n4OkG9AIi0WsGo-A',
+                            'image' => config('app.base_url').'/img/yibao.jpg',
+                        ]
+                    ),
+                ];
+
+                return new News($items);
+                break;
             case 'minren':
                 $content = '《民人志》往期目录：'.config('app.blog_url').'/category/minrenzhi';
 
@@ -160,10 +175,27 @@ class TextMessageHandler implements EventHandlerInterface
 
                 return $content;
                 break;
+            case 'zhaopin':
+                $content = '<a href="'.config('app.blog_url').'/tag/zhaopin">点此进入一周招聘</a>';
+
+                return $content;
+                break;
             case 'studyroom':
                 $tousername = $message['FromUserName'];
                 $content = '<a href="https://wechat.stuzone.com/iscuecer/lab_query/web/studyroom?openid='.
                     $tousername.'">自习室查询</a>';
+
+                return $content;
+                break;
+            case 'suggest':
+                $MessageStr = array('谢谢你的反馈。么么哒/:,@-D', '你的反馈我们已经收到，谢谢你对我们的支持。么么哒/:hug', '你的意见我们已经收录，感谢你的支持。么么哒/::)');
+                $MessageStrRandom = rand(0, 2);
+                $content = $MessageStr[$MessageStrRandom];
+
+                return $content;
+                break;
+            case 'mental_test':
+                $content = '<a href="http://xinli.scuec.edu.cn/login.aspx">心理素质能力测试系统</a>';
 
                 return $content;
                 break;
@@ -234,71 +266,53 @@ class TextMessageHandler implements EventHandlerInterface
                 break;
             case 'timetable':
                 $account = new AccountInfoController();
-                try {
-                    $content = $account->getTableMessage();
-                    if (is_array($content)) {
-                        return new News($content);
-                    } else {
-                        return $content;
-                    }
-                } catch (\Exception $exception) {
-                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
-                }
+                $content = $this->replyHandle($account, 'getTableMessage');
+
+                return $content;
                 break;
             case 'exam':
                 $account = new AccountInfoController();
-                try {
-                    $content = $account->getExamMessage();
-                    if (is_array($content)) {
-                        return $content['message'];
-                    } else {
-                        return $content;
-                    }
-                } catch (\Exception $exception) {
-                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
-                }
+                $content = $this->replyHandle($account, 'getExamMessage');
+
+                return $content;
                 break;
             case 'score':
                 $account = new AccountInfoController();
-                try {
-                    $content = $account->getScoreMessage();
-                    if (is_array($content)) {
-                        return new News($content);
-                    } else {
-                        return $content;
-                    }
-                } catch (\Exception $exception) {
-                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
-                }
+                $content = $this->replyHandle($account, 'getScoreMessage');
+
+                return $content;
                 break;
             case 'score_scratchoff':
                 $account = new AccountInfoController();
-                try {
-                    $content = $account->guaguale();
-                    if (is_array($content)) {
-                        return new News($content);
-                    } else {
-                        return $content;
-                    }
-                } catch (\Exception $exception) {
-                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
-                }
+                $content = $this->replyHandle($account, 'guaguale');
+
+                return $content;
                 break;
             case 'score_scratchoff_close':
                 $account = new AccountInfoController();
-                try {
-                    $content = $account->guaguale_close();
-                    if (is_array($content)) {
-                        return new News($content);
-                    } else {
-                        return $content;
-                    }
-                } catch (\Exception $exception) {
-                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
-                }
+                $content = $this->replyHandle($account, 'guaguale_close');
+
+                return $content;
                 break;
             case 'security_education_tiny_course':
                 $content = '<a href="http://wb.mycourse.cn/svnweiban/">点此进入安全微课</a>';
+
+                return $content;
+                break;
+            case 'hlepPush':
+                $content = '<a href="'.config('app.blog_url').'/information-to-help-push-rules.html">帮推</a>';
+                $content = '点击查看:'.$content;
+
+                return $content;
+                break;
+            case 'fanfou':
+                $content = '<a href="'.config('app.blog_url').'/tag/fanfou">点此进入饭否</a>';
+
+                return $content;
+                break;
+            case 'about':
+                $questionAndAnswer = '<a href="'.config('app.blog_url').'/about">资讯民大Q&A</a>';
+                $content = '资讯民大是学生工作部(处)下属的学生资讯集团推出的为全校师生提供信息查询、权威资讯的微信公众平台。更多详情请点击'.$questionAndAnswer."\n©学生资讯集团\n当前版本: 2.0\n技术支持:".'<a href="http://126.am/bitworkshop">比特工场</a>'."\n".'<a href="'.sconfig('app.blog_url').'/contact-us">联系我们</a>'.' | <a href="'.config('app.blog_url').'/join">加入我们</a>';
 
                 return $content;
                 break;
@@ -310,6 +324,20 @@ class TextMessageHandler implements EventHandlerInterface
                             'description' => '',
                             'url' => 'https://ng.bitworkshop.net/login/',
                             'image' => config('app.base_url').'/img/new_market.jpg',
+                        ]
+                    ),
+                ];
+
+                return new News($items);
+                break;
+            case 'kaozheng':
+                $items = [
+                    new NewsItem(
+                        [
+                            'title' => '2018考试时间汇总，在大学多考几个证！',
+                            'description' => '',
+                            'url' => 'http://mp.weixin.qq.com/s/TSUGn5HmHJ1XxUjCIgsMoA',
+                            'image' => config('app.base_url').'/img/kaozheng.jpg',
                         ]
                     ),
                 ];
@@ -332,29 +360,32 @@ class TextMessageHandler implements EventHandlerInterface
                 break;
             case 'borrow':
                 $account = new LibInfoController();
-                try {
-                    $content = $account->getMessage();
-                    if (is_array($content)) {
-                        return new News($content);
-                    } else {
-                        return $content;
-                    }
-                } catch (\Exception $exception) {
-                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
-                }
+                $content = $this->replyHandle($account, 'getMessage');
+
+                return $content;
                 break;
             case 'moneyInfo':
                 $account = new AccountInfoController();
-                try {
-                    $content = $account->getMoneyMessage();
-                    if (is_array($content)) {
-                        return new News($content);
-                    } else {
-                        return $content;
-                    }
-                } catch (\Exception $exception) {
-                    Common::writeLog($exception->getMessage().$exception->getTraceAsString());
-                }
+                $content = $this->replyHandle($account, 'getMoneyMessage');
+
+                return $content;
+                break;
+            case 'signtest':
+                $account = new WakeSignDetailInfosController();
+                $content = $this->replyHandle($account, 'store');
+
+                return $content;
+                break;
+            case 'sign':
+                return "十分抱歉，打卡功能还在测试中~";
+                break;
+            case 'call_monkey':
+                //TODO:待完成
+//                $tmp = new Zixunminda\Wechat\Core\Wechat();
+//                $tmp->fromUserName = $object->FromUserName;
+//                $tmp->toUserName = $object->ToUserName;
+//                $msg = Zixunminda\Utils\MonkeyCaller::call($tousername, $keyword);
+//                $resultStr = Zixunminda\Wechat\Message\MessageWriter::write($tmp, $msg);
                 break;
             case 'test2':
                 $items = [
@@ -369,7 +400,7 @@ class TextMessageHandler implements EventHandlerInterface
 
                 return new News($items);
             default:
-                return $message['Content'].$message['FromUserName'];
+                return '暂时不能处理你的消息噢，请留言告诉我们吧~';
         }
     }
 
@@ -382,7 +413,7 @@ class TextMessageHandler implements EventHandlerInterface
      */
     private function dealStr($keyword) //字符串处理，用于确定用户的目的，正则匹配增加容错率
     {
-        if (('0' == $keyword) or ('帮助' == $keyword)) { //此处有陷阱，如果字符串以合法的数字开头，就用该数字作为其值，否则其值为数字0。
+        if (('0' == $keyword) || ('帮助' == $keyword) || ('使用帮助' == $keyword)) { //此处有陷阱，如果字符串以合法的数字开头，就用该数字作为其值，否则其值为数字0。
             return 'help';
         } elseif ('天气' == $keyword) {
             return 'weather';
@@ -444,6 +475,30 @@ class TextMessageHandler implements EventHandlerInterface
             return 'moneyInfoDetail';
         } elseif (('借阅' == $keyword) || ('当前借阅' == $keyword) || ('借阅查询' == $keyword)) {
             return 'borrow';
+        } elseif (preg_match('/(打卡test)$/', $keyword)) {
+            return 'signtest';
+        } elseif ('早起打卡' == $keyword) {
+            return 'sign';
+        } elseif (('大学生医保' == $keyword) || '报销' == $keyword || '医保' == $keyword || '医疗报销' == $keyword) {
+            return 'yibaobaoxiao';
+        } elseif (('心理素质能力测试' == $keyword) or ('心理素质测试' == $keyword) or ('心理测试' == $keyword) or ('心理测评' == $keyword)) {
+            return 'mental_test';
+        } elseif (false !== strpos($keyword, '考证')) {
+            return 'kaozheng';
+        } elseif ('帮推' == $keyword) {
+            return 'hlepPush';
+        } elseif (preg_match('/@/', $keyword)) {
+            if (strpos($keyword, '程序员') || strpos($keyword, '程序猿')) {
+                return 'call_monkey';
+            }
+
+            return 'suggest';
+        } elseif ('关于' == $keyword) {
+            return 'about';
+        } elseif ('饭否' == $keyword) {
+            return 'fanfou';
+        } elseif ('一周招聘' == $keyword) {
+            return 'zhaopin';
         }
     }
 
@@ -478,5 +533,19 @@ class TextMessageHandler implements EventHandlerInterface
 更多功能努力研发ing';
 
         return $helpStr;
+    }
+
+    private function replyHandle($className, $fnName, $params = array())
+    {
+        try {
+            $content = call_user_func_array(array($className, $fnName), $params);
+            if (is_array($content)) {
+                return new News($content);
+            } else {
+                return $content;
+            }
+        } catch (\Exception $exception) {
+            Common::writeLog($exception->getMessage().$exception->getTraceAsString());
+        }
     }
 }

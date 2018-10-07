@@ -82,7 +82,7 @@ $(document).ready(function() {
                             var className = _this.parent().parent().children("h1").text(); //TODO
 
                             $.ajax({ // 擦除成功 发送参数
-                                url: 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId,
+                                url: 'https://wechat3.stuzone.com/api/students/ssfw/score/'+openId,
                                 type: 'POST',
                                 dataType: 'json',
                                 data: {
@@ -153,7 +153,7 @@ $(document).ready(function() {
         // console.log("技术支持：比特工场。欢迎有互联网梦想的同学加入我们！");
         var openId = getUrlParam("openid");
         $.ajax({
-                url: 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId,
+                url: 'https://wechat3.stuzone.com/api/students/ssfw/score/'+openId,
                 type: 'POST',
                 dataType: 'json',
                 timeout: 15000,
@@ -225,7 +225,7 @@ $(document).ready(function() {
                         console.log(className);
                         var openId = getUrlParam("openid");
                         $.ajax({ //放入 请求
-                            url: 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId,
+                            url: 'https://wechat3.stuzone.com/api/students/ssfw/score/'+openId,
                             type: 'POST',
                             dataType: 'json',
                             data: {
@@ -303,7 +303,7 @@ $(document).ready(function() {
             var likeMark = 'false';
         }
         $.ajax({
-            url: 'https://wechat.uliuli.fun/api/students/ssfw/score/'+openId,
+            url: 'https://wechat3.stuzone.com/api/students/ssfw/score/'+openId,
             type: 'POST',
             dataType: 'json',
             data: {

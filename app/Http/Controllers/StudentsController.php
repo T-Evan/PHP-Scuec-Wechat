@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Api\AccountInfoController;
-use App\Http\Controllers\Api\AccountInfoDetailController;
-use App\Http\Controllers\Api\LibInfoController;
+use App\Http\Controllers\Api\StudentWeixinInfosController;
+use App\Http\Controllers\Api\WakeSignDetailInfosController;
 use App\Http\Requests\StudentRequest;
-use App\Models\Student;
+use App\Models\StudentInfo;
+use App\Models\StudentWeixinInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
@@ -43,10 +44,10 @@ class StudentsController extends Controller
         }
         if (!empty($result['data'])) { //验证通过
             Redis::setex($type.'_'.$openid, 3600, $result['data']['cookie']); //cookie缓存有效期为1小时
-            $student = Student::where('openid', $openid);
+            $student = StudentInfo::where('openid', $openid);
             if (!$refreshCookie) {   //重新绑定时需要刷新缓存并更新密码
                 if (empty($student->get()->first())) {
-                    $student = Student::create([
+                    $student = StudentInfo::create([
                         'openid' => $openid,
                         'account' => $account,
                         $type.'_password' => encrypt($password), //拼接要保存的密码类型
@@ -86,10 +87,15 @@ class StudentsController extends Controller
             'password' => 'x753951scz',
         ];
 //        $result = $this->api->post('students/lib', $user_info_array); //dingo内部调用
-//        $test = new LibInfoController();
-//        $res = $test->getMessage();
-        $test = new AccountInfoController();
-        $res = $test ->getMoneyMessage();
+
+//        $test = new WakeSignDetailInfosController();
+//        $res = $test->store();
+
+            $test = new StudentWeixinInfosController();
+            $res = $test->getUserInfo('oULq3uBCIOqS4HqeJh4ldRnFXr5s',true);
+
+//        $test = new AccountInfoController();
+//        $res = $test ->getMoneyMessage();
         dd($res);
     }
 
@@ -101,7 +107,7 @@ class StudentsController extends Controller
         $cookie = Redis::get($key);
         if (!$cookie) {
             $password = $type.'_password'; //拼接数据表的密码字段
-            $student = Student::select('account', $password, 'openid')
+            $student = StudentInfo::select('account', $password, 'openid')
                 ->where('openid', $openid)
                 ->get()->first();
             if (!isset($student->account)) {
