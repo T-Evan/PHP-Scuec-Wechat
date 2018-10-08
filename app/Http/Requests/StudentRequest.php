@@ -20,7 +20,7 @@ class StudentRequest extends FormRequest
             'password' => 'required',
             'openid' => [
                 'required',
-                'regex:/^oULq3u[a-zA-Z0-9_-]{22}/'
+                'regex:'.config('app.openidRegex'),
             ],
             'type'  => 'required|string|in:ssfw,lib',
 

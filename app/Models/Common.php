@@ -29,13 +29,27 @@ class Common extends Model
     /**
      * @param $message
      * @param string $sql
-     * 记录日志
+     * 记录错误日志
      */
     public static function writeLog($message, $sql = '')
     {
         $common = app('wechat_common');
         $openid = $common->openid;
+        Log::useDailyFiles(storage_path('logs/error.log'));
         Log::error('openid：'.$openid.'error：'.$message);
+    }
+
+    /**
+     * @param $message
+     * @param string $sql
+     * 记录反馈日志
+     */
+    public static function writeCallLog($message, $sql = '')
+    {
+        $common = app('wechat_common');
+        $openid = $common->openid;
+        Log::useDailyFiles(storage_path('logs/call.log'));
+        Log::info('openid：'.$openid.'error：'.$message);
     }
 
     public static function getWrong()

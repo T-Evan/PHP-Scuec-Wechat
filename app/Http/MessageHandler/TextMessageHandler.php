@@ -377,15 +377,15 @@ class TextMessageHandler implements EventHandlerInterface
                 return $content;
                 break;
             case 'sign':
-                return "十分抱歉，打卡功能还在测试中~";
+                return '十分抱歉，打卡功能还在测试中~';
                 break;
             case 'call_monkey':
-                //TODO:待完成
-//                $tmp = new Zixunminda\Wechat\Core\Wechat();
-//                $tmp->fromUserName = $object->FromUserName;
-//                $tmp->toUserName = $object->ToUserName;
-//                $msg = Zixunminda\Utils\MonkeyCaller::call($tousername, $keyword);
-//                $resultStr = Zixunminda\Wechat\Message\MessageWriter::write($tmp, $msg);
+                Common::writeCallLog($message['Content']);
+                $MessageStr = array('谢谢你的反馈。么么哒/:,@-D', '你的反馈我们已经收到，谢谢你对我们的支持。么么哒/:hug', '你的意见我们已经收录，感谢你的支持。么么哒/::)');
+                $MessageStrRandom = rand(0, 2);
+                $content = $MessageStr[$MessageStrRandom];
+
+                return $content;
                 break;
             case 'test2':
                 $items = [
@@ -487,7 +487,7 @@ class TextMessageHandler implements EventHandlerInterface
             return 'kaozheng';
         } elseif ('帮推' == $keyword) {
             return 'hlepPush';
-        } elseif (preg_match('/@/', $keyword)) {
+        } elseif (preg_match('/@/', $keyword)|| '反馈' == $keyword) {
             if (strpos($keyword, '程序员') || strpos($keyword, '程序猿')) {
                 return 'call_monkey';
             }

@@ -59,9 +59,9 @@ class AccountInfoController extends Controller
         $crawler->addHtmlContent($data);
         for ($i = 10; $i < 15; ++$i) {
             $key = $crawler->filter('#casLoginForm > input[type="hidden"]:nth-child('.$i.')')
-                ->attr('name');
+                ->attr('name') ?? null;
             $value = $crawler->filter('#casLoginForm > input[type="hidden"]:nth-child('.$i.')')
-                ->attr('value');
+                ->attr('value') ?? null;
             $userInfoArray[$key] = $value;
         }
 
