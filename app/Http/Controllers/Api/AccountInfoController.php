@@ -572,7 +572,7 @@ class AccountInfoController extends Controller
         }
         $contentstr = $contentstr.'查询校园卡消费明细请回复"校园卡消费详情"';
         */
-        $temp = "\n余额查询服务测试中，目前结果仅供参考噢~";
+        $temp = "\n余额查询功能测试中，当前结果仅供参考噢~";
         $contentstr .= $temp;
         return $contentstr;
     }

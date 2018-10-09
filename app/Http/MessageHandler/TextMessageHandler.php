@@ -659,10 +659,10 @@ class TextMessageHandler implements EventHandlerInterface
                 return $content;
                 break;
             case 'call_monkey':
-                Common::writeCallLog($message['Content']);
-                $MessageStr = array('谢谢你的反馈。么么哒/:,@-D', '你的反馈我们已经收到，谢谢你对我们的支持。么么哒/:hug', '你的意见我们已经收录，感谢你的支持。么么哒/::)');
-                $MessageStrRandom = rand(0, 2);
-                $content = $MessageStr[$MessageStrRandom];
+                $hint = HelperService::randStr(8);
+                $content = "程序猿已经把你的反馈记下来啦~程序猿有空时会回复你的。这是程序猿才能读懂的暗号：{$hint}";
+
+                Common::writeCallLog($message['Content'].' hint：'.$hint);
 
                 return $content;
                 break;
@@ -956,6 +956,7 @@ class TextMessageHandler implements EventHandlerInterface
                 return $content;
             }
         } catch (\Exception $exception) {
+            return "你好棒! 发现一个小bug. 快点@程序猿告诉他吧!";
             Common::writeLog($exception->getMessage().$exception->getTraceAsString());
         }
     }

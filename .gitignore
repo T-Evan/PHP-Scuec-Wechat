@@ -1,6 +1,7 @@
 /node_modules
 /public/hot
 /public/storage
+/public/webhook/webhook_deploy.log
 /storage/*.key
 /vendor
 /.idea
