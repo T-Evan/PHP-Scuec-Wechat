@@ -77,7 +77,7 @@ return [
         'iscuecer' => [
             'app_id'         => 'wxdfff0a26d620924e',    //应用ID
             'secret'         => '1d52a7d37f4b824d4c49110e872eb971',    //应用密钥
-            'token'          => '24bOs78PgAU9u0eGqKzDIE35WyVgxP',    //Token(令牌)
+            'token'          => 'zESHBCkwPuFe6wAtFE5A28tv',    //Token(令牌)
             'aes_key'        => 'Qq7K5TjcRYvvuBjs19hO3EX1I2UpPxGUHyC05gXFRSH',    //消息加解密密钥
         ],
         //iyaozhen的测试号

@@ -9,6 +9,7 @@
 namespace App\Http\MessageHandler;
 
 use App\Http\Controllers\Api\AccountInfoController;
+use App\Http\Controllers\Api\WakeSignDetailInfosController;
 use App\Http\Service\HelperService;
 use App\Models\Common;
 use App\Models\StudentInfo;
@@ -26,8 +27,8 @@ class EventInfoHandler implements EventHandlerInterface
             switch ($message['Event']) {
                 case 'subscribe':   //订阅
                     $content = "欢迎订阅资讯民大微信公众平台。\n您可以戳一下底部的菜单，常用功能都在里面哦，或者随便说点什么。/::P \n回复【帮助】查看我的全部技能。";
-                    $user = StudentInfo::create(['openid' => $message['FromUserName']]);
-//                    $user->save();
+                    StudentInfo::create(['openid' => $message['FromUserName']]);
+
                     return $content;
                     break;
                 case 'unsubscribe': //取消订阅
@@ -52,7 +53,6 @@ class EventInfoHandler implements EventHandlerInterface
                     $content = $this->helpStr();     //帮助信息文本
                     return $content;  //标准格式回复
                     break;
-                case 'new_timetable_test': //临时解决延迟，如果你看到这行就删了吧
                 case 'timetable':
                     $account = new AccountInfoController();
                     $content = $this->replyHandle($account, 'getTableMessage');
@@ -67,8 +67,10 @@ class EventInfoHandler implements EventHandlerInterface
                     break;
                 case 'signbutton': //临时解决延迟，如果你看到这行就删了吧
                 case 'sign':
-                    return "十分抱歉，打卡功能还在测试中~";
-                    break;
+                    $account = new WakeSignDetailInfosController();
+                    $content = $this->replyHandle($account, 'store');
+
+                    return $content;
                 case 'SchoolCalendar':
                     $items = [
                         new NewsItem(

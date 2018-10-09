@@ -227,7 +227,7 @@ class AccountInfoController extends Controller
             if (isset($adjInfo)) {
                 $adjInfoString = '';
                 foreach ($adjInfo as $each) {
-                    if (isset($each['origin']['raw']) || isset($each['modified']['raw'])) {
+                    if (isset($each['origin']['raw']) && isset($each['modified']['raw'])) {
                         $adjInfoString .= $each['origin']['raw']."\n=>".$each['modified']['raw']."\n\n";
                     } elseif ((
                             $each['origin']['from_week'] >= $currWeek &&

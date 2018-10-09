@@ -82,21 +82,12 @@ class StudentsController extends Controller
 
     public function test()
     {
-        $user_info_array = [
-            'username' => '201621093024',
-            'password' => 'x753951scz',
-        ];
-//        $result = $this->api->post('students/lib', $user_info_array); //dingo内部调用
-
-//        $test = new WakeSignDetailInfosController();
-//        $res = $test->store();
-
-            $test = new StudentWeixinInfosController();
-            $res = $test->getUserInfo('oULq3uBCIOqS4HqeJh4ldRnFXr5s',true);
-
-//        $test = new AccountInfoController();
-//        $res = $test ->getMoneyMessage();
-        dd($res);
+        $student = StudentInfo::select('account', 'ssfw_password', 'openid')
+            ->where('openid', 'oULq3uIviy9z6GuDx8E0xIWZmaV8')
+            ->get()->first();
+        $arr['account'] = $student->account;
+        $arr['password'] = decrypt($student->toArray()['ssfw_password']);
+        print_r($arr);
     }
 
     public function cookie($type)

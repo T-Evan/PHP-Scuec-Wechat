@@ -22,6 +22,8 @@ class Common extends Model
     {
         $message = app('wechat')->server->getMessage();
         return $message['FromUserName'] ?? null;
+
+        //测试时开启，有空抽到新函数里
 //        return 'onzftwySIXNVZolvsw_hUvvT8UN0';
     }
 
@@ -36,7 +38,7 @@ class Common extends Model
         $common = app('wechat_common');
         $openid = $common->openid;
         Log::useDailyFiles(storage_path('logs/error.log'));
-        Log::error('openid：'.$openid.'error：'.$message);
+        Log::error('openid：'.$openid.' error：'.$message);
     }
 
     /**
@@ -49,7 +51,7 @@ class Common extends Model
         $common = app('wechat_common');
         $openid = $common->openid;
         Log::useDailyFiles(storage_path('logs/call.log'));
-        Log::info('openid：'.$openid.'error：'.$message);
+        Log::info('openid：'.$openid.' error：'.$message);
     }
 
     public static function getWrong()

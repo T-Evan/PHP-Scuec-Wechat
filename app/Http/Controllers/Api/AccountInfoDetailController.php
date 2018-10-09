@@ -183,8 +183,8 @@ class AccountInfoDetailController extends Controller
                 //reg_match_all("/(\d{1,2})/", $nofit_arrr[0], $week); //匹配上课时间
                 preg_match('/.+(?=&)/', $nofit_arrr[0], $name); //匹配课程名字
                 $no_arrange[$key] = array(
-                    'name' => $name[0],
-                    'teacher' => $nofit_arrr[1],
+                    'name' => $name[0] ?? '',
+                    'teacher' => $nofit_arrr[1] ?? '',
                 ); //构造数组
             }
         }
@@ -517,8 +517,8 @@ class AccountInfoDetailController extends Controller
 
     private function parseTimetable($arrTimetable)
     {
-        $beginTime = array('08:00', '08:55', '10:00', '10:55', '14:10', '15:05', '16:00', '16:55', '18:40', '19:30', '20:20');
-        $tiyuTime = array('08:00', '08:55', '10:00', '10:00', '11:30', '14:10', '16:00', '16:10', '17:40', '19:30', '20:20');
+        $beginTime = array('08:00', '08:55', '10:00', '10:55', '14:10', '15:05', '16:00', '16:55', '18:40', '19:30', '20:20', '21:10');
+        $tiyuTime = array('08:00', '08:55', '10:00', '10:00', '11:30', '14:10', '16:00', '16:10', '17:40', '19:30', '20:20', '21:10');
         $result = array();
         foreach ($arrTimetable as $day => $courses) {
             $result[$day] = array();
