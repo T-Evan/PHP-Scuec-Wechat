@@ -602,7 +602,7 @@ class AccountInfoDetailController extends Controller
                     'from_section' => intval($match[4]),
                     'to_section' => intval($match[5]),
                     'teacher' => $ori[1],
-                    'place' => $ori[2],
+                    'place' => $ori[2] ?? null,
                 );
             } else {
                 $originArr = array('raw' => HelperService::removeHtmlEntities($origin));
