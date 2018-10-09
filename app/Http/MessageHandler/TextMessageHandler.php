@@ -730,7 +730,7 @@ class TextMessageHandler implements EventHandlerInterface
             return 'at_me';
         } elseif ('一周招聘' == $keyword) {
             return 'zhaopin';
-        } elseif (('校园卡余额' == $keyword) || ('余额' == $keyword)) {
+        } elseif (('校园卡余额' == $keyword) || ('余额' == $keyword) || ('校园卡' == $keyword)) {
             return 'moneyInfo';
         } elseif ('校园卡消费详情' == $keyword) {
             return 'moneyInfoDetail';
