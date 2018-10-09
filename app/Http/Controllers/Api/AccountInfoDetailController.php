@@ -41,6 +41,8 @@ class AccountInfoDetailController extends Controller
 //        );
         //TODO:9.8 消费详情接口未返回数据，校园卡消费详情功能待开发
 
+
+        //TODO:尝试从ecard获取校园卡信息，困于验证码，无果
         // 转换成页面使用的gb2312编码,默认为UTF-8,否则乱码！
         $isFail = true;
         for ($i = 0; $i < 5; ++$i) {
