@@ -234,8 +234,8 @@ class AccountInfoController extends Controller
                             $each['origin']['to_week'] <= $currWeek
                         ) ||
                         (
-                            $each['modified']['from_week'] >= $currWeek &&
-                            $each['modified']['to_week'] <= $currWeek
+                            isset($each['modified']['from_week']) && $each['modified']['from_week'] >= $currWeek &&
+                            isset($each['modified']['from_week']) && $each['modified']['to_week'] <= $currWeek
                         )
                     ) {
                         $dayIndex = $each['origin']['day_in_week'] - 1;
