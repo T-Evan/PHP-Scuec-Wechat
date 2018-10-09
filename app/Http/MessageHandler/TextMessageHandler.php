@@ -54,8 +54,8 @@ class TextMessageHandler implements EventHandlerInterface
                     new NewsItem(
                         [
                             'title' => '中南民族大学地图',
-                            'description' => '点击进入民大地图\n周边搜索功能，囊括餐饮、娱乐、购物等周边生活信息，轻松掌控城市生活。\n线路搜索功能，轻松规划出行线路',
-                            'url' => 'https://m.expoon.com/qjjx/xuexiao/7onuyhthawb.html',
+                            'description' => "点击进入民大地图\n周边搜索功能，囊括餐饮、娱乐、购物等周边生活信息，轻松掌控城市生活。\n线路搜索功能，轻松规划出行线路",
+                            'url' => "https://m.expoon.com/qjjx/xuexiao/7onuyhthawb.html",
                             'image' => config('app.base_url').'/img/baidumap.jpg',
                         ]
                     ),
