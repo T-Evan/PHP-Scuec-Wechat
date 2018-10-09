@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Api\AccountInfoController;
-use App\Http\Controllers\Api\StudentWeixinInfosController;
-use App\Http\Controllers\Api\WakeSignDetailInfosController;
+use App\Http\Controllers\Api\AccountInfoDetailController;
 use App\Http\Requests\StudentRequest;
 use App\Models\StudentInfo;
-use App\Models\StudentWeixinInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
@@ -82,18 +79,25 @@ class StudentsController extends Controller
 
     public function test()
     {
-        $student = StudentInfo::select('account', 'ssfw_password', 'openid')
-            ->where('openid', 'oULq3uIviy9z6GuDx8E0xIWZmaV8')
-            ->get()->first();
-        $arr['account'] = $student->account;
-        $arr['password'] = decrypt($student->toArray()['ssfw_password']);
-        print_r($arr);
+        $student = new AccountInfoDetailController();
+        $student->getMoney();
     }
 
-    public function cookie($type)
+    /**
+     * @param $type:账号类型, $testOpenid:测试接口调用此方法时可传递openid
+     * @param null $testOpenid
+     *
+     * @return array
+     */
+    public function cookie($type, $testOpenid = null)
     {
         $common = app('wechat_common');
         $openid = $common->openid;
+
+        if ($testOpenid) {
+            $openid = $testOpenid;
+        }
+
         $key = $type.'_'.$openid;
         $cookie = Redis::get($key);
         if (!$cookie) {

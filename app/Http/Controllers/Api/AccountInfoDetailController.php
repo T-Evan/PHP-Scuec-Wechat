@@ -15,7 +15,7 @@ class AccountInfoDetailController extends Controller
 {
     public function getMoney()
     {
-        /* ehall接口暂不可用
+//        /* ehall接口暂不可用
         $student_controller = new StudentsController();
         $cookie_array = $student_controller->cookie('ssfw');
         if (null == $cookie_array['data']) {
@@ -27,11 +27,13 @@ class AccountInfoDetailController extends Controller
             $cookie,
             'http://ssfw.scuec.edu.cn/ssfw/index.do'
         );
-        $moneyInfo = json_decode($res['res']->getbody()->getcontents(),true);
+        $moneyInfo = json_decode($res['res']->getbody()->getcontents(), true);
         $final = array(
             'KNYE' => $moneyInfo['remining'], //卡内余额
         );
-        */
+
+        return $final;
+//        */
 //        $res = HelperService::get(
 //            'http://ehall.scuec.edu.cn/publicapp/sys/myyktzd/mySmartCard/getBillDetail.do',
 //            $cookie,
@@ -41,7 +43,7 @@ class AccountInfoDetailController extends Controller
 
         // 转换成页面使用的gb2312编码,默认为UTF-8,否则乱码！
         $isFail = true;
-        for ($i = 0; $i < 5; ++$i ) {
+        for ($i = 0; $i < 5; ++$i) {
             if (!$isFail) {
                 break;
             }
