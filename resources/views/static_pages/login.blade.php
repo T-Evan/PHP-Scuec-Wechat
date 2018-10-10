@@ -15,7 +15,7 @@
     @if(session()->get('danger')=='错误：你尝试的次数过多，请点击链接进行身份认证后，重新进行绑定！')
         <a href="http://id.scuec.edu.cn/authserver/login">〖统一身份认证〗</a>
     @endif
-    <form method="POST" action="{{ secure_url(route('students.store')) }}" class="form-signin">
+    <form method="POST" action="{{ route('students.store') }}" class="form-signin">
         {{ csrf_field() }}
         <h2 class="form-signin-heading">账号绑定</h2>
         @if ($type === 'ssfw')
