@@ -47,6 +47,7 @@ class AccountInfoController extends Controller
      *                           为了提高效率，使用了Guzzle扩展完成curl操作
      *                           因此返回的cookie为Guzzle扩展中的Cookiejar对象(转化成合法cookie比较耗时，先这样吧
      *                           该对象可经反序列化后直接在Guzzle中使用
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function judgeAccount(Request $request)
     {

@@ -11,6 +11,7 @@ namespace App\Http\Service;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\DomCrawler\Crawler;
 
 class HelperService
@@ -62,6 +63,13 @@ class HelperService
         );
     }
 
+    /**
+     * @param $apiStr
+     * @param null $cookie_jar
+     * @param null $referer
+     * @return array
+     * @throws GuzzleException
+     */
     public static function get($apiStr, $cookie_jar = null, $referer = null)
     {
         $client = new Client();
@@ -81,7 +89,10 @@ class HelperService
         try {
             $res = $client->request('GET', $apiStr, $request_array);
         } catch (GuzzleException $e) {
-            return $e->getMessage();
+            // log here
+            Log::error($e->getMessage());
+            // just throw it out
+            throw $e;
         }
 
         return array(
