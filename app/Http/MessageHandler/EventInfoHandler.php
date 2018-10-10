@@ -77,7 +77,7 @@ class EventInfoHandler implements EventHandlerInterface
                             [
                                 'title' => '时刻表 | 民大生存必备，你要的时间都在这里！',
                                 'description' => '时刻表每学期一更，维持民大最新的各地点记录～',
-                                'url' => 'http://url.cn/54ggqvj',
+                                'url' => 'https://mp.weixin.qq.com/s/3ytk6WYaWXT8HcLI1Y3SOQ',
                                 'image' => config('app.base_url').'/img/Calendar.jpg?v20180925-1',
                             ]
                         ),

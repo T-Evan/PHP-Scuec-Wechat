@@ -73,7 +73,7 @@ class TextMessageHandler implements EventHandlerInterface
                         [
                             'title' => '纯干货 | 十校联盟辅修事项',
                             'description' => '小塔为你整理的辅修干货在这里呀，希望可以帮到要辅修的同学哦~',
-                            'url' => 'http://mp.weixin.qq.com/s/xYNhsFdgdWlxP4b_lZd_JQ',
+                            'url' => 'https://mp.weixin.qq.com/s/k15m9oDliTacNlmjSTr-rw',
                             'image' => config('app.base_url').'/img/fuxiu.jpg',
                         ]
                     ),
@@ -87,7 +87,7 @@ class TextMessageHandler implements EventHandlerInterface
                         [
                             'title' => '干货 | 在大学一定要多拿几个奖',
                             'description' => '奖/助学金大汇总，奖项多到你想不到！',
-                            'url' => 'http://mp.weixin.qq.com/s/vxHhH_mntbbcRioBSbor2A',
+                            'url' => 'https://mp.weixin.qq.com/s/KMUg4w1LskoENcHLeo3PdQ',
                             'image' => config('app.base_url').'/img/zhuxue.jpg',
                         ]
                     ),
@@ -612,7 +612,7 @@ class TextMessageHandler implements EventHandlerInterface
                         [
                             'title' => '2018考试时间汇总，在大学多考几个证！',
                             'description' => '',
-                            'url' => 'http://mp.weixin.qq.com/s/TSUGn5HmHJ1XxUjCIgsMoA',
+                            'url' => 'https://mp.weixin.qq.com/s/FctmJKmNaCyEAffGH_-gRQ',
                             'image' => config('app.base_url').'/img/kaozheng.jpg',
                         ]
                     ),
