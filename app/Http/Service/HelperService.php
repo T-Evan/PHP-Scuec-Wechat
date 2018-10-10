@@ -384,6 +384,6 @@ class HelperService
      */
     public static function wechatArticleUrl(string $url)
     {
-        return env('APP_URL').'?url='.urlencode($url);
+        return env('APP_URL').'/wechatArticleRedirect?url='.urlencode($url);
     }
 }
