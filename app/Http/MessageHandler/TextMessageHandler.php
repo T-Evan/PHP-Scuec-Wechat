@@ -101,7 +101,7 @@ class TextMessageHandler implements EventHandlerInterface
                         [
                             'title' => '时刻表 | 民大生存必备，你要的时间都在这里！',
                             'description' => '时刻表每学期一更，维持民大最新的各地点记录～',
-                            'url' => HelperService::wechatArticleUrl('http://mp.weixin.qq.com/s/76TUgsjaqb-H0Ep4iMwqmA'),
+                            'url' => HelperService::wechatArticleUrl('https://mp.weixin.qq.com/s/76TUgsjaqb-H0Ep4iMwqmA'),
                             'image' => config('app.base_url').'/img/Calendar.jpg',
                         ]
                     ),

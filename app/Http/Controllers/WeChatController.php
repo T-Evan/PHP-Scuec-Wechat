@@ -37,7 +37,8 @@ class WeChatController extends Controller
      * 用于修复微信对于返回的图文链接加上subscence参数导致图文消息内容无法访问的问题
      *
      * @param Request $request
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\RedirectResponse
+     *          |\Illuminate\Routing\Redirector|\Symfony\Component\HttpFoundation\Response
      */
     public function redirectWechatArticle(Request $request)
     {
@@ -45,7 +46,7 @@ class WeChatController extends Controller
             return response("参数错误")->setStatusCode(403);
         }
         $realUrl = urldecode($request->get('url'));
-        $isValid = preg_match("/https:\/\/.*\.weixin\.qq\.com\/.*/", $realUrl);
+        $isValid = preg_match("/(https|http):\/\/.*\.weixin\.qq\.com\/.*/", $realUrl);
         if (!$isValid) {
             return response("参数错误")->setStatusCode(403);
         }
