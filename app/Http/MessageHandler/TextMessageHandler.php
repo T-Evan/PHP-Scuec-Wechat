@@ -73,7 +73,7 @@ class TextMessageHandler implements EventHandlerInterface
                         [
                             'title' => '纯干货 | 十校联盟辅修事项',
                             'description' => '小塔为你整理的辅修干货在这里呀，希望可以帮到要辅修的同学哦~',
-                            'url' => 'https://mp.weixin.qq.com/s/k15m9oDliTacNlmjSTr-rw',
+                            'url' => HelperService::wechatArticleUrl('https://mp.weixin.qq.com/s/k15m9oDliTacNlmjSTr-rw'),
                             'image' => config('app.base_url').'/img/fuxiu.jpg',
                         ]
                     ),
@@ -87,7 +87,7 @@ class TextMessageHandler implements EventHandlerInterface
                         [
                             'title' => '干货 | 在大学一定要多拿几个奖',
                             'description' => '奖/助学金大汇总，奖项多到你想不到！',
-                            'url' => 'https://mp.weixin.qq.com/s/KMUg4w1LskoENcHLeo3PdQ',
+                            'url' => HelperService::wechatArticleUrl('https://mp.weixin.qq.com/s/KMUg4w1LskoENcHLeo3PdQ'),
                             'image' => config('app.base_url').'/img/zhuxue.jpg',
                         ]
                     ),
@@ -101,7 +101,7 @@ class TextMessageHandler implements EventHandlerInterface
                         [
                             'title' => '时刻表 | 民大生存必备，你要的时间都在这里！',
                             'description' => '时刻表每学期一更，维持民大最新的各地点记录～',
-                            'url' => 'http://mp.weixin.qq.com/s/76TUgsjaqb-H0Ep4iMwqmA',
+                            'url' => HelperService::wechatArticleUrl('http://mp.weixin.qq.com/s/76TUgsjaqb-H0Ep4iMwqmA'),
                             'image' => config('app.base_url').'/img/Calendar.jpg',
                         ]
                     ),
@@ -129,7 +129,7 @@ class TextMessageHandler implements EventHandlerInterface
                         [
                             'title' => '干货丨普通话等级考试报名攻略',
                             'description' => '小塔整理的普通话考试干货，内容有不完整的地方欢迎来补充哦~希望这个干货能帮到各位塔粉~',
-                            'url' => 'https://mp.weixin.qq.com/s/wRz-ztt0OI9oKtKKubhIxw',
+                            'url' => HelperService::wechatArticleUrl('https://mp.weixin.qq.com/s/wRz-ztt0OI9oKtKKubhIxw'),
                             'image' => config('app.base_url').'/img/putonghua.jpg',
                         ]
                     ),
@@ -157,7 +157,7 @@ class TextMessageHandler implements EventHandlerInterface
                         [
                             'title' => '【干货】大学生医保报销流程及事宜 ',
                             'description' => "大学生医保的干货\n希望可以帮到塔粉们~\n有问题可以直接留言指出哦！",
-                            'url' => 'https://mp.weixin.qq.com/s/8ZH5R2n4OkG9AIi0WsGo-A',
+                            'url' => HelperService::wechatArticleUrl('https://mp.weixin.qq.com/s/8ZH5R2n4OkG9AIi0WsGo-A'),
                             'image' => config('app.base_url').'/img/yibao.jpg',
                         ]
                     ),
@@ -612,7 +612,7 @@ class TextMessageHandler implements EventHandlerInterface
                         [
                             'title' => '2018考试时间汇总，在大学多考几个证！',
                             'description' => '',
-                            'url' => 'https://mp.weixin.qq.com/s/FctmJKmNaCyEAffGH_-gRQ',
+                            'url' => HelperService::wechatArticleUrl('https://mp.weixin.qq.com/s/FctmJKmNaCyEAffGH_-gRQ'),
                             'image' => config('app.base_url').'/img/kaozheng.jpg',
                         ]
                     ),
