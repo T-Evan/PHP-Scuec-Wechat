@@ -18,3 +18,5 @@ Route::post('/students', 'StudentsController@store')->name('students.store');
 
 
 Route::any('/wechat', 'WeChatController@serve');
+
+Route::get('/wechatArticleRedirect', 'WechatController@redirectWechatArticle');

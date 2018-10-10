@@ -376,4 +376,14 @@ class HelperService
     {
         return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
     }
+
+    /**
+     * 通过重定向进行
+     * @param string $url
+     * @return \Illuminate\Contracts\Routing\UrlGenerator|string
+     */
+    public static function wechatArticleUrl(string $url)
+    {
+        return env('APP_URL').'?url='.urlencode($url);
+    }
 }

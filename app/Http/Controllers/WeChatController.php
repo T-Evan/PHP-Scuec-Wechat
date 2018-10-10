@@ -12,6 +12,7 @@ use Config;
 use EasyWeChat\Factory;
 use EasyWeChat\Kernel\Messages\Message;
 use EasyWeChat\Kernel\Messages\News;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class WeChatController extends Controller
@@ -30,5 +31,24 @@ class WeChatController extends Controller
         $app->server->push(TextMessageHandler::class, Message::TEXT); // 处理文字消息
         $app->server->push(ImageMessageHandler::class, Message::IMAGE); // 处理图片消息
         return $app->server->serve();
+    }
+
+    /**
+     * 用于修复微信对于返回的图文链接加上subscence参数导致图文消息内容无法访问的问题
+     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Symfony\Component\HttpFoundation\Response
+     */
+    public function redirectWechatArticle(Request $request)
+    {
+        if (!$request->has('url')) {
+            return response("参数错误")->setStatusCode(403);
+        }
+        $realUrl = urldecode($request->get('url'));
+        $isValid = preg_match("/https:\/\/.*\.weixin\.qq\.com\/.*/", $realUrl);
+        if (!$isValid) {
+            return response("参数错误")->setStatusCode(403);
+        }
+        return redirect($realUrl);
     }
 }
