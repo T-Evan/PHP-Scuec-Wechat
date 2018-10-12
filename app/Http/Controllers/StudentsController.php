@@ -104,7 +104,7 @@ class StudentsController extends Controller
             $password = $type.'_password'; //拼接数据表的密码字段
             $student = StudentInfo::select('account', $password, 'openid')
                 ->where('openid', $openid)
-                ->get()->first();
+                ->first();
             if (!isset($student->account)) {
                 return ['data' => null, 'message' => '用户不存在'];
             }
