@@ -35,7 +35,7 @@ class WebhookController extends Controller
                 if (false !== $changes) {
                     foreach ($changes as $each) {
                         if (isset($each['new']) && isset($each['new']['target'])) {
-                            if (false !== strpos($each['new']['target']['message'], DEPLOY_KEYWORD)) {
+                            if (false !== strpos($each['new']['target']['message'], self::DEPLOY_KEYWORD)) {
                                 Log::debug("----webhook triggered-----");
                                 Log::debug(
                                     "[git log]"
