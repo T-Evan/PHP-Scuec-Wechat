@@ -107,6 +107,8 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
+        App\Providers\AccountServiceProvider::class,
     ],
 
     /*
@@ -154,5 +156,11 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+
+        // 基础的用户账户相关服务
+        'Account' => App\Http\Service\AccountService\Facades\Account::class,
+
+        // 根据 EasyWechat 封装的 Facade
+        'Wechat' => App\Http\Service\WechatService\Facades\WechatService::class,
     ],
 ];

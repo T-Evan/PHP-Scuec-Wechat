@@ -41,13 +41,11 @@ class WeChatServiceProvider extends ServiceProvider
     {
         $this->app->singleton('wechat', function ($app) {
             $options = Config::get('wechat')['official_account']['default'];
-            $wechat_app = Factory::officialAccount($options);
-            return $wechat_app;
+            return Factory::officialAccount($options);
         });
 
         $this->app->singleton('wechat_log', function ($app) {
-            $log = new LogManager(app('wechat'));
-            return $log;
+            return new LogManager(app('wechat'));
         });
 
         $this->app->singleton('wechat_common', function ($app) {

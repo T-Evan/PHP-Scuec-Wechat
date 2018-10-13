@@ -18,11 +18,16 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-$api->version('v1', function ($api) {
+$api->version('v1', function (\Dingo\Api\Routing\Router $api) {
     $api->post('students/ssfw', 'App\Http\Controllers\Api\AccountInfoController@judgeAccount');
     $api->get('students/ssfw/timetable/{openid}', 'App\Http\Controllers\Api\AccountInfoController@tableApi');
     $api->post('students/ssfw/score/{openid}', 'App\Http\Controllers\Api\AccountInfoController@scoreApi');
     $api->post('students/lib', 'App\Http\Controllers\Api\LibInfoController@judgeAccount');
     $api->post('students/lib/booklist', 'App\Http\Controllers\Api\LibInfoController@getBookList');
+});
 
+Route::group(['prefix' => 'v1'], function() {
+    Route::post('getStatus', 'PhysicalExperimentController');
+
+    Route::post('');
 });
