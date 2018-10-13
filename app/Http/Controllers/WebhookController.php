@@ -9,6 +9,8 @@ class WebhookController extends Controller
 {
     private $BASE_PATH = '';
 
+    private $LOG_FILE = '';
+
     const REPOSITORY_FULL_NAME  = 'zixunminda/iscuecer';
     const REPOSITORY_UUID       = '{b6f9ee1a-f707-4be6-89b4-5c4da9216d4a}';
     const DEPLOY_KEYWORD        = 'DEPLOY_NOW';
@@ -16,6 +18,7 @@ class WebhookController extends Controller
     public function __construct()
     {
         $this->BASE_PATH = base_path();
+        $this->LOG_FILE = storage_path('logs/webhook.log');
     }
 
     public function handler(Request $request)
@@ -36,13 +39,9 @@ class WebhookController extends Controller
                     foreach ($changes as $each) {
                         if (isset($each['new']) && isset($each['new']['target'])) {
                             if (false !== strpos($each['new']['target']['message'], self::DEPLOY_KEYWORD)) {
-                                Log::debug("----webhook triggered-----");
-                                Log::debug(
-                                    "[git log]"
-                                    .shell_exec("cd {$this->BASE_PATH}; git pull 2>&1")
-                                );
-                                Log::debug(shell_exec("cd {$this->BASE_PATH}; composer install 2>&1"));
-                                Log::debug("----webhook closed-----");
+                                Log::debug("webhook triggered");
+                                shell_exec("cd {$this->BASE_PATH}; git pull 2>&1 > {$this->LOG_FILE} &");
+                                shell_exec("cd {$this->BASE_PATH}; composer install 2>&1 > {$this->LOG_FILE} &");
                                 return 'success';
                             }
                         }
