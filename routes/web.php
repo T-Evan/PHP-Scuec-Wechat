@@ -12,7 +12,7 @@
 */
 
 // webhook
-Route::get('webhook', 'WebhookController@handler');
+Route::post('webhook', 'WebhookController@handler');
 
 Route::get('/test1', 'StudentsController@test');
 
