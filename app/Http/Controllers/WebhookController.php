@@ -20,8 +20,8 @@ class WebhookController extends Controller
 
     public function handler(Request $request)
     {
-        if (checkHeader('X-Event-Key', 'repo:push')
-            && checkIP($request->getClientIp()) ) {
+        if ($this->checkHeader('X-Event-Key', 'repo:push')
+            && $this->checkIP($request->getClientIp()) ) {
             $jsonData = $request->input();
             //check repository
             if (
