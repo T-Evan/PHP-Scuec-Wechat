@@ -9,6 +9,7 @@
 namespace App\Http\MessageHandler;
 
 use App\Http\Controllers\Api\AccountInfoController;
+use App\Http\Controllers\Api\PhysicalExperimentController;
 use App\Http\Controllers\Api\WakeSignDetailInfosController;
 use App\Http\Service\HelperService;
 use App\Models\Common;
@@ -47,7 +48,14 @@ class EventInfoHandler implements EventHandlerInterface
                     return true;
                     break;
             }
+
+            return $this->handleButtonEvent($message);
         }
+        return false;
+    }
+
+    public function handleButtonEvent(Array $message)
+    {
         if ('CLICK' == $message['Event']) {
             switch ($message['EventKey']) {
                 case 'help':
@@ -66,7 +74,6 @@ class EventInfoHandler implements EventHandlerInterface
 
                     return $content;
                     break;
-                case 'signbutton': //临时解决延迟，如果你看到这行就删了吧
                 case 'sign':
                     $account = new WakeSignDetailInfosController();
                     $content = $this->replyHandle($account, 'store');
@@ -85,6 +92,10 @@ class EventInfoHandler implements EventHandlerInterface
                     ];
 
                     return new News($items);
+                    break;
+                case 'PhysicalExperiment':
+                    $handler = new PhysicalExperimentController();
+                    return $this->replyHandle($handler, 'handle');
                     break;
                 default:
                     $content = '亲，你按到火星上去了！/::L';
