@@ -40,8 +40,8 @@ class WebhookController extends Controller
                         if (isset($each['new']) && isset($each['new']['target'])) {
                             if (false !== strpos($each['new']['target']['message'], self::DEPLOY_KEYWORD)) {
                                 Log::debug("webhook triggered");
-                                shell_exec("cd {$this->BASE_PATH}; git pull 2>&1 > {$this->LOG_FILE} &");
-                                shell_exec("cd {$this->BASE_PATH}; composer install 2>&1 > {$this->LOG_FILE} &");
+                                shell_exec("cd {$this->BASE_PATH}; git pull >> {$this->LOG_FILE}  2>&1 &");
+                                shell_exec("cd {$this->BASE_PATH}; composer install >> {$this->LOG_FILE} 2>&1 &");
                                 return 'success';
                             }
                         }
