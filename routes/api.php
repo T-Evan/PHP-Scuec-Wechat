@@ -27,7 +27,6 @@ $api->version('v1', function (\Dingo\Api\Routing\Router $api) {
 });
 
 Route::group(['prefix' => 'v1'], function() {
-    Route::post('getStatus', 'PhysicalExperimentController');
+    Route::post('getStatus', 'PhysicalExperimentController@getStatus');
 
-    Route::post('');
 });

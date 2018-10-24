@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
-class PhysicalExperimentController
+class PhysicalExperimentController extends Controller
 {
     private $BIND_URL;
 
