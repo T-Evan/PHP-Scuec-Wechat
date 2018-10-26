@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Service\AccountService\Facades\Account;
 use App\Http\Service\HelperService;
 use App\Http\Service\SchoolDatetime;
+use App\Models\StudentInfo;
 use EasyWeChat\Kernel\Messages\NewsItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Symfony\Component\DomCrawler\Crawler;
+use Validator;
 
 class AccountInfoController extends Controller
 {
@@ -662,5 +665,28 @@ class AccountInfoController extends Controller
                 }
             }
         }
+    }
+
+    /**
+     * 返回账户是否绑定
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function isBind(Request $request)
+    {
+        $validator = Validator::make($request->input(), [
+            'openid' => 'required'
+        ]);
+        if ($validator->fails()) {
+            $this->response->errorBadRequest('parameter missing');
+        }
+        $openid = $request->get('openid');
+        $user = StudentInfo::where('openid', $openid)->first();
+        $bind = 1;
+        if (!$user || !$user->account) {
+            $bind = 0;
+        }
+        return ['bind' => $bind];
     }
 }
