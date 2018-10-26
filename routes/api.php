@@ -19,14 +19,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 $api->version('v1', function (\Dingo\Api\Routing\Router $api) {
-    $api->post('students/ssfw', 'App\Http\Controllers\Api\AccountInfoController@judgeAccount');
-    $api->get('students/ssfw/timetable/{openid}', 'App\Http\Controllers\Api\AccountInfoController@tableApi');
-    $api->post('students/ssfw/score/{openid}', 'App\Http\Controllers\Api\AccountInfoController@scoreApi');
-    $api->post('students/lib', 'App\Http\Controllers\Api\LibInfoController@judgeAccount');
-    $api->post('students/lib/booklist', 'App\Http\Controllers\Api\LibInfoController@getBookList');
-});
-
-Route::group(['prefix' => 'v1'], function() {
-    Route::post('getStatus', 'PhysicalExperimentController@getStatus');
-
+    $api->group(['prefix' => 'students'], function(\Dingo\Api\Routing\Router $api) {
+        $api->post('ssfw', 'App\Http\Controllers\Api\AccountInfoController@judgeAccount');
+        $api->get('ssfw/timetable/{openid}', 'App\Http\Controllers\Api\AccountInfoController@tableApi');
+        $api->post('ssfw/score/{openid}', 'App\Http\Controllers\Api\AccountInfoController@scoreApi');
+        $api->post('lib', 'App\Http\Controllers\Api\LibInfoController@judgeAccount');
+        $api->post('lib/booklist', 'App\Http\Controllers\Api\LibInfoController@getBookList');
+        $api->post('lab/verifyState', 'App\Http\Controllers\Api\PhysicalExperimentController@verifyState');
+    });
 });

@@ -77,13 +77,13 @@ class AccountService
      *
      * @return bool
      */
-    public function isBindLib(): bool
+    public function isBindLab(): bool
     {
         $account = $this->getAccount();
         if (!$account) {
             return false;
         }
-        if ($account->lib_password == null || $account->lib_password == '') {
+        if ($account->lab_password == null || $account->lab_password == '') {
             return false;
         }
         return true;

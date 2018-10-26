@@ -27,7 +27,8 @@ Route::get('/wechatArticleRedirect', 'WeChatController@redirectWechatArticle');
 // 大物实验
 Route::group(['prefix' => '/phy_exp'], function () {
     // 绑定账号
-    Route::get('/bind_account', 'PhysicalExperimentController@bindAccountView')->name('phy_exp.bind');
+    Route::get('/bind_account', 'Api\PhysicalExperimentController@bindAccountView')
+        ->name('phy_exp.bind');
 });
 
 Route::get('getUrl', function () {

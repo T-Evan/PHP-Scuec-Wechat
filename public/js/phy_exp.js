@@ -5,7 +5,7 @@ $(document).ready(function() {
         var state = getUrlParam("state");
         var code = getUrlParam("code");
         $.ajax({
-            url: '../src/API/api.php',
+            url: '/api/students/lab/verifyState',
             type: 'POST',
             dataType: 'json',
             timeout: 5000,

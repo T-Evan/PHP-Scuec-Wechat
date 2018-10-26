@@ -39,7 +39,8 @@ class OAuth
         $this->targetUrl = sprintf(self::$OAUTH_URL,
             env('WECHAT_OFFICIAL_ACCOUNT_APPID'),
             urlencode($this->callbackUrl),
-            $this->scope);
+            $this->scope,
+            $this->state);
         return $this->targetUrl;
     }
 
