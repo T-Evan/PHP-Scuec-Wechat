@@ -45,6 +45,9 @@ class PublicAPIAuth
         $appid  = $request->get('appid');
         $ts     = $request->get('ts');
         $sign   = $request->get('sign');
+        if (abs($ts - time()) > 30) {
+            $this->response->errorForbidden();
+        }
         $token = $this->verifyAPPID($appid);
         if (!$token) {
             $this->response->errorForbidden();
