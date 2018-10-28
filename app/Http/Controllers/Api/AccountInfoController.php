@@ -687,6 +687,9 @@ class AccountInfoController extends Controller
         if (!$user || !$user->account) {
             $bind = 0;
         }
-        return ['bind' => $bind];
+        return [
+            'bind' => $bind,
+            'account' => $user->account
+        ];
     }
 }
