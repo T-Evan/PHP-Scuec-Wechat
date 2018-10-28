@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Api\AccountInfoDetailController;
+use App\Http\Controllers\Api\AccountManager\AccountManagerFactory;
 use App\Http\Requests\StudentRequest;
 use App\Models\StudentInfo;
 use Illuminate\Http\Request;
@@ -38,43 +39,58 @@ class StudentsController extends Controller
             case 'lib':
                 $result = $this->api->post('students/lib', $user_info_array); //dingo内部调用
                 break;
+            case 'lab':
+                $result = $this->api->post('students/lab', $user_info_array);
+                break;
+            default:
+                $result = ['message' => '错误的提交'];
+                break;
         }
-        if (!empty($result['data'])) { //验证通过
-            Redis::setex($type.'_'.$openid, 3600, $result['data']['cookie']); //cookie缓存有效期为1小时
-            $student = StudentInfo::where('openid', $openid);
-            if (!$refreshCookie) {   //重新绑定时需要刷新缓存并更新密码
-                if (empty($student->get()->first())) {
-                    $student = StudentInfo::create([
-                        'openid' => $openid,
-                        'account' => $account,
-                        $type.'_password' => encrypt($password), //拼接要保存的密码类型
-                    ]);
-                    $student->save();
-                    session()->flush(); //清空缓存
-                    session()->flash('success', '完成：初步绑定成功！点击左上角返回聊天窗口，再次回复关键字即可。');
-                } else {
-                    $student->update(['account' => $account,
-                        $type.'_password' => encrypt($password), ]);
-                    session()->flush();
 
-                    //重新绑定，刷新cookie，通过绑定增加一定的操作复杂度，防止用户不停刷新
-                    $redis = Redis::connection('exam');
-                    $redis->del('exam_'.$openid);
+        $accountManager = AccountManagerFactory::getAccountManager($type);
+        $validationResult = $accountManager->validateAccount();
 
-                    session()->flash('info', '提醒：账号绑定信息更新成功！缓存数据已刷新。点击左上角返回聊天窗口，再次回复关键字即可。');
-                }
-            }
-        } else {
+        if ($validationResult->isFailed()) {
             session()->flash('danger', '错误：'.$result['message']);
+            return view('static_pages.login', [
+                'type' => $type,
+                'openid' => $openid,
+                //主要用做刷新缓存函数调用此函数时的判断逻辑
+                'message' => $validationResult->getMsg(),
+            ]);
         }
 
-        $array = [
+        Redis::connection('default')
+            ->setex($type.'_'.$openid, 3600, $result['data']['cookie']);
+        $student = StudentInfo::where('openid', $openid);
+        if (!$refreshCookie) {   //重新绑定时需要刷新缓存并更新密码
+            if (empty($student->get()->first())) {
+                $student = StudentInfo::create([
+                    'openid' => $openid,
+                    'account' => $account,
+                    $type.'_password' => encrypt($password), //拼接要保存的密码类型
+                ]);
+                $student->save();
+                session()->flush(); //清空缓存
+                session()->flash('success', '完成：初步绑定成功！点击左上角返回聊天窗口，再次回复关键字即可。');
+            } else {
+                $student->update(['account' => $account,
+                    $type.'_password' => encrypt($password), ]);
+                session()->flush();
+
+                //重新绑定，刷新cookie，通过绑定增加一定的操作复杂度，防止用户不停刷新
+                $redis = Redis::connection('exam');
+                $redis->del('exam_'.$openid);
+
+                session()->flash('info', '提醒：账号绑定信息更新成功！缓存数据已刷新。点击左上角返回聊天窗口，再次回复关键字即可。');
+            }
+        }
+
+        return view('static_pages.login', [
             'type' => $type,
             'openid' => $openid,
             'message' => $result['message'], //主要用做刷新缓存函数调用此函数时的判断逻辑
-        ];
-
-        return view('static_pages.login', $array);
+        ]);
     }
 
     public function test()

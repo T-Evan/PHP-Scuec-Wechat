@@ -25,6 +25,8 @@ $api->version('v1', function (\Dingo\Api\Routing\Router $api) {
         $api->post('ssfw/score/{openid}', 'App\Http\Controllers\Api\AccountInfoController@scoreApi');
         $api->post('lib', 'App\Http\Controllers\Api\LibInfoController@judgeAccount');
         $api->post('lib/booklist', 'App\Http\Controllers\Api\LibInfoController@getBookList');
+
+        $api->post('labAccount', 'App\Http\Controllers\Api\PhysicalExperimentController@labAccount');
         $api->post('lab/verifyState', 'App\Http\Controllers\Api\PhysicalExperimentController@verifyState');
     });
 });

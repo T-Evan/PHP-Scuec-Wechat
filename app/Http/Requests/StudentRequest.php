@@ -22,7 +22,7 @@ class StudentRequest extends FormRequest
                 'required',
                 'regex:'.config('app.openidRegex'),
             ],
-            'type'  => 'required|string|in:ssfw,lib',
+            'type'  => 'required|string|in:ssfw,lib,lab',
 
         ];
     }

@@ -11,6 +11,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\PhysicalExperiment\LabInfoSpider;
 use App\Http\Service\AccountService\Facades\Account;
+use App\Http\Service\HelperService;
 use App\Http\Service\WechatService\Exceptions\NetworkException;
 use App\Http\Service\WechatService\Exceptions\WechatAuthException;
 use App\Http\Service\WechatService\Facades\WechatService;
@@ -55,9 +56,15 @@ class PhysicalExperimentController extends Controller
 
     public function handle()
     {
+        $account = Account::getAccount();
+        if (!$account) {
+            return '你还没有绑定教务系统账户，请先绑定吧.'.HelperService::getBindingLink('ssfw');
+        }
         if (!Account::isBindLib()) {
             return "先去<a href=\"{$this->BIND_URL}\">绑定大物实验的账户吧</a>";
         }
+        $labInfoSpider = new LabInfoSpider($account->id, $account->lab_password);
+//        $labInfoSpider
     }
 
     public function bindAccountView(Request $request)
@@ -106,6 +113,11 @@ class PhysicalExperimentController extends Controller
         ]);
         $conn->expire($redisKey, self::TTL_QUERY_STATE);
         return $this->jsonResponse(self::STATUS_SUCCESS);
+    }
+
+    public function labAccount(Request $request)
+    {
+
     }
 
     public function bindAccount(Request $request)
