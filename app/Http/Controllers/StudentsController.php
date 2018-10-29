@@ -17,6 +17,10 @@ class StudentsController extends Controller
             'openid' => $request->openid,
         ];
 
+        if ($request->has('redirect_url')) {
+            session()->flash('redirect_url', $request->get('redirect_url'));
+        }
+
         return view('static_pages.login', $array);
     }
 
@@ -42,6 +46,9 @@ class StudentsController extends Controller
         if (!empty($result['data'])) { //验证通过
             Redis::setex($type.'_'.$openid, 3600, $result['data']['cookie']); //cookie缓存有效期为1小时
             $student = StudentInfo::where('openid', $openid);
+            if (session()->has('redirect_url')) {
+                return redirect(session()->get('redirect_url'));
+            }
             if (!$refreshCookie) {   //重新绑定时需要刷新缓存并更新密码
                 if (empty($student->get()->first())) {
                     $student = StudentInfo::create([
