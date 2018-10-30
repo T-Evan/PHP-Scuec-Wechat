@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+use Dingo\Api\Routing\Router;
+
 $api = app('Dingo\Api\Routing\Router');
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
@@ -28,5 +30,9 @@ $api->version('v1', function (\Dingo\Api\Routing\Router $api) {
 
         $api->post('labAccount', 'App\Http\Controllers\Api\PhysicalExperimentController@labAccount');
         $api->post('lab/verifyState', 'App\Http\Controllers\Api\PhysicalExperimentController@verifyState');
+
+        $api->group(['prefix' => 'account', 'middleware' => 'public_api_auth'], function(Router $api) {
+            $api->get('isBind', 'App\Http\Controllers\Api\AccountInfoController@isBind');
+        });
     });
 });

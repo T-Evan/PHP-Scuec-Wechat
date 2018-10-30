@@ -18,6 +18,10 @@ class StudentsController extends Controller
             'openid' => $request->openid,
         ];
 
+        if ($request->has('redirect_url')) {
+            session()->flash('redirect_url', $request->get('redirect_url'));
+        }
+
         return view('static_pages.login', $array);
     }
 
@@ -46,7 +50,6 @@ class StudentsController extends Controller
                 $result = ['message' => '错误的提交'];
                 break;
         }
-
         $accountManager = AccountManagerFactory::getAccountManager($type);
         $validationResult = $accountManager->validateAccount();
 
