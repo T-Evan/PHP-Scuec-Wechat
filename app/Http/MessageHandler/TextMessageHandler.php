@@ -9,8 +9,10 @@
 namespace App\Http\MessageHandler;
 
 use App\Http\Controllers\Api\AccountInfoController;
+use App\Http\Controllers\Api\AccountManager\LabSysAccountManager;
 use App\Http\Controllers\Api\LibInfoController;
 use App\Http\Controllers\Api\PhysicalExperiment\LabInfoSpider;
+use App\Http\Controllers\Api\PhysicalExperimentController;
 use App\Http\Controllers\Api\WakeSignDetailInfosController;
 use App\Http\Service\AccountService\Facades\Account;
 use App\Http\Service\HelperService;
@@ -274,8 +276,8 @@ class TextMessageHandler implements EventHandlerInterface
                 return $content;
                 break;
             case 'lab_query':
-                $labInfoSpider = new LabInfoSpider(Account::getAccount());
-                $content = $this->replyHandle($labInfoSpider, 'handler');
+                $phyExpSysController = new PhysicalExperimentController();
+                $content = $this->replyHandle($phyExpSysController, 'handler');
                 return $content;
             case 'exam':
                 $account = new AccountInfoController();
