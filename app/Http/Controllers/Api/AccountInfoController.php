@@ -683,12 +683,13 @@ class AccountInfoController extends Controller
         }
         $openid = $request->get('openid');
         $user = StudentInfo::where('openid', $openid)->first();
-        $bind = 1;
         if (!$user || !$user->account) {
-            $bind = 0;
+            return [
+                'bind' => 0
+            ];
         }
         return [
-            'bind' => $bind,
+            'bind' => 1,
             'account' => $user->account
         ];
     }
