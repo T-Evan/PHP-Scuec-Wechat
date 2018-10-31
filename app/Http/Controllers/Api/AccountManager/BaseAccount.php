@@ -15,6 +15,24 @@ class BaseAccount
 
     protected $password;
 
+    protected $openid;
+
+    /**
+     * @return mixed
+     */
+    public function getOpenid()
+    {
+        return $this->openid;
+    }
+
+    /**
+     * @param mixed $openid
+     */
+    public function setOpenid($openid)
+    {
+        $this->openid = $openid;
+    }
+
     /**
      * @return mixed
      */

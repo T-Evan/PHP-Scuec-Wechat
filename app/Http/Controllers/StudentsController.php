@@ -52,6 +52,7 @@ class StudentsController extends Controller
         $eduSysAccount = new BaseAccount();
         $eduSysAccount->setAccount($account);
         $eduSysAccount->setPassword($password);
+        $eduSysAccount->setOpenid($openid);
         try {
             $validationResult = $accountManager->validateAccount($eduSysAccount);
         } catch (GuzzleException $e) {

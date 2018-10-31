@@ -12,7 +12,6 @@ namespace App\Http\Controllers\Api\AccountManager;
 use App\Http\Controllers\Api\AccountManager\EduSys\EduSysAccount;
 use App\Http\Controllers\Api\AccountManager\Exceptions\AccountValidationFailedException;
 use App\Http\Controllers\Api\AccountManagerInterface\AccountManagerInterface;
-use App\Http\Service\AccountService\Facades\Account;
 use App\Http\Service\HelperService;
 use App\Models\StudentInfo;
 use GuzzleHttp\Cookie\CookieJar;
@@ -107,7 +106,7 @@ class EduSysAccountManager implements AccountManagerInterface
         // 将cookie序列化并写入redis
         $cookieString = serialize($cookie_jar);
         Redis::connection('default')
-            ->setex(self::getSSFWRedisKey(Account::getOpenid()),
+            ->setex(self::getSSFWRedisKey($accountInfo->getOpenid()),
                 env('COOKIE_TIME', 3600),
                 $cookieString);
 
