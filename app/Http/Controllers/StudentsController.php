@@ -115,32 +115,17 @@ class StudentsController extends Controller
             $openid = $testOpenid;
         }
 
-        $key = $type.'_'.$openid;
-        $cookie = Redis::get($key);
-        if (!$cookie) {
-            $password = $type.'_password'; //拼接数据表的密码字段
-            $student = StudentInfo::select('account', $password, 'openid')
-                ->where('openid', $openid)
-                ->first();
-            if (!isset($student->account)) {
-                return ['data' => null, 'message' => '用户不存在'];
-            }
-            $studentRequest = new StudentRequest();
-            $studentRequest->account = $student->account;
-            if (null == $student->toArray()[$password]) {
-                return ['data' => null, 'message' => '用户信息有误'];
-            }
-            $studentRequest->password = decrypt($student->toArray()[$password]);
-            $studentRequest->openid = $student->openid;
-            $studentRequest->type = $type;
-            $res = $this->store($studentRequest)->getData();
-            if ('用户账号密码正确' == $res['message']) {
-                $cookie = Redis::get($key);
-            } else {
-                return ['data' => null, 'message' => '用户信息有误'];
-            }
+        $accountManager = AccountManagerFactory::getAccountManager($type);
+        try {
+            $cookieJar = $accountManager->getCookie($openid);
+            $cookieString = serialize($cookieJar);
+            return ['data' => $cookieString, 'message' => '获取cookie成功'];
+        } catch (Api\AccountManager\Exceptions\AccountNotBoundException $e) {
+            return ['data' => null, 'message' => '用户不存在'];
+        } catch (Api\AccountManager\Exceptions\AccountValidationFailedException $e) {
+            return ['data' => null, 'message' => '用户信息有误'];
+        } catch (GuzzleException $e) {
+            return ['data' => null, 'message' => '服务请求错误'];
         }
-
-        return ['data' => $cookie, 'message' => '获取cookie成功'];
     }
 }

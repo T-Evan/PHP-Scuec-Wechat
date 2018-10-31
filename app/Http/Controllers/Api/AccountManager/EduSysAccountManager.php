@@ -137,6 +137,7 @@ class EduSysAccountManager implements AccountManagerInterface
         $eduSysAccount = new EduSysAccount();
         $eduSysAccount->setAccount($studentInfo->account);
         $eduSysAccount->setPassword(decrypt($studentInfo->ssfw_password));
+        $eduSysAccount->setOpenid($openid);
         $validationResult = $this->validateAccount($eduSysAccount);
         if ($validationResult->isFailed()) {
             throw new AccountValidationFailedException(
