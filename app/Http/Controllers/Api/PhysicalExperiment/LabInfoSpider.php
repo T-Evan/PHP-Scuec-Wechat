@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\AccountManager\LabSysAccountManager;
 use App\Http\Service\HelperService;
 use App\Http\Service\SchoolDatetime;
 use App\Models\StudentInfo;
+use Illuminate\Redis\Connections\Connection;
+use Illuminate\Support\Facades\Redis;
 
 class LabInfoSpider
 {
@@ -90,6 +92,18 @@ class LabInfoSpider
      */
     public function getMessage()
     {
+        // 判断缓存先
+        $redisConn = self::getRedisConn();
+        $redisKey = self::getRedisKey($this->openid);
+        $labInfoCache = $redisConn->get($redisKey);
+        if ($labInfoCache) {
+            $labInfoCache = json_decode($labInfoCache, true);
+            return [
+                'status' => 200,
+                'data' => $labInfoCache
+            ];
+        }
+
         $arrRawTable = $this->getRawTable();
         if ($arrRawTable['status'] != 200) {
             return $arrRawTable;
@@ -144,6 +158,16 @@ class LabInfoSpider
         }
         $title = sprintf("大物实验安排 (第%d周)", $currentWeek);
         $resultContent = trim($resultContentPending . "\n" . $resultContentFinished);
+
+        $responseData = [
+            'title' => $title,
+            'content' => $resultContent
+        ];
+
+        // 写缓存
+        $redisConn->set($redisKey, json_encode($responseData));
+        $redisConn->expire($redisKey, env('LAB_INFO_CACHE_TIME', 3600));
+
         return [
             'status' => 200,
             'data' => [
@@ -151,5 +175,15 @@ class LabInfoSpider
                 'content' => $resultContent
             ],
         ];
+    }
+
+    public static function getRedisKey(string $openid)
+    {
+        return 'lab_'.$openid;
+    }
+
+    public static function getRedisConn(): Connection
+    {
+        return Redis::connection('lab');
     }
 }
