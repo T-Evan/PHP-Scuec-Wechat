@@ -93,7 +93,7 @@ class EventInfoHandler implements EventHandlerInterface
 
                     return new News($items);
                     break;
-                case 'PhysicalExperiment':
+                case 'lab_query':
                     $handler = new PhysicalExperimentController();
                     return $this->replyHandle($handler, 'handle');
                     break;
