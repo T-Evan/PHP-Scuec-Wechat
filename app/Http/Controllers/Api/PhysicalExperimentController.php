@@ -17,6 +17,7 @@ use App\Http\Service\WechatService\Exceptions\WechatAuthException;
 use App\Http\Service\WechatService\Facades\WechatService;
 use App\Http\Service\WechatService\OAuth;
 use App\Models\StudentInfo;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use Illuminate\Redis\Connections\Connection;
 use Illuminate\Support\Facades\Log;
@@ -25,7 +26,6 @@ use Illuminate\Support\Facades\Validator;
 
 class PhysicalExperimentController extends Controller
 {
-    private $BIND_URL;
 
     protected static $STATE_SALT    = 'lab_info_query';
     protected static $REDIS_CONN     = 'phy_exp';
@@ -46,12 +46,6 @@ class PhysicalExperimentController extends Controller
 
     public function __construct()
     {
-        $openId = Account::getOpenid();
-        $this->BIND_URL = WechatService::oauth()
-            ->setScope(OAuth::SCOPE_BASE)
-            ->setCallbackUrl(route('phy_exp.bind'))
-            ->setState(sha1($openId.self::$STATE_SALT))
-            ->getRedirectUrl();
     }
 
     public function handle()
@@ -60,11 +54,24 @@ class PhysicalExperimentController extends Controller
         if (!$account) {
             return '你还没有绑定教务系统账户，请先绑定吧.'.HelperService::getBindingLink('ssfw');
         }
-        if (!Account::isBindLib()) {
-            return "先去<a href=\"{$this->BIND_URL}\">绑定大物实验的账户吧</a>";
+        if (!Account::isBindLab()) {
+            return '你还没有绑定大学物理实验室账户，请先绑定吧.'.HelperService::getBindingLink('lab');
         }
-        $labInfoSpider = new LabInfoSpider($account->id, $account->lab_password);
-//        $labInfoSpider
+        $labInfoSpider = new LabInfoSpider($account);
+        try {
+            $labInfo = $labInfoSpider->getMessage();
+        } catch (AccountManager\Exceptions\AccountNotBoundException $e) {
+            return '你还没有绑定教务系统账户，请先绑定吧.'.HelperService::getBindingLink('ssfw');
+        } catch (AccountManager\Exceptions\AccountValidationFailedException $e) {
+            return '大物实验的账户貌似不能验证通过，重新绑定试试?'.HelperService::getBindingLink('lab');
+        } catch (GuzzleException $e) {
+            return '抱歉，我们的服务器好像出了点问题，等会再来试试吧';
+        }
+        if ($labInfo['status'] != 200) {
+            return $labInfo['message'];
+        }
+        $response = $labInfo['data']['title']."\n".$labInfo['data']['content'];
+        return $response;
     }
 
     public function bindAccountView(Request $request)

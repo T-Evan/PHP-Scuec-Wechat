@@ -9,37 +9,61 @@
 namespace App\Http\Controllers\Api\AccountManager;
 
 
+use App\Http\Controllers\Api\AccountManager\EduSys\EduSysAccount;
+use App\Http\Controllers\Api\AccountManager\Exceptions\AccountValidationFailedException;
 use App\Http\Controllers\Api\AccountManagerInterface\AccountManagerInterface;
+use App\Http\Service\AccountService\Facades\Account;
 use App\Http\Service\HelperService;
+use App\Models\StudentInfo;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Redis;
 use Symfony\Component\DomCrawler\Crawler;
 
 class EduSysAccountManager implements AccountManagerInterface
 {
 
-    public function validateAccount(): AccountValidationResult
+    /**
+     * @param BaseAccount $accountInfo
+     * @return AccountValidationResult
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function validateAccount(BaseAccount $accountInfo): AccountValidationResult
     {
-        $userInfoArray = request()->toArray();
         $res = HelperService::get('http://id.scuec.edu.cn/authserver/login');
         $data = $res['res']->getBody()->getContents();
         $cookie_jar = $res['cookie'];
 
         $crawler = new Crawler();
         $crawler->addHtmlContent($data);
+        $loginPostData = [
+            'username' => $accountInfo->getAccount(),
+            'password' => $accountInfo->getPassword()
+        ];
         for ($i = 10; $i < 15; ++$i) {
             $key = $crawler->filter('#casLoginForm > input[type="hidden"]:nth-child('.$i.')')
                     ->attr('name') ?? null;
             $value = $crawler->filter('#casLoginForm > input[type="hidden"]:nth-child('.$i.')')
                     ->attr('value') ?? null;
-            $userInfoArray[$key] = $value;
+            $loginPostData[$key] = $value;
         }
 
         $res = HelperService::post(
-            $userInfoArray,
+            $loginPostData,
             'http://id.scuec.edu.cn/authserver/login?goto=http%3A%2F%2Fssfw.scuec.edu.cn%2Fssfw%2Fj_spring_ids_security_check',
             'form_params',
             'http://ehall.scuec.edu.cn/new/index.html',
             $cookie_jar
         );
+
+        if (!is_array($res)) {
+            return new AccountValidationResult(
+                true,
+                self::STATUS_REQUEST_FAILED,
+                null,
+                '服务请求错误，请稍后重试'.$res
+            );
+        }
 
         $data = $res['res']->getBody()->getContents();
         //尝试从登录后页面获取姓名，判断是否登录成功
@@ -80,11 +104,55 @@ class EduSysAccountManager implements AccountManagerInterface
             }
         }
 
+        // 将cookie序列化并写入redis
+        $cookieString = serialize($cookie_jar);
+        Redis::connection('default')
+            ->setex(self::getSSFWRedisKey(Account::getOpenid()),
+                env('COOKIE_TIME', 3600),
+                $cookieString);
+
         return new AccountValidationResult(
             false,
             self::STATUS_SUCCESS,
             $res['cookie'],
             'success'
         );
+    }
+
+    /**
+     * @param string $openid
+     * @return CookieJar
+     * @throws GuzzleException
+     * @throws AccountValidationFailedException
+     */
+    public function getCookie(string $openid): CookieJar
+    {
+        $cookieString = Redis::connection('default')->get(self::getSSFWRedisKey($openid));
+        if ($cookieString) {
+            return unserialize($cookieString);
+        }
+        $studentInfo = StudentInfo::where('openid', $openid)->first();
+        if (!$studentInfo || !$studentInfo->account || !$studentInfo->ssfw_password) {
+            return null;
+        }
+        $eduSysAccount = new EduSysAccount();
+        $eduSysAccount->setAccount($studentInfo->account);
+        $eduSysAccount->setPassword(decrypt($studentInfo->ssfw_password));
+        $validationResult = $this->validateAccount($eduSysAccount);
+        if ($validationResult->isFailed()) {
+            throw new AccountValidationFailedException(
+                $validationResult->getMsg(),
+                $validationResult->getCode());
+        }
+        return $validationResult->getCookie();
+    }
+
+    /**
+     * @param string $openid
+     * @return string
+     */
+    public static function getSSFWRedisKey(string $openid): string
+    {
+        return "ssfw_$openid";
     }
 }

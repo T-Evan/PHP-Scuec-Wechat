@@ -18,7 +18,7 @@ class AccountValidationResult
     protected $cookie;
     protected $msg;
 
-    public function __construct(bool $failed, int $code, CookieJar $cookie, string $msg = '')
+    public function __construct(bool $failed, int $code, $cookie, string $msg = '')
     {
         $this->failed = $failed;
         $this->code = $code;
@@ -43,9 +43,9 @@ class AccountValidationResult
     }
 
     /**
-     * @return CookieJar
+     * @return CookieJar|null
      */
-    public function getCookie(): CookieJar
+    public function getCookie()
     {
         return $this->cookie;
     }

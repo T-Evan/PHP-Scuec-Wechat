@@ -93,7 +93,7 @@ class LibInfoController extends Controller
     private function getContent()
     {
         $sContent = HelperService::get('http://coin.lib.scuec.edu.cn/reader/captcha.php');
-        $captcha = new ReadCaptcha($sContent['res']->getBody()->getContents(), 'libary');
+        $captcha = new ReadCaptcha($sContent['res']->getBody()->getContents(), 'library');
         $captcha = $captcha->showImg();
         $bodys = [
             'number' => $this->user,
@@ -212,10 +212,10 @@ class LibInfoController extends Controller
             $bookList = array($basicInfo, $arrTr);
         }
 
-        $redis = Redis::connection('libary');
+        $redis = Redis::connection('library');
         $redis->setex(
-            'libary_'.app('wechat_common')->openid,
-            config('app.libary_cookie_cache_time'),
+            'library_'.app('wechat_common')->openid,
+            config('app.library_cookie_cache_time'),
             json_encode($bookList)
         ); //缓存借阅信息一小时
 
@@ -238,10 +238,10 @@ class LibInfoController extends Controller
     {
         /*FIXME:据说小说不能续借。想办法判断哪些书是小说，然后加入可续借判断算法中，并把续借算法独立出来作为一个类方法。*/
         /*FIXME:光盘的罚款是每日0.5元，而不是0.1元。罚金计算算法需要加入对光盘的判断。*/
-        $redis = Redis::connection('libary');
-        $libaryCache = $redis->get('libary_'.app('wechat_common')->openid);
-        if (false != $libaryCache) {
-            $bookList = json_decode($libaryCache, true);
+        $redis = Redis::connection('library');
+        $libraryCache = $redis->get('library_'.app('wechat_common')->openid);
+        if (false != $libraryCache) {
+            $bookList = json_decode($libraryCache, true);
         } else {
             $bookList = $this->api->post('students/lib/booklist'); //dingo内部调用
             if (!is_array($bookList)) {

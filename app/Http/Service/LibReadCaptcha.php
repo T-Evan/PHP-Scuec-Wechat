@@ -9,9 +9,7 @@
 
 namespace App\Http\Service;
 
-use APP\Vendor\ImageOCR\Image;
-
-require __DIR__.'/../../Vendor/image-ocr/Image.php';
+use App\Vendor\ImageOCR\Image;
 
 class ReadCaptcha
 {
@@ -26,6 +24,10 @@ class ReadCaptcha
         $this->type = $type;
     }
 
+    /**
+     * @return null|string
+     * @throws \Exception
+     */
     public function showImg()
     {
         $img = $this->content;

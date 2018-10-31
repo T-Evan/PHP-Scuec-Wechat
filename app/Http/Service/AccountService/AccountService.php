@@ -29,8 +29,22 @@ class AccountService
 
     public function __construct()
     {
-        $this->message = app('wechat')->server->getMessage();
-        $this->openid = $this->message['FromUserName'] ?? null;
+        if (env('APP_ENV') != 'local' && env('APP_ENV') != 'testing') {
+            $this->message = app('wechat')->server->getMessage();
+            $this->openid = $this->message['FromUserName'] ?? null;
+        } else {
+            // for local environment
+            $this->openid = 'oULq3utesttesttesttesttest13';
+            if (!StudentInfo::where('openid', $this->openid)->first()) {
+                $student = new StudentInfo();
+                $student->openid = $this->openid;
+                $student->account = '201621094040';
+                $student->ssfw_password = encrypt('.dl151713');
+                $student->lib_password = encrypt('201621094040');
+                $student->lab_password = encrypt('.dl151713');
+                $student->save();
+            }
+        }
     }
 
     /**

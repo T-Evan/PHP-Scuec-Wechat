@@ -18,14 +18,12 @@ class AccountManagerFactory
                 return new EduSysAccountManager();
                 break;
             case 'lib':
-//                $result = $this->api->post('students/lib', $user_info_array); //dingo内部调用
+                return new LibSysAccountManager();
                 break;
             case 'lab':
-//                $result = $this->api->post('students/lab', $user_info_array);
-                break;
-            default:
-//                $result = ['message' => '错误的提交'];
+                return new LabSysAccountManager();
                 break;
         }
+        return null;
     }
 }

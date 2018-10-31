@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\Vendor\ImageOCR;
+namespace App\Vendor\ImageOCR;
 
 require 'StorageFile.php';
 
@@ -36,7 +36,7 @@ class Image
     {
         $this->type = $type;
         switch ($this->type) {
-            case 'libary':
+            case 'library':
                 $this->CHAR_NUM = 4;
                 break;
             case 'ecard':
@@ -119,7 +119,7 @@ class Image
                 }
             }
         }
-        if ('libary' == $this->type) {
+        if ('library' == $this->type) {
             for ($i = 0; $i < $this->_image_h; ++$i) {
                 for ($j = 0; $j < $this->_image_w; ++$j) {
                     if ($hash_data[$i][$j]) {
@@ -277,7 +277,7 @@ class Image
                 }
             }
         }
-        if ('libary' == $this->type) {
+        if ('library' == $this->type) {
             if (0 == $n) {
                 for ($i = $n * $a; $i < ($n + 1) * $a + 20; ++$i) {
                     $column = array_column($this->_hash_data, $i);
@@ -503,7 +503,7 @@ class Image
         $s = 0;
         foreach ($samples as $k => $v) {
             foreach ($v as $val) {
-                if ('libary' == $this->type) {
+                if ('library' == $this->type) {
                     $samples_hash_data = str_split($val);
                 }
                 if ('ecard' == $this->type) {

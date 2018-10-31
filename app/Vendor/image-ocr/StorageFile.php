@@ -22,7 +22,7 @@ class StorageFile
     public function __construct($type)
     {
         switch ($type) {
-            case 'libary':
+            case 'library':
                 $this->FILE_PATH = self::FILE_DIR.'db.json';
                 break;
             case 'ecard':

@@ -26,9 +26,10 @@ class HelperService
      * @param $apiStr
      * @param $postType
      * @param string $referer
-     * @param null   $cookie_jar
+     * @param null $cookie_jar
      *
      * @return array|string
+     * @throws GuzzleException
      */
     public static function post($body, $apiStr, $postType, $referer = null, $cookie_jar = null)
     {
@@ -37,9 +38,8 @@ class HelperService
         if (empty($cookie_jar)) {
             $cookie_jar = new CookieJar();
         }
+
         $request_array = [
-//                'debug' => true,
-//                'proxy' => ['http' => 'http://localhost:8888'],
             'cookies' => $cookie_jar,
             $postType => $body,
             'timeout' => 5,
@@ -49,13 +49,7 @@ class HelperService
             ],
         ];
 
-        try {
-//            $request = new Request('POST',$apiStr,$request_array);
-//            $response = $client->send($request, ['timeout' => 2]);
-            $res = $client->request('POST', $apiStr, $request_array);
-        } catch (GuzzleException $e) {
-            return $e->getMessage();
-        }
+        $res = $client->request('POST', $apiStr, $request_array);
 
         return array(
             'cookie' => $cookie_jar,
@@ -338,6 +332,7 @@ class HelperService
      */
     public static function getCookieFromStr($string)
     {
+//        CookieJar::
         $isMatched = preg_match_all("/(Set-Cookie|Cookie):\s(.*?)\r\n/ism", $string, $arrCookies);  //一定要\r\n啊，否则抓到的Cookie会带有\r
         if ($isMatched) {
             $cookie = implode('; ', $arrCookies[2]);
