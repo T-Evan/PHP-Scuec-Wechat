@@ -962,8 +962,8 @@ class TextMessageHandler implements EventHandlerInterface
                 return $content;
             }
         } catch (\Exception $exception) {
-            return "你好棒! 发现一个小bug. 快点@程序猿告诉他吧!";
             Common::writeLog($exception->getMessage().$exception->getTraceAsString());
+            return "你好棒! 发现一个小bug. 快点@程序猿告诉他吧!";
         }
     }
 }
