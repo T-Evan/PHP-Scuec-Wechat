@@ -33,6 +33,8 @@ $api->version('v1', function (\Dingo\Api\Routing\Router $api) {
 
         $api->group(['prefix' => 'account', 'middleware' => 'public_api_auth'], function(Router $api) {
             $api->get('isBind', 'App\Http\Controllers\Api\AccountInfoController@isBind');
+
+            $api->get('accessToken', 'App\Http\Controllers\Api\BaseAPIController@getAccessToken');
         });
     });
 });

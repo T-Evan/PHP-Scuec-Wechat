@@ -38,4 +38,9 @@ class WechatService extends Facade
         }
         return self::$userInfoRetriever;
     }
+
+    public static function accessToken()
+    {
+        return app('wechat')->access_token->getToken();
+    }
 }
