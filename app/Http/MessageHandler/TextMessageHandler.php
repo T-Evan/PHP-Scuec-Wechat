@@ -277,7 +277,7 @@ class TextMessageHandler implements EventHandlerInterface
                 break;
             case 'lab_query':
                 $phyExpSysController = new PhysicalExperimentController();
-                $content = $this->replyHandle($phyExpSysController, 'handler');
+                $content = $this->replyHandle($phyExpSysController, 'handle');
                 return $content;
             case 'exam':
                 $account = new AccountInfoController();
