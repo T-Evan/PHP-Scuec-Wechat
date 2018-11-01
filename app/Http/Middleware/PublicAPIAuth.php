@@ -17,6 +17,10 @@ class PublicAPIAuth
         [
             'appid' => 'ZTk5MTA5MmY3ZjQ1',
             'token' => 'NmVmOWJkYjhhODI5YmJiMDUxZWRjZTcy'
+        ],
+        [
+            'appid' => '7a302c109152fd00',
+            'token' => 'e1273226ffe6ea38f22dcf118d049f2c'
         ]
     ];
 

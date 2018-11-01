@@ -17,4 +17,11 @@ class BaseAPIController extends Controller
     {
         return WechatService::accessToken();
     }
+
+    public function testAuth()
+    {
+        return [
+            'status' => 0
+        ];
+    }
 }

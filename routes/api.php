@@ -31,10 +31,15 @@ $api->version('v1', function (\Dingo\Api\Routing\Router $api) {
         $api->post('labAccount', 'App\Http\Controllers\Api\PhysicalExperimentController@labAccount');
         $api->post('lab/verifyState', 'App\Http\Controllers\Api\PhysicalExperimentController@verifyState');
 
-        $api->group(['prefix' => 'account', 'middleware' => 'public_api_auth'], function(Router $api) {
-            $api->get('isBind', 'App\Http\Controllers\Api\AccountInfoController@isBind');
+    });
 
+    $api->group(['middleware' => 'public_api_auth'], function(Router $api) {
+        $api->get('students/account/isBind', 'App\Http\Controllers\Api\AccountInfoController@isBind');
+
+        $api->group(['prefix' => 'open'], function (Router $api) {
             $api->get('accessToken', 'App\Http\Controllers\Api\BaseAPIController@getAccessToken');
+
+            $api->get('testAuth', 'App\Http\Controllers\Api\BaseAPIController@testAuth');
         });
     });
 });

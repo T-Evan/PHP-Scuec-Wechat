@@ -208,8 +208,7 @@ class TextMessageHandler implements EventHandlerInterface
                         [
                             'title' => '小塔的校园网使用说明书',
                             'description' => '校园网的秘密都在这里了~',
-                            'url' => 'http://mp.weixin.qq.com/s?__biz=MzA5OTA0ODUyOA==&mid=400024069'.
-                                '&idx=1&sn=58c58c242113fdeeb86ea575ac997d7d&scene=4#wechat_redirect',
+                            'url' => HelperService::wechatArticleUrl('https://mp.weixin.qq.com/s/EDGbhmhiy_VbFeqwVsokNw'),
                             'image' => config('app.base_url').'/img/wifi.jpg',
                         ]
                     ),
