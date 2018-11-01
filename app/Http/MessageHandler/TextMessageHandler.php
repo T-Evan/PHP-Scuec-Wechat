@@ -49,9 +49,7 @@ class TextMessageHandler implements EventHandlerInterface
             case 'kuaidi':
                 $kuaidi_num = HelperService::getContent($keyword, '快递');  // 得到快递单号
                 $kuaidi_service = new KuaiDiApiService($kuaidi_num);
-                $content = $kuaidi_service->kuaiDi();
-
-                return $content;
+                return $this->replyHandle($kuaidi_service, 'kuaiDi');
                 break;
             case 'map':
                 $items = [
