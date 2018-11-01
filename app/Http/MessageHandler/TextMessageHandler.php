@@ -206,18 +206,10 @@ class TextMessageHandler implements EventHandlerInterface
                 $items = [
                     new NewsItem(
                         [
-                            'title' => '小塔的校园网使用说明书',
+                            'title' => '干货 | 校园网使用指南，专治网卡网崩',
                             'description' => '校园网的秘密都在这里了~',
                             'url' => HelperService::wechatArticleUrl('https://mp.weixin.qq.com/s/EDGbhmhiy_VbFeqwVsokNw'),
-                            'image' => config('app.base_url').'/img/wifi.jpg',
-                        ]
-                    ),
-                    new NewsItem(
-                        [
-                            'title' => '【新技能】用路由器共享校园网',
-                            'description' => '小塔教你如何在宿舍使用路由器共享校园网~',
-                            'url' => 'http://mp.weixin.qq.com/s?__biz=MzA5OTA0ODUyOA==&mid=211654347&idx=1'.
-                                '&sn=b44754a9f238824bbc2b117d0e915b33',
+                            'image' => config('app.base_url').'/img/xyw.png',
                         ]
                     ),
                 ];
