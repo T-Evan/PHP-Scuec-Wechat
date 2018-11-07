@@ -112,7 +112,7 @@ class WakeSignDetailInfosController extends Controller
                 ? "\n噫~睡懒觉了哟\n".'上次早起时间是'.date('H:i:s', $lastSign->sign_timestamp)
                 : "\n早起的鸟儿有虫吃(ง •̀_•́)ง\n";
             //reply success
-            $replyMessage = '成功啦~这是坚持早起的第'.$signRes->sign_day."天。\n"
+            $replyMessage = '成功啦~这是坚持早起的第'.$signRes['sign_day']."天。\n"
                 .'今天早起时间为'
                 .date('H:i:s', $this->now_time)
                 .'，民大第'
@@ -128,7 +128,7 @@ class WakeSignDetailInfosController extends Controller
             }
             isset($compareMessage) && $replyMessage .= $compareMessage;
             $replyMessage .= $signRankName.$extraInfo.$weatherInfo.$clickInfo;
-            $signday = '早起打卡'.'(第'.$signRes->sign_day.'天)';
+            $signday = '早起打卡'.'(第'.$signRes['sign_day'].'天)';
             $pngnumber = rand(1, 4); //随机选取四张封面图
             $pngurl = config('app.base_url').'/punch_card/img/shoutu'.$pngnumber.'.jpg';
             $news = [

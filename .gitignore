@@ -14,3 +14,4 @@ yarn-error.log
 
 # ide helper files
 _ide_helper*.php
+.DS_STORE
