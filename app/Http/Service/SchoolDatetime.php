@@ -117,10 +117,10 @@ class SchoolDatetime
 
     private static function weekDiff($startTimestamp, $endTimestamp)
     {
+        if ($startTimestamp > $endTimestamp) return 0;
         $startDayOfWeek = (int)date('N', $startTimestamp);
         $days = floor(($endTimestamp - $startTimestamp) / 86400);
-        $weeks = floor(($days + ($startDayOfWeek - 1)) / 7);
-        // 如果还没有开学，则返回周数为0，代表没有开学
-        return $weeks > 0 ? $weeks : 0;
+        $weeks = floor(($days + ($startDayOfWeek - 1)) / 7) + 1;
+        return $weeks;
     }
 }

@@ -33,6 +33,8 @@ $api->version('v1', function (\Dingo\Api\Routing\Router $api) {
 
     });
 
+    $api->get('time/currentWeek', 'App\Http\Controllers\Api\BaseAPIController@time');
+
     $api->group(['middleware' => 'public_api_auth'], function(Router $api) {
         $api->get('students/account/isBind', 'App\Http\Controllers\Api\AccountInfoController@isBind');
 

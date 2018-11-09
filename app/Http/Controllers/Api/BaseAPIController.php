@@ -9,6 +9,7 @@
 namespace App\Http\Controllers\Api;
 
 
+use App\Http\Service\SchoolDatetime;
 use App\Http\Service\WechatService\Facades\WechatService;
 
 class BaseAPIController extends Controller
@@ -22,6 +23,13 @@ class BaseAPIController extends Controller
     {
         return [
             'status' => 0
+        ];
+    }
+
+    public function time()
+    {
+        return [
+            'current_week' => SchoolDatetime::getSchoolWeek()
         ];
     }
 }
