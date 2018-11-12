@@ -133,6 +133,9 @@ class AccountInfoController extends Controller
      */
     public function getTableMessage()
     {
+        if (!Account::isBindSSFW()) {
+            return "还没有绑定教务系统账号，先去绑定吧：".HelperService::getBindingLink('ssfw');
+        }
         $termWeek = SchoolDatetime::getSchoolWeek();    // 本周的学期周数
         if ($termWeek > 20) {   // 如果大于20周课表查询关闭
             $content = "\n本学期已经结束了哦，课表查询功能自动关闭。学霸们，下个学期继续努力吧。";
