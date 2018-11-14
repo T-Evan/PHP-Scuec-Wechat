@@ -42,6 +42,8 @@ $api->version('v1', function (\Dingo\Api\Routing\Router $api) {
             $api->get('accessToken', 'App\Http\Controllers\Api\BaseAPIController@getAccessToken');
 
             $api->get('testAuth', 'App\Http\Controllers\Api\BaseAPIController@testAuth');
+
+            $api->get('timetable', 'App\Http\Controllers\Api\BaseAPIController@timetable');
         });
     });
 });

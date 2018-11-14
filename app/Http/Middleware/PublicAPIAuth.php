@@ -14,13 +14,20 @@ class PublicAPIAuth
     const MSG_INVALID_SIGN = 'you are limited to fetch resource';
 
     protected $keys = [
+        // 体测成绩业务
         [
             'appid' => 'ZTk5MTA5MmY3ZjQ1',
             'token' => 'NmVmOWJkYjhhODI5YmJiMDUxZWRjZTcy'
         ],
+        // 微信菜单管理工具
         [
             'appid' => '7a302c109152fd00',
             'token' => 'e1273226ffe6ea38f22dcf118d049f2c'
+        ],
+        // 调度助手
+        [
+            'appid' => 'YWQ3OWFkYmVhN2I4',
+            'token' => 'ZDA4YTZhODJiY2ZmMWNhN2MyNzFlM2Q2'
         ]
     ];
 
