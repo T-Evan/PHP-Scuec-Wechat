@@ -35,3 +35,7 @@ Route::get('getUrl', function () {
     return  Wechat::oauth()->scopes(['snsapi_base'])->setRedirectUrl(route('phy_exp.bind'))
         ->redirect()->getTargetUrl();
 });
+
+Route::group(['prefix' => 'bye'], function () {
+    Route::get('wish_wall', 'ByeController@wishWall');
+});
