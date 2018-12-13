@@ -1,4 +1,0 @@
-<FilesMatch (.*)\.(sql|json|gitignore|htaccess|lock|md|log)$>
-    Order allow,deny
-    deny from all
-</FilesMatch>

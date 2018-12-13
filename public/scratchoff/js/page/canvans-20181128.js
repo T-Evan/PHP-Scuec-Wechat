@@ -1,9 +1,8 @@
-$(document).ready(function() {
+$(document).ready(function () {
     // 画成绩的
     var CanvasWidth = 0,
         CanvasHeight = 0;
     var scoreObj = {};
-
     function fillImg(str, num) {
         var strCanvas = $(".score-canvas")[num];
         strCanvas.setAttribute("data-scroenum", str);
@@ -20,7 +19,6 @@ $(document).ready(function() {
     }
 
     // 画阴影的 想把画阴影的和擦的放在一起了
-    // todo
     function fillShadow(i) {
         var shadowCanvas = $(".score-shadow");
         shadowCanvas = shadowCanvas[i];
@@ -28,18 +26,17 @@ $(document).ready(function() {
         //resize canvas width and height
         ctx.canvas.width = CanvasWidth;
         ctx.canvas.height = CanvasHeight;
-        // ctx.fillStyle = "#dbdbdb"; //涂层
-        // ctx.fillRect(0, 0, 2 * CanvasWidth, 2 * CanvasHeight);
+        ctx.fillStyle = "#dbdbdb"; //涂层
+        ctx.fillRect(0, 0, 2 * CanvasWidth, 2 * CanvasHeight);
         var img = new Image();
         // img.src = "G:/front-end/img/fillimg.png";
-        img.src = "./img/fillimg.png";
-        img.onload = function() {
+        img.src = "../img/fillimg.png";
+        img.onload = function () {
             // var pattern = ctx.createPattern(img, "no-repeat");
             // ctx.fillStyle = pattern;
             // ctx.fillRect(0, 0, 2 * CanvasWidth, 2 * CanvasHeight);
             ctx.drawImage(img, 0, 0, CanvasWidth, CanvasHeight);
         }
-
     }
 
     function clearShadow() {
@@ -62,27 +59,23 @@ $(document).ready(function() {
             if (mousedown) {
                 if (!!event.touches) {
                     e = event.touches[0];
-                    //每个触摸事件对象中都包括了touches这个属性，用于描述前位于屏幕上的所有手指的一个列表那么获取当前事件对象我们习惯性的使用  event = event.touches[0]
+                    //每个触摸事件对象中都包括了touches这个属性，用于描述前位于屏幕上的所有手指的一个列表那么获取当前事件对象我们习惯性的使用  event = event.touches[0] 
                 };
                 var offsetX = Math.floor(_this.offset().left),
                     offsetY = Math.floor(_this.offset().top);
                 var x = (e.clientX + document.body.scrollLeft || e.pageX) - offsetX || 0,
                     y = (e.clientY + document.body.scrollTop || e.pageY) - offsetY || 0;
-                if (x > 15) {
-                    x = x + 15;
-                };
-                with(ctx) {
+                if (x > 15) { x = x + 15; };
+                with (ctx) {
                     beginPath();
                     arc(x, y, 15, 0, Math.PI * 2);
                     if (x > CanvasWidth / 2.7 && x < CanvasWidth / 2 && y < CanvasHeight) {
+                        _hmt.push(['_trackEvent', '刮成绩', '刮开成功']); //百度统计事件转化代码
                         if (_this.attr("data-ok") !== "ok") {
-                            _hmt.push(['_trackEvent', '刮成绩', '刮开成功']); //百度统计事件转化代码
-
                             var openId = getUrlParam("openid");
                             var className = _this.parent().parent().children("h1").text(); //TODO
-
                             $.ajax({ // 擦除成功 发送参数
-                                url: 'https://wechat3.stuzone.com/api/students/ssfw/score/'+openId,
+                                url: 'api.php',
                                 type: 'POST',
                                 dataType: 'json',
                                 data: {
@@ -90,32 +83,22 @@ $(document).ready(function() {
                                     act: 'checked',
                                     data: className
                                 },
-                                success: function(res) {
-                                    // console.log("保存成功的效果");
-                                },
-                                error: function(err) {
-                                    console.log(err);
-                                    // console.log("请求发送失败！");
-                                }
                             });
-                            console.log("saved");
                             //触发特效
                             setTimeout(() => {
-                                hua("hua", _this.parent().children().attr("scroeNum"));
-                                badImg(_this.parent().children().attr("scroeNum"));
+                                hua("hua", _this.parent().children().attr("data-scroeNum"));
+                                badImg(_this.parent().children().attr("data-scroeNum"));
                             }, 1200); //
                         };
-
                         if (!_this.prop("data-ok")) {
                             _this.attr("data-ok", "ok");
                         };
-
                     };
-                    fill();
+                    fillHtml();
                 }
             }
         }
-        $(".main-contain").on('mousedown', '.score-shadow', function(event) {
+        $(".main-contain").on('mousedown', '.score-shadow', function (event) {
             _this = $(this);
             ctx = _this[0].getContext('2d');
             ctx.globalCompositeOperation = 'destination-out';
@@ -124,7 +107,7 @@ $(document).ready(function() {
         $(".main-contain").on('mouseup', '.score-shadow', eventUp);
         $(".main-contain").on('mousemove', '.score-shadow', eventMove);
 
-        $(".main-contain").on('touchstart', '.score-shadow', function(event) {
+        $(".main-contain").on('touchstart', '.score-shadow', function (event) {
             _this = $(this);
             ctx = _this[0].getContext('2d');
             ctx.globalCompositeOperation = 'destination-out';
@@ -150,109 +133,110 @@ $(document).ready(function() {
     }
     // 渲染成绩的html
     function fillHtml() {
-        // console.log("技术支持：比特工场。欢迎有互联网梦想的同学加入我们！");
-        var openId = getUrlParam("openid");
+        // console.log("技术支持：比特工场。欢迎有互联网梦想的同学加入我们！")
+        let openId = getUrlParam("openid");
+        let apiURL = 'https://wechat3.stuzone.com/api/students/ssfw/score/' + openId;
         $.ajax({
-                url: 'https://wechat3.stuzone.com/api/students/ssfw/score/'+openId,
-                type: 'POST',
-                dataType: 'json',
-                timeout: 15000,
-            })
-            .done(function aa(res) {
-                if (res.status == 200) {
-                    var cardLi = "",
-                        tempArr = [];
-                    var data = res.data;
-                    for (i in data) {
-                        var hideShadow = "";
-                        if (data[i].is_checked) {
-                            hideShadow = "hide";
-                        }
-                        var hiddenBlack = "";
-                        if (data[i].hidden == true) {
-                            hiddenBlack = "hide1";
-                        }
-                        cardLi += '<div class="card-li ' + hiddenBlack + '">';
-                        cardLi += '<img class="li-img" src="img/ljt.png">'
-                        cardLi += '<h1 class="black-color">' + data[i].name + '</h1>'; //scoreName
-                        cardLi += '<div class="score-show">' +
-                            '<canvas class="score-canvas">浏览器暂不支持该功能</canvas>' +
-                            '<canvas class="score-shadow ' + hideShadow + '">浏览器暂不支持该功能</canvas>' +
+            url: apiURL,
+            type: 'POST',
+            dataType: 'json',
+            timeout: 15000,
+        }).done(function aa(res) {
+            if (res.status == 200) {
+                var cardLi = "",
+                    tempArr = [];
+                var data = res.data;
+                for (i in data) {
+                    var hideShadow = "";
+                    if (data[i].is_checked) {
+                        hideShadow = "hide";
+                    }
+                    var hiddenBlack = "";
+                    if (data[i].hidden == false) {
+                        hiddenBlack = "hide1";
+                    }
+                    cardLi += '<div class="card-li ' + hiddenBlack + '">';
+                    cardLi += '<img class="li-img" src="img/ljt.png">'
+                    cardLi += '<h1 class="black-color">' + data[i].class_name + '</h1>'; //scoreName
+                    cardLi += '<div class="score-show">' +
+                        '<canvas class="score-canvas">浏览器暂不支持该功能</canvas>' +
+                        '<canvas class="score-shadow ' + hideShadow + '">浏览器暂不支持该功能</canvas>' +
 
-                            '</div>';
-                        cardLi += '<div class="dash-border"></div>';
-                        cardLi += '<h3 class="black-color">【' + data[i].type + '】</h3>'; //scoreClass
-                        cardLi += '</div>';
-                    };
-                    $(".card-ul").empty().append(cardLi);
-                    $(".main-contain").removeClass("hide");
-                    $(".prompt").fadeOut(1000);
-                    CanvasWidth = $(".score-canvas").width();
-                    CanvasHeight = $(".score-canvas").height();
-                    for (i in data) {
-                        fillShadow(i);
-                        fillImg(data[i].score, i);
-                    };
-                    if (res.is_like == false) {
-                        $(".score-shadow").addClass("hide");
-                        $("#ifLike").prop("checked", false);
-                    };
-                } else {
-                    // no results
-                    var className = ".err-" + res.status;
-                    $(".loading").addClass("hide");
-                    $(className).removeClass("hide");
-                }
-                $(".main-contain").addClass("hide");
-                //放入黑名单弹出
-                $(".li-img").bind("click", function() {
-                    let cradLi = $(this).parent();
-                    let mod = '<div class = "mod">' +
-                        '<div class = "sec">' +
-                        '<img src = "img/emoj.png">' +
-                        '<p> 是否将该成绩放入黑名单？ </p>' +
-                        '<div class = "btn-box">' +
-                        '<div class = "mod-btn mod-btn-y">是</div>' +
-                        '<div class = "mod-btn mod-btn-n">否</div> ' +
-                        '</div></div><div>';
-                    $(".main-contain").append(mod);
-                    $(".mod-btn-n").click(() => {
-                        $(".mod").remove();
-                    });
-                    $(".mod-btn-y").click(() => {
-                        _hmt.push(['_trackEvent', '黑名单', '放入']); //百度统计事件转化代码
-                        var className = cradLi.children("h1").text();
-                        console.log(className);
-                        var openId = getUrlParam("openid");
-                        $.ajax({ //放入 请求
-                            url: 'https://wechat3.stuzone.com/api/students/ssfw/score/'+openId,
-                            type: 'POST',
-                            dataType: 'json',
-                            data: {
-                                act: 'black',
-                                course_name: className,
-                            },
-                            success: function(res) {
-                                cradLi.fadeOut(1000, () => { cradLi.remove() });
-                                $(".mod").remove();
-                            },
-                            error: function(err) {
-                                console.log("失败，请检查你的网络问题。");
-                                let _mod = '<p style="font-size:1.75em;">黑历史放入失败。</p>';
-                                $(".sec").empty().append(_mod);
-                                setTimeout(() => { $(".mod").remove(); }, 1500);
-                            }
-                        });
-                        // cradLi.fadeOut(1000, () => {
-                        //     cradLi.remove()
-                        // });
-                        // $(".mod").remove();
-                    });
+                        '</div>';
+                    cardLi += '<div class="dash-border"></div>';
+                    cardLi += '<h3 class="black-color">【' + data[i].class_type + '】</h3>'; //scoreClass
+                    cardLi += '</div>';
+                };
+                $(".card-ul").empty().append(cardLi);
+                $(".main-contain").removeClass("hide");
+                $(".prompt").fadeOut(1000);
+                CanvasWidth = $(".score-canvas").width();
+                CanvasHeight = $(".score-canvas").height();
+                for (i in data) {
+                    fillShadow(i);
+                    fillImg(data[i].score, i);
+                };
+                if (res.is_like == false) {
+                    $(".score-shadow").addClass("hide");
+                    $("#ifLike").prop("checked", false);
+                };
+            } else {
+                // no results
+                var className = ".err-" + res.status;
+                $(".loading").addClass("hide");
+                $(className).removeClass("hide");
+            }
+            $(".main-contain").addClass("hide");
+            //放入黑名单弹出
+            $(".li-img").bind("click", function () {
+                let cradLi = $(this).parent();
+                let mod = '<div class = "mod">' +
+                    '<div class = "sec">' +
+                    '<img src = "img/emoj.png">' +
+                    '<p> 是否将该成绩放入黑名单？ </p>' +
+                    '<div class = "btn-box">' +
+                    '<div class = "mod-btn mod-btn-y">是</div>' +
+                    '<div class = "mod-btn mod-btn-n">否</div> ' +
+                    '</div></div><div>';
+                $(".main-contain").append(mod);
+                $(".mod-btn-n").click(() => {
+                    $(".mod").remove();
                 });
+                $(".mod-btn-y").click(() => {
+                    _hmt.push(['_trackEvent', '黑名单', '放入']); //百度统计事件转化代码
+                    var className = cradLi.children("h1").text();
+                    var score = cradLi.children(".score-show").children(".score-canvas").data("scroenum");
+                    var openId = getUrlParam("openid");
+                    $.ajax({ //放入 请求
+                        url: 'hide.php',
+                        type: 'PUT',
+                        dataType: 'json',
+                        data: {
+                            openid: openId,
+                            course_name: className,
+                            course_score: score
+                        },
+                        success: function (res) {
+                            cradLi.fadeOut(1000, () => { cradLi.remove() });
+                            $(".mod").remove();
+                        },
+                        error: function (err) {
+                            console.log("失败，请检查你的网络问题。");
+                            let _mod = '<p style="font-size:1.75em;">黑历史放入失败。</p>';
+                            $(".sec").empty().append(_mod);
+                            setTimeout(() => { $(".mod").remove(); }, 1500);
+                        }
+                    });
+                    cradLi.fadeOut(1000, () => {
+                        cradLi.remove()
+                    });
+                    $(".mod").remove();
+                });
+            });
 
-            })
+        })
             /*失败函数 */
-            .fail(function() {
+            .fail(function () {
                 //TODO
                 $(".loading").addClass("hide");
                 $(".err-500").removeClass("hide");
@@ -260,14 +244,14 @@ $(document).ready(function() {
             /**
              * 成功失败都执行
              */
-            .always(function() {
+            .always(function () {
                 clearShadow();
             });
     }
 
     function initNotLike() {
         // 弹窗是否出现
-        $("#ifLike").click(function() {
+        $("#ifLike").click(function () {
             var ifLikeChecked = $(this).prop("checked");
             if (!ifLikeChecked) {
                 $(".ui-dialog").addClass('show');
@@ -277,7 +261,7 @@ $(document).ready(function() {
             }
         });
         // 点击弹窗出现的btn按钮 处理结果
-        $(".ui-dialog").delegate('button', 'click', function() {
+        $(".ui-dialog").delegate('button', 'click', function () {
             var _this = $(this);
             _this.parent().parent().parent().removeClass('show');
             var _btnIndex = _this.index();
@@ -289,7 +273,7 @@ $(document).ready(function() {
             }
         });
         //关闭按钮
-        $(".not-like-closebtn").click(function() {
+        $(".not-like-closebtn").click(function () {
             $(this).parent().addClass('hide');
         });
     }
@@ -299,38 +283,43 @@ $(document).ready(function() {
         var openId = getUrlParam("openid");
         if (isLike == 1) {
             var likeMark = 'true';
+
         } else {
             var likeMark = 'false';
+
         }
         $.ajax({
-            url: 'https://wechat3.stuzone.com/api/students/ssfw/score/'+openId,
+            url: 'api.php',
             type: 'POST',
             dataType: 'json',
             data: {
+                openid: openId,
                 act: 'like',
                 data: likeMark
             },
-            success: function(res) {
+            success: function (res) {
                 $(".score-shadow").fadeOut();
                 // $(".score-shadow").addClass('hide');
             },
-            error: function(err) {
+            error: function (err) {
                 console.log("失败，请检查你的网络问题。");
             }
         });
         //console.log( "switch: "+isLike );
     }
-    //TODO
-    $(".tryagain").click(function() {
+
+    // 再试一次
+    $(".tryagain").click(function () {
         console.log("clicked");
         $(".err-prompt").addClass("hide");
         $(".loading").removeClass("hide");
-        setTimeout(function() {
+        setTimeout(function () {
             fillHtml();
             initNotLike();
         }, 1800);
     });
-    $(".binding").click(function() {
+    // 重新绑定
+    $(".binding").click(function () {
         var openId = getUrlParam("openid");
         var url = "http://www.stuzone.com/zixunminda/binding/login.php?type=ssfw&tousername=" + openId;
         window.location.href = url;
@@ -343,12 +332,13 @@ $(document).ready(function() {
     // 首页点击进入
     $(".toScore").click(() => {
         $(".home").addClass("hide");
-        $(".main-contain").removeClass("hide");
+        $(".main-contain").removeClass("hide");//进入成绩
 
     });
+    // 黑历史
     $(".toBlack").click(() => {
         var openId = getUrlParam("openid");
-        var url = "./black.html?openid=" + openId;
+        var url = "../black.html?openid=" + openId;
         window.location.href = url;
     });
 
@@ -372,6 +362,8 @@ $(document).ready(function() {
             ];
 
             for (var i = 0; i < 300; i++) {
+
+
                 //生成碎片数组
                 particle.push({
                     x: width / 2,
@@ -384,7 +376,7 @@ $(document).ready(function() {
                     angle: convertToRadians(randomRange(0, 360)), //角度转化为弧度
                     color: colors[Math.floor(Math.random() * colors.length)], //颜色
                     anglespin: randomRange(-0.2, 0.2),
-                    draw: function() {
+                    draw: function () {
                         context.save();
                         context.translate(this.x, this.y);
                         context.rotate(this.angle);
@@ -415,7 +407,6 @@ $(document).ready(function() {
                     },
                 });
             }
-
 
             function drawScreen() {
                 //利用数组产生碎片
@@ -466,11 +457,5 @@ $(document).ready(function() {
             }, 1500);
         }
     }
-
-
-
-
-
-
 
 });

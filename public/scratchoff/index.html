@@ -8,30 +8,41 @@
     <META HTTP-EQUIV="Expires" CONTENT="0" />
     <title>成绩刮刮乐|资讯民大</title>
     <link rel="stylesheet" type="text/css" href="css/lib/frozenui.min.css" />
-    <link rel="stylesheet" type="text/css" href="css/page/main.css?ver=6.1" />
+    <link rel="stylesheet" type="text/css" href="css/page/main.css" />
     <script>
         //百度统计
         var _hmt = _hmt || [];
-        (function() {
+        (function () {
             var hm = document.createElement("script");
             hm.src = "https://hm.baidu.com/hm.js?4a8667907394e2156941dcc928069463";
             var s = document.getElementsByTagName("script")[0];
             s.parentNode.insertBefore(hm, s);
         })();
     </script>
+
 </head>
 
 <body>
     <div class="home">
+        <div style="position:fixed;bottom:1em;margin:0;padding:0;width:100%;text-align:center;color:#999;font-size:0.8em;">&copy;
+            比特工场</div>
         <div class="txt  txt-home">
-            <p>刮刮乐，&nbsp;&nbsp;&nbsp;</p>
-            <p> &nbsp;&nbsp;了解一下？</p>
+            <!-- 你有一份刮刮乐
+               请注意查收 -->
+            <div class="home0">
+                <img class="img-home0" src="img/home-0.png" />
+            </div>
         </div>
         <img class="img-home" src="img/home.png" />
         <div class="btn-border">
-            <div class="btn btn-y toScore">刮成绩</div>
+            <div class="btn btn-y toScore">
+                <img class="img-home1" src="img/home-1.png" />
+            </div>
+
+            <div class="black-his toBlack">
+                <img class="img-home_img" src="img/home-2.png" />
+            </div>
         </div>
-        <div class="black-his toBlack">黑历史</div>
     </div>
 
     <div class="main-contain hide">
@@ -43,8 +54,8 @@
             <span class="not-like-title white-
              ui-nowrap-flex ui-whitespace">不喜欢这个功能？点右边可以关闭哦~</span>
             <label class="ui-switch">
-            <input type="checkbox" id="ifLike" checked />
-        </label>
+                <input type="checkbox" id="ifLike" checked />
+            </label>
         </div>
         <div class="ui-dialog">
             <div class="ui-dialog-cnt">
@@ -61,91 +72,118 @@
 
 
     <div class="prompt">
-        <div style="position:fixed;bottom:1em;margin:0;padding:0;width:100%;text-align:center;color:#999;font-size:0.8em;">&copy; 比特工场</div>
+        <div style="position:fixed;bottom:1em;margin:0;padding:0;width:100%;text-align:center;color:#999;font-size:0.8em;">&copy;
+            比特工场</div>
         <div class="err-prompt err-204 hide">
             <div class="txt txt-l txt-home">
-                <p>别急</p>
-                <p>成绩还没出来呢</p>
-            </div>
-            <img class="img-home" src="img/err-1.png" />
+                <!-- <p>别急</p>
+                <p>成绩还没出来呢</p> -->
+                <div class="chengji">
+                    <img class="chengji_img205" src="img/chengji.png" />
+                </div>
 
-            <div class="btn-border">
-                <a href="https://wish.stuzone.com">
-                    <div class="prompt-btn btn-y">许个愿吧</div>
-                </a>
+            </div>
+            <div class="imghome">
+                <img class="img-home" src="img/err-1.png" />
             </div>
             <div class="btn-border">
-                <div class="prompt-btn tryagain btn-y">再试一下</div>
+                <a href="http://wish.stuzone.com">
+                    <div class="prompt-btn_1 btn-y">
+                        <!-- 许愿 -->
+                        <img class="aimg-home3" src="img/home3.png" />
+                    </div>
+                </a>
+                <div class="prompt-btn0 tryagain btn-y">
+                    <img class="tryagain_img0" src="img/tryagain.png" />
+                </div>
             </div>
         </div>
         <div class="err-prompt err-205 hide">
-            <div class="txt">
-                <p>咦，你似乎还没</p>
-                <p>有评教哦</p>
+            <!-- 未评教 -->
+            <div class="txt205">
+                <div class="pingjiao">
+                    <img class="chengji_img" src="img/pingjiao.png" />
+                </div>
             </div>
-            <img src="img/err-2.png" />
+            <img class="img-home2" src="img/err-2.png" />
             <div class="btn-border">
-                <div class="prompt-btn btn-g">再试一下</div>
+                <div class="prompt-btn205 btn-g">
+                    <img class="tryagain_img" src="img/tryagain.png" />
+                </div>
             </div>
 
         </div>
         <div class="err-prompt err-403 hide">
+            <!-- 账号密码有错 -->
             <div class="txt txt-24">
-                <p>糟糕 账号和密码</p>
-                <p>似乎对不上号呢</p>
+                <div class="zhanghao_div">
+                    <img class="zhanghao" src="img/zhanghao.png" />
+                </div>
             </div>
-            <img src="img/err-3.png" />
+            <img class="img-home403" src="img/err-3.png" />
             <div class="btn-border">
-                <div class="prompt-btn binding btn-g">重新绑定</div>
+                <div class="prompt-btn binding btn-g">
+                    <img class="tryagain_img" src="img/tryagain_mima.png" />
+                </div>
             </div>
 
         </div>
         <div class="err-prompt err-404 hide">
+            <!-- 教务系统出错 -->
             <div class="txt txt-26">
-                <p>教务系统出错了</p>
-                <p>吓得我哑铃都掉了</p>
+                <div class="jiaowuxitong_1">
+                    <img class="jiaowuxitong" src="img/jiaowuxitong.png" />
+                </div>
             </div>
-            <img src="img/err-4.png" />
+            <img class="img-home4" src="img/err-4.png" />
             <div class="btn-border">
-                <div class="prompt-btn tryagain btn-g">再试一下</div>
+                <div class="prompt-btn_4 tryagain btn-g">
+                    <img class="tryagain_img4" src="img/tryagain.png" />
+                </div>
             </div>
 
         </div>
         <div class="err-prompt err-407 hide ">
+            <!-- 账号未绑定 -->
             <div class="txt">
-                <p>嗨 你似乎没有</p>
-                <p>绑定账号哦</p>
+                <div class="imgery-407">
+                    <img class="err-407-img" src="img/bangding.png" />
+                </div>
             </div>
-            <img src="img/err-5.png" />
+            <img class="img-home5" src="img/err-5.png" />
             <div class="btn-border">
-                <div class="prompt-btn binding btn-y">绑定账号</div>
+                <div class="prompt-btn binding btn-y">
+                    <img class="tryagain_img" src="img/tryagain.png" />
+                </div>
             </div>
 
         </div>
         <div class="err-prompt err-500 hide">
-            <div class="txt-r txt">
-                <p>程序员正在努力</p>
-                <p>修复中…</p>
+            <!-- 程序员在修复 -->
+            <div class="txt-r txt txt-500">
+                <div class="err-500-pos">
+                    <img class="err-500-img" src="img/xiufu.png" />
+                </div>
             </div>
-            <img src="img/err-6.png" />
+            <img class="img-home6" src="img/err-6.png" />
             <div class="btn-border">
-                <div class="prompt-btn tryagain btn-y">再试一下</div>
+                <div class="prompt-btn6 tryagain btn-y">
+                    <img class="tryagain_img" src="img/tryagain.png" />
+                </div>
             </div>
 
         </div>
         <div class="err-prompt loading">
             <div class="txt">
-                <p>刮刮乐正在</p>
-                <p>向你跑来…</p>
+                <div class="shouye">
+                    <img class="shouye_img" src="img/shouye.png" />
+                </div>
             </div>
-            <img src="img/err-7.png" />
+            <img class="img-loading" src="img/err-7.png" />
         </div>
     </div>
-    <script src="js/lib/jquery-1.11.3.min.js">
-    </script>
-    <script src="js/page/canvas-20180531.js">
-    </script>
-
+    <script src="js/lib/jquery-1.11.3.min.js"></script>
+    <script src="js/page/canvans-20181128.js"></script>
 </body>
 
 </html>

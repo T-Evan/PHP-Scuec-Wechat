@@ -485,8 +485,8 @@ class AccountInfoController extends Controller
                         [
                             'title' => '成绩刮刮乐: 您有新成绩!',
                             'description' => '新成绩来啦, 请做好心理准备。回复“关闭刮刮乐”可以直接查看成绩。',
-                            'url' => config('app.base_url')."/scratchoff/index.html?ver=6.0&openid={$openid}",
-                            'image' => config('app.base_url').'/scratchoff/img/pictures/picture2.png',
+                            'url' => config('app.base_url')."/scratchoff_v6/index.html?ver=7.0&openid={$openid}",
+                            'image' => config('app.base_url').'/scratchoff_v6/img/pictures/picture2.png',
                         ]
                     ),
                 ];
@@ -496,8 +496,8 @@ class AccountInfoController extends Controller
                         [
                             'title' => '成绩刮刮乐',
                             'description' => '点击图文即可进入成绩刮刮乐。回复"关闭刮刮乐"可以直接查看成绩，回复"刮刮乐"并点击页面下方开关可再次打开该功能',
-                            'url' => config('app.base_url')."/scratchoff/index.html?ver=6.0&openid={$openid}",
-                            'image' => config('app.base_url').'/scratchoff/img/pictures/picture2.png',
+                            'url' => config('app.base_url')."/scratchoff_v6/index.html?ver=6.0&openid={$openid}",
+                            'image' => config('app.base_url').'/scratchoff_v6/img/pictures/picture2.png',
                         ]
                     ),
                 ];
@@ -520,7 +520,7 @@ class AccountInfoController extends Controller
                 .'，学分: '.$item['credits']
                 .'，班级排名: '.$item['rank']."\n";
         }
-        $courseStr .= "\n<a href=\"".config('app.base_url')."/scratchoff/index.html?ver=6.0&openid={$openid}\">刮刮乐，玩儿心跳</a>";
+        $courseStr .= "\n<a href=\"".config('app.base_url')."/scratchoff_v6/index.html?ver=6.0&openid={$openid}\">刮刮乐，玩儿心跳</a>";
         $courseStr .= "\n成绩信息更新于：".$arrScore['update_time'];
 
         return $courseStr;
