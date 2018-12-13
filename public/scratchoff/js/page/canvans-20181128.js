@@ -37,6 +37,7 @@ $(document).ready(function () {
             // ctx.fillRect(0, 0, 2 * CanvasWidth, 2 * CanvasHeight);
             ctx.drawImage(img, 0, 0, CanvasWidth, CanvasHeight);
         }
+
     }
 
     function clearShadow() {
@@ -65,7 +66,9 @@ $(document).ready(function () {
                     offsetY = Math.floor(_this.offset().top);
                 var x = (e.clientX + document.body.scrollLeft || e.pageX) - offsetX || 0,
                     y = (e.clientY + document.body.scrollTop || e.pageY) - offsetY || 0;
-                if (x > 15) { x = x + 15; };
+                if (x > 15) {
+                    x = x + 15;
+                };
                 with (ctx) {
                     beginPath();
                     arc(x, y, 15, 0, Math.PI * 2);
@@ -74,6 +77,8 @@ $(document).ready(function () {
                         if (_this.attr("data-ok") !== "ok") {
                             var openId = getUrlParam("openid");
                             var className = _this.parent().parent().children("h1").text(); //TODO
+
+
                             $.ajax({ // 擦除成功 发送参数
                                 url: 'api.php',
                                 type: 'POST',
@@ -83,17 +88,28 @@ $(document).ready(function () {
                                     act: 'checked',
                                     data: className
                                 },
+                                success: function (res) {
+                                    // console.log("保存成功的效果");
+                                },
+                                error: function (err) {
+                                    console.log(err);
+                                    // console.log("请求发送失败！");
+                                }
                             });
+                            console.log("saved");
                             //触发特效
                             setTimeout(() => {
                                 hua("hua", _this.parent().children().attr("data-scroeNum"));
                                 badImg(_this.parent().children().attr("data-scroeNum"));
                             }, 1200); //
                         };
+
                         if (!_this.prop("data-ok")) {
                             _this.attr("data-ok", "ok");
                         };
+
                     };
+
                     fillHtml();
                 }
             }
@@ -135,12 +151,15 @@ $(document).ready(function () {
     function fillHtml() {
         // console.log("技术支持：比特工场。欢迎有互联网梦想的同学加入我们！")
         let openId = getUrlParam("openid");
-        let apiURL = 'https://wechat3.stuzone.com/api/students/ssfw/score/' + openId;
+        let apiURL = "https://wechat3.stuzone.com/api/students/ssfw/score/" + openId;
         $.ajax({
             url: apiURL,
             type: 'POST',
             dataType: 'json',
             timeout: 15000,
+            data: {
+                openid: openId
+            },
         }).done(function aa(res) {
             if (res.status == 200) {
                 var cardLi = "",
@@ -338,7 +357,7 @@ $(document).ready(function () {
     // 黑历史
     $(".toBlack").click(() => {
         var openId = getUrlParam("openid");
-        var url = "../black.html?openid=" + openId;
+        var url = "black.html?openid=" + openId;
         window.location.href = url;
     });
 
@@ -407,6 +426,7 @@ $(document).ready(function () {
                     },
                 });
             }
+
 
             function drawScreen() {
                 //利用数组产生碎片
