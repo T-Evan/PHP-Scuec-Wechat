@@ -636,12 +636,14 @@ class AccountInfoController extends Controller
             if (empty($request->act)) {
                 $score_cache = $redis->get('score_'.$openid);
                 //将json转换为前端需要的格式
-                $new_score_array = json_decode($score_cache);
+                $new_score_array = json_decode($score_cache, true);
+                if (!$new_score_array)
+                    $new_score_array = [];
                 $checked_score_array = $redis->lRange("user:{$openid}:score:checked", 0, -1);
                 $black_score_array = $redis->hgetall("user:{$openid}:score:hidden");
                 foreach ($new_score_array as $key => $value) {
-                    $value->hidden = key_exists($value->name, $black_score_array) ? true : false;
-                    $value->is_checked = in_array($value->name, $checked_score_array) ? true : false;
+                    $value['hidden'] = key_exists($value->name, $black_score_array) ? true : false;
+                    $value['is_checked'] = in_array($value->name, $checked_score_array) ? true : false;
                 }
                 $new_score_array = array('status' => 200, 'data' => $new_score_array);
                 echo json_encode($new_score_array);
