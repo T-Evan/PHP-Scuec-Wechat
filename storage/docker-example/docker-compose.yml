@@ -1,0 +1,34 @@
+version: '3'
+services:
+    web:
+        build: ./docker
+        container_name: wechat
+        volumes:
+            - "./app:/var/www"
+        working_dir: "/var/www"
+        environment:
+            WEBROOT: "/var/www"
+            VIRTUAL_NETWORK: "http-servers"
+            VIRTUAL_HOST: "wechat.uliuli.fun"
+            LETSENCRYPT_HOST: "wechat.uliuli.fun"
+            LETSENCRYPT_EMAIL: "loopist@outlook.com"
+            DB_CONNECTION: "mysql"
+            DB_HOST: "blog_mysql"
+            DB_DATABASE: "wechat"
+            DB_USER: "root"
+            DB_PORT: 3306
+            DB_PASSWORD: "233233"
+            REDIS_HOST: "public-redis"
+            REDIS_PORT: 6379
+            REDIS_PASSWORD: ""
+            SKIP_COMPOSER: 1
+        networks:
+            iteration:
+            http-group:
+networks:
+    iteration:
+        external:
+            name: iscuecer
+    http-group:
+        external:
+            name: http-servers
