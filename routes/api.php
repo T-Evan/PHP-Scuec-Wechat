@@ -47,3 +47,5 @@ $api->version('v1', function (\Dingo\Api\Routing\Router $api) {
         });
     });
 });
+
+$api->get('accessToken', 'App\Http\Controllers\Api\BaseAPIController@getAccessToken');
