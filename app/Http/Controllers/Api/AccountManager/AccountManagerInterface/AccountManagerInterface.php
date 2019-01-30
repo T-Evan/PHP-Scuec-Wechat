@@ -32,5 +32,5 @@ interface AccountManagerInterface
 
     public function validateAccount(BaseAccount $account): AccountValidationResult;
 
-    public function getCookie(string $openid): CookieJar;
+    public function getCookie(string $openid);
 }

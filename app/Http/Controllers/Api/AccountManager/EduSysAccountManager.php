@@ -124,7 +124,7 @@ class EduSysAccountManager implements AccountManagerInterface
      * @throws GuzzleException
      * @throws AccountValidationFailedException
      */
-    public function getCookie(string $openid): CookieJar
+    public function getCookie(string $openid)
     {
         $cookieString = Redis::connection('default')->get(self::getSSFWRedisKey($openid));
         if ($cookieString) {
