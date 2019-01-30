@@ -9,6 +9,7 @@
 namespace App\Http\Service;
 
 use EasyWeChat\Kernel\Messages\NewsItem;
+use Illuminate\Support\Facades\Log;
 
 class OuterApiService
 {
@@ -111,19 +112,20 @@ class OuterApiService
     public static function translate($word)
     {
         if (strlen($word)) {
-            $host = 'http://jisuzxfy.market.alicloudapi.com';
-            $path = '/translate/translate';
+            $host = 'https://transsz.xiaohuaerai.com';
+            $path = '/transsz';
             //根据字段是否为中文判断翻译类型
             if (preg_match("/[\x7f-\xff]/", $word)) {
-                $querys = "from=zh-CN&text=$word&to=en&type=baidu";
+                $querys = "d=en&q=$word&s=zh";
             } else {
-                $querys = "from=en&text=$word&to=zh-CN&type=baidu";
+                $querys = "d=zh&q=$word&s=en";
             }
-            $url = $host.$path.'?'.$querys;
-            $result = json_decode(OuterApiService::apiCurlGet($url), true);
-            if ('0' == $result['status']) {
-                $trans_word = $result['result']['result']; //取出翻译结果
-                $content = 'baidu翻译结果: '.strip_tags($trans_word);
+            $url = $host.$path;
+            $result = json_decode(self::apiCurlPost($url, $querys), true);
+
+            if (200 == $result['status']) {
+                $trans_word = $result['msg']; //取出翻译结果
+                $content = strip_tags($trans_word);
             } else {
                 $content = '出现错误，你可以稍后再试或把问题反馈给我们。';
             }
@@ -154,13 +156,20 @@ class OuterApiService
         array_push($headers, 'Authorization:APPCODE '.config('outapi.ali_APPCODE'));
         //根据API的要求，定义相对应的Content-Type
         array_push($headers, 'Content-Type'.':'.'application/x-www-form-urlencoded; charset=UTF-8');
+
         $curl = curl_init();
+
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_FAILONERROR, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $bodys);
+        if (1 == strpos("$".$url, "https://"))
+        {
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        }
 
         return curl_exec($curl);
     }
