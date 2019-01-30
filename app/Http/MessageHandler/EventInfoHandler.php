@@ -97,6 +97,11 @@ class EventInfoHandler implements EventHandlerInterface
                     $handler = new PhysicalExperimentController();
                     return $this->replyHandle($handler, 'handle');
                     break;
+                case 'score':
+                    $account = new AccountInfoController();
+                    $content = $this->replyHandle($account, 'getScoreMessage');
+
+                    return $content;
                 default:
                     $content = '亲，你按到火星上去了！/::L';
 
