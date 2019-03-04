@@ -20,10 +20,6 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-    'log' => env('APP_LOG', 'daily'),
-
-    'log_level' => env('APP_LOG_LEVEL', 'debug'),
-
     //应用内常用环境变量
 
     'openid_regex' => env('OPENID_REGEX', null),

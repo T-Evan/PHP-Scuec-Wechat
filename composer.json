@@ -8,9 +8,9 @@
         "php": ">=7.0.0",
         "ext-json": "^1.6",
         "dingo/api": "2.0.0-alpha2",
-        "fideloper/proxy": "~3.3",
+        "fideloper/proxy": "~4.0",
         "guzzlehttp/guzzle": "^6.3",
-        "laravel/framework": "5.5.*",
+        "laravel/framework": "5.6.*",
         "laravel/tinker": "~1.0",
         "overtrue/laravel-lang": "~3.0",
         "overtrue/laravel-wechat": "~4.0",
@@ -26,7 +26,7 @@
         "filp/whoops": "~2.0",
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "~1.0",
-        "phpunit/phpunit": "~6.0",
+        "phpunit/phpunit": "~7.0",
         "symfony/thanks": "^1.0"
     },
     "autoload": {
