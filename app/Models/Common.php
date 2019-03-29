@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Monolog\Logger;
 
 class Common extends Model
 {
@@ -37,8 +38,7 @@ class Common extends Model
     {
         $common = app('wechat_common');
         $openid = $common->openid;
-        Log::useDailyFiles(storage_path('logs/error.log'));
-        Log::error('openid：'.$openid.' error：'.$message);
+        Log::channel('error')->error('openid：'.$openid.' error：'.$message);
     }
 
     /**
@@ -50,8 +50,7 @@ class Common extends Model
     {
         $common = app('wechat_common');
         $openid = $common->openid;
-        Log::useDailyFiles(storage_path('logs/call.log'));
-        Log::info('openid：'.$openid.' error：'.$message);
+        Log::channel('call')->info('openid：'.$openid.' error：'.$message);
     }
 
     public static function getWrong()
