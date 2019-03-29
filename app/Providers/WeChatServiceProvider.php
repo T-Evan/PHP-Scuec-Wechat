@@ -11,6 +11,7 @@ use EasyWeChat\Factory;
 use Config;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\BufferHandler;
+use Monolog\Logger;
 
 class WeChatServiceProvider extends ServiceProvider
 {
@@ -57,7 +58,7 @@ class WeChatServiceProvider extends ServiceProvider
             $handler->setFormatter(
                 new LineFormatter("[%datetime%]%level_name% %message% %context% %extra%\n", 'i:s', true, true)
             );
-            $monolog = Log::getMonolog();
+            $monolog = new Logger(config('logging.daily'));
             $monolog->pushHandler(new BufferHandler($handler));
             return $monolog;
         });
