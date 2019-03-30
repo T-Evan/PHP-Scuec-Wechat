@@ -165,7 +165,7 @@ class AccountInfoController extends Controller
         }
         if (200 == $timetable['status']) {
             /* 课表index以周一为0, so $currDay ranges from 0 to 6 */
-            $currDay = intval(date('N')) - 1;
+            $currDay = intval(date('N')) - 2;
             $currWeek = SchoolDatetime::getSchoolWeek();
             /* 处理课程信息 */
             $currDayTable = $timetable['data']['timetable'][$currDay] ?? [];
@@ -351,8 +351,8 @@ class AccountInfoController extends Controller
             // $extraInfo = "\n- 遇到课表错误，记得@程序员反馈哦\n".$updateDateStr;
 
             // BEGIN OF APRIL FOOL CODE BLOCKS
-            $update_time = "\n\n课表更新于：".$timetable['update_time'];
-            $extraInfo = "\n- 要查询所有课程，请查看一周课表\n".$updateDateStr;
+            $update_time = "课表更新于：".$timetable['update_time'];
+           /* $extraInfo = "\n- 要查询所有课程，请查看一周课表\n".$updateDateStr;
             // END OF APRIL FOOL CODE BLOCKS
             $news = [
                 new NewsItem(
@@ -362,7 +362,12 @@ class AccountInfoController extends Controller
                         'url' => config('app.base_url').'/schedule/index.html?openid='.$openid,
                     ]
                 ),
-            ];
+            ];*/
+            $timeTableLink = '<a href="'.config('app.base_url').'/schedule/index.html?openid='.
+                $openid.'">   〖一周课表〗</a>';
+            $extraInfo = "\n- 要查询所有课程，请查看".$timeTableLink.$updateDateStr;
+            $news = $dateString."\n\n".
+                $replyText.$adjInfoString.$nextDayCoursePrompt.$update_time.$extraInfo;
         } else {
             $news = '出现了一些小问题，你可以稍后再试一次。';
         }

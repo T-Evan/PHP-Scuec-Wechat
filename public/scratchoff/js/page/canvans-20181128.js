@@ -151,7 +151,7 @@ $(document).ready(function () {
     function fillHtml() {
         // console.log("技术支持：比特工场。欢迎有互联网梦想的同学加入我们！")
         let openId = getUrlParam("openid");
-        let apiURL = "https://wechat3.stuzone.com/api/students/ssfw/score/" + openId;
+        let apiURL = "https://bit-wechat.uliuli.fun/api/students/ssfw/score/" + openId;
         $.ajax({
             url: apiURL,
             type: 'POST',

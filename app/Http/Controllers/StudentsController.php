@@ -98,7 +98,7 @@ class StudentsController extends Controller
     public function test()
     {
         $student = new AccountInfoController();
-        $student->getTableMessage();
+        dd($student->getTableMessage());
     }
 
     /**
