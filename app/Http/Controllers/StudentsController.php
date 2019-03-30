@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\AccountInfoController;
 use App\Http\Controllers\Api\AccountInfoDetailController;
 use App\Http\Controllers\Api\AccountManager\AccountManagerFactory;
 use App\Http\Controllers\Api\AccountManager\BaseAccount;
@@ -96,8 +97,8 @@ class StudentsController extends Controller
 
     public function test()
     {
-        $student = new AccountInfoDetailController();
-        $student->getMoney();
+        $student = new AccountInfoController();
+        $student->getTableMessage();
     }
 
     /**

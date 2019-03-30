@@ -34,7 +34,8 @@ class AccountService
             $this->openid = $this->message['FromUserName'] ?? null;
         } else {
             // for local environment
-            $this->openid = 'oULq3utesttesttesttesttest13';
+            app('wechat_common')->openid = 'oCA4T1testtesttesttesttest13';
+            $this->openid = 'oCA4T1testtesttesttesttest13';
             if (!StudentInfo::where('openid', $this->openid)->first()) {
                 $student = new StudentInfo();
                 $student->openid = $this->openid;

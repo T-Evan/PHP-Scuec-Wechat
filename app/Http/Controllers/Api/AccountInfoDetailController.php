@@ -112,10 +112,10 @@ class AccountInfoDetailController extends Controller
         $redis = Redis::connection('timetable');
         $timetable_cache = $redis->get('timetable_'.$openid);
         if (!empty($timetable_cache)) {
-            $pass_time = config('app.timetable_cache_time') - $redis->ttl('timetable_'.$openid); //已缓存了多久
+            $pass_time = config('app.timetable_cache_time') - $redis->ttl('timetable_' . $openid); //已缓存了多久
             $timetable = array(
                 'status' => 200,
-                'message' => __CLASS__.': get timetable successfully',
+                'message' => __CLASS__ . ': get timetable successfully',
                 'data' => json_decode($timetable_cache, true),
                 'update_time' => Carbon::now()->subSeconds($pass_time)->diffForHumans(),
             );
@@ -406,6 +406,7 @@ class AccountInfoDetailController extends Controller
                 $is_new = $this->isNewScoreExists($openid, $redis, count($course));
             }
         }
+        dd($course);
         $redis->setex('score_'.$openid, config('app.score_cache_time'), json_encode($course)); //缓存考试两小时
         return array(
             'status' => 200,
