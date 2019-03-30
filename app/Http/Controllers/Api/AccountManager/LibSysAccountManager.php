@@ -69,7 +69,7 @@ class LibSysAccountManager implements AccountManagerInterface
         return new AccountValidationResult($failed, $statusCode, $res_array['cookie'], $returnMsg);
     }
 
-    public function getCookie(string $openid): CookieJar
+    public function getCookie(string $openid): ?CookieJar
     {
         $redisKey = self::getLibRedisKey($openid);
         $cookieCache = self::redisConn()->get($redisKey);
